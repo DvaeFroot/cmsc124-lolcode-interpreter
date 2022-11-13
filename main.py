@@ -30,7 +30,7 @@ def save_file():
     window.title(f"Text Editor Application - {filepath}")
 
 window = tk.Tk()
-window.title("Text Editor Application")
+window.title("LOLCODE INTERPRETER")
 window.columnconfigure(0, weight=1)
 
 #Frame for upper subwindows
@@ -93,5 +93,48 @@ tbl_lex.heading('Classification', text="Classification",anchor=CENTER)
 sb_lex.config(command=tbl_lex.yview)
 
 tbl_lex.pack()
+
+#Frame for Symbol table
+fr_sym = tk.Frame(fr_tokens)
+fr_sym.grid(row=0, column=1, sticky=N)
+
+lb_sym = tk.Label(fr_sym,text="Symbol Table")
+lb_sym.pack()
+
+#Table for Lexemes
+sb_sym = Scrollbar(fr_sym)
+sb_sym.pack(side=RIGHT,fill=Y)
+
+tbl_sym = ttk.Treeview(fr_sym, yscrollcommand=sb_sym.set)
+tbl_sym['columns'] = ('Identifier', 'Value')
+
+tbl_sym.column('#0', width=0, stretch=NO)
+tbl_sym.column('Identifier', anchor=CENTER, width=200)
+tbl_sym.column('Value', anchor=CENTER, width=200)
+
+tbl_sym.heading('#0', text="",anchor=CENTER)
+tbl_sym.heading('Identifier', text="Identifier",anchor=CENTER)
+tbl_sym.heading('Value', text="Value",anchor=CENTER)
+
+sb_sym.config(command=tbl_sym.yview)
+
+tbl_sym.pack()
+
+#Execute Button
+btn_execute = tk.Button(fr_run, text="EXECUTE")
+btn_execute.pack()
+
+#Console
+sb_consoley = Scrollbar(fr_run)
+sb_consoley.pack(side=RIGHT,fill=Y)
+sb_consolex = Scrollbar(fr_run,orient=HORIZONTAL)
+sb_consolex.pack(side=BOTTOM,fill=X)
+
+txt_console = tk.Text(fr_run, width=155, state=DISABLED, wrap=NONE, yscrollcommand=sb_consoley.set, xscrollcommand=sb_consolex.set)
+txt_console.pack()
+
+sb_consoley.config(command=txt_console.yview)
+sb_consolex.config(command=txt_console.xview)
+
 
 window.mainloop()
