@@ -14,7 +14,7 @@ def open_file():
     with open(filepath, "r") as input_file:
         text = input_file.read()
         txt_edit.insert(tk.END, text)
-    window.title(f"Text Editor Application - {filepath}")
+    window.title(f"LOLCODE INTERPRETER - {filepath}")
 
 def save_file():
     """Save the current file as a new file."""
@@ -27,7 +27,7 @@ def save_file():
     with open(filepath, "w") as output_file:
         text = txt_edit.get(1.0, tk.END)
         output_file.write(text)
-    window.title(f"Text Editor Application - {filepath}")
+    window.title(f"LOLCODE INTERPRETER - {filepath}")
 
 window = tk.Tk()
 window.title("LOLCODE INTERPRETER")
@@ -72,14 +72,14 @@ sb_editx.config(command=txt_edit.xview)
 fr_lex = tk.Frame(fr_tokens)
 fr_lex.grid(row=0, column=0, sticky=N)
 
-lb_lex = tk.Label(fr_lex,text="Lexemes")
+lb_lex = tk.Label(fr_lex,text="Lexemes", pady=5)
 lb_lex.pack()
 
 #Table for Lexemes
 sb_lex = Scrollbar(fr_lex)
 sb_lex.pack(side=RIGHT,fill=Y)
 
-tbl_lex = ttk.Treeview(fr_lex, yscrollcommand=sb_lex.set)
+tbl_lex = ttk.Treeview(fr_lex, yscrollcommand=sb_lex.set, height=11)
 tbl_lex['columns'] = ('Lexeme', 'Classification')
 
 tbl_lex.column('#0', width=0, stretch=NO)
@@ -98,14 +98,14 @@ tbl_lex.pack()
 fr_sym = tk.Frame(fr_tokens)
 fr_sym.grid(row=0, column=1, sticky=N)
 
-lb_sym = tk.Label(fr_sym,text="Symbol Table")
+lb_sym = tk.Label(fr_sym,text="Symbol Table", pady=5)
 lb_sym.pack()
 
 #Table for Lexemes
 sb_sym = Scrollbar(fr_sym)
 sb_sym.pack(side=RIGHT,fill=Y)
 
-tbl_sym = ttk.Treeview(fr_sym, yscrollcommand=sb_sym.set)
+tbl_sym = ttk.Treeview(fr_sym, yscrollcommand=sb_sym.set, height=11)
 tbl_sym['columns'] = ('Identifier', 'Value')
 
 tbl_sym.column('#0', width=0, stretch=NO)
