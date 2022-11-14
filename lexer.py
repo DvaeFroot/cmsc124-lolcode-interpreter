@@ -112,6 +112,12 @@ class Lexer(object):
 
 if __name__ == '__main__':
     rules = [
+        # litereal
+        ('\".*\"',             'YARN'),
+        ('TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE', 'TYPE'),
+        ('WIN|FAIL',           'TROOF'),
+        ('-?\d+.\d+',          'NUMBAR'),
+        ('0|-?[1-9][0-9]*',    'NUMBR'),
         # keywords
         ('IF\sU\sSAY\sSO', 'IF U SAY SO'),
         ('IM\sOUTTA\sYR', 'IM OUTTA YR'),
@@ -164,12 +170,6 @@ if __name__ == '__main__':
         ('YR', 'YR'),
         ('A', 'A'),
         ('R', 'R'),
-        # litereal
-        ('TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE', 'TYPE'),
-        ('WIN|FAIL',           'TROOF'),
-        ('\".*\"',             'YARN'),
-        ('-?\d+.\d+',          'NUMBAR'),
-        ('0|-?[1-9][0-9]*',    'NUMBR'),
         #  identifier
         ('[a-z][a-z0-9_]+',    'IDENTIFIER'),
 
@@ -189,6 +189,8 @@ if __name__ == '__main__':
     VISIBLE food
     VISIBLE biz
     VISIBLE bird
+    "HAI"
+    "KTHXBYE"
     KTHXBYE
     """)
 
