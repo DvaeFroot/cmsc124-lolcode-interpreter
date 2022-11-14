@@ -6,6 +6,7 @@ class Token(object):
     """ A simple Token structure.
         Contains the token type, value and position.
     """
+
     def __init__(self, type, val, pos):
         self.type = type
         self.val = val
@@ -20,6 +21,7 @@ class LexerError(Exception):
         pos:
             Position in the input line where the error occurred.
     """
+
     def __init__(self, pos):
         self.pos = pos
 
@@ -28,6 +30,7 @@ class Lexer(object):
     """ A simple regex-based lexer/tokenizer.
         See below for an example of usage.
     """
+
     def __init__(self, rules, skip_whitespace=True):
         """ Create a lexer.
             rules:
@@ -102,25 +105,92 @@ class Lexer(object):
         """
         while 1:
             tok = self.token()
-            if tok is None: break
+            if tok is None:
+                break
             yield tok
 
 
 if __name__ == '__main__':
     rules = [
-        ('\d+',             'NUMBER'),
-        ('[a-zA-Z_]\w+',    'IDENTIFIER'),
-        ('\+',              'PLUS'),
-        ('\-',              'MINUS'),
-        ('\*',              'MULTIPLY'),
-        ('\/',              'DIVIDE'),
-        ('\(',              'LP'),
-        ('\)',              'RP'),
-        ('=',               'EQUALS'),
+        # keywords
+        ('IF\sU\sSAY\sSO', 'IF U SAY SO'),
+        ('IM\sOUTTA\sYR', 'IM OUTTA YR'),
+        ('QUOSHUNT\sOF', 'QUOSHUNT OF'),
+        ('PRODUKT\sOF', 'PRODUKT OF'),
+        ('BOTH\sSAEM', 'BOTH SAEM'),
+        ('EITHER\sOF', 'EITHER OF'),
+        ('HOW\sIZ\sI', 'HOW IZ I'),
+        ('IM\sIN\sYR', 'IM IN YR'),
+        ('IS\sNOW\sA', 'IS NOW A'),
+        ('SMALLR\sOF', 'SMALLR OF'),
+        ('BIGGR\sOF', 'BIGGR OF'),
+        ('I\sHAS\sA', 'I HAS A'),
+        ('BOTH\sOF', 'BOTH OF'),
+        ('DIFF\sOF', 'DIFF OF'),
+        ('DIFFRINT', 'DIFFRINT'),
+        ('O\sRLY\?', 'O RLY?'),
+        ('ALL\sOF', 'ALL OF'),
+        ('ANY\sOF', 'ANY OF'),
+        ('KTHXBYE', 'KTHXBYE'),
+        ('MOD\sOF', 'MOD OF'),
+        ('NO\sWAI', 'NO WAI'),
+        ('SUM\sOF', 'SUM OF'),
+        ('VISIBLE', 'VISIBLE'),
+        ('WON\sOF', 'WON OF'),
+        ('YA\sRLY', 'YA RLY'),
+        ('GIMMEH', 'GIMMEH'),
+        ('NERFIN', 'NERFIN'),
+        ('OMGWTF', 'OMGWTF'),
+        ('SMOOSH', 'SMOOSH'),
+        ('FOUND', 'FOUND'),
+        ('I\sIZ', 'I IZ'),
+        ('MEBBE', 'MEBBE'),
+        ('UPPIN', 'UPPIN'),
+        ('WTF\?', 'WTF?'),
+        ('GTFO', 'GTFO'),
+        ('MAEK', 'MAEK'),
+        ('MKAY', 'MKAY'),
+        ('OBTW', 'OBTW'),
+        ('TLDR', 'TLDR'),
+        ('WILE', 'WILE'),
+        ('BTW', 'BTW'),
+        ('HAI', 'HAI'),
+        ('ITZ', 'ITZ'),
+        ('NOT', 'NOT'),
+        ('OIC', 'OIC'),
+        ('OMG', 'OMG'),
+        ('TIL', 'TIL'),
+        ('AN', 'AN'),
+        ('YR', 'YR'),
+        ('A', 'A'),
+        ('R', 'R'),
+        # litereal
+        ('TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE', 'TYPE'),
+        ('WIN|FAIL',           'TROOF'),
+        ('\".*\"',             'YARN'),
+        ('-?\d+.\d+',          'NUMBAR'),
+        ('0|-?[1-9][0-9]*',    'NUMBR'),
+        #  identifier
+        ('[a-z][a-z0-9_]+',    'IDENTIFIER'),
+
     ]
 
     lx = Lexer(rules, skip_whitespace=True)
-    lx.input('erw = _abc + 12*(R4-623902)  ')
+    lx.input("""
+    HAI 1.2
+    BTW this is how we declare variables
+    I HAS A food
+    I HAS A bird
+    BTW this is how we assign variables
+    food R 1
+    bird R 5
+    BTW this is how initialize variables
+    I HAS A biz ITZ "OMG!"
+    VISIBLE food
+    VISIBLE biz
+    VISIBLE bird
+    KTHXBYE
+    """)
 
     try:
         for tok in lx.tokens():
