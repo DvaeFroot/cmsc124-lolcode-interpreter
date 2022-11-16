@@ -1,3 +1,4 @@
+#Forked from https://gist.github.com/eliben/5797351
 import re
 import sys
 
@@ -52,12 +53,18 @@ class Lexer(object):
         self.group_type = {}
 
         for regex, type in rules:
+            #Define the name of the group
             groupname = 'GROUP%s' % idx
+            #Define Capture Groupname and the corresponding regex
             regex_parts.append('(?P<%s>%s)' % (groupname, regex))
+            #Define the type of the groupname
             self.group_type[groupname] = type
             idx += 1
 
+        #This is where all the rules get compiled separated by '|'. This is the only regex that will be used for checking Lexemes
         self.regex = re.compile('|'.join(regex_parts))
+
+        #For white space checking
         self.skip_whitespace = skip_whitespace
         self.re_ws_skip = re.compile('\S')
 
@@ -78,28 +85,39 @@ class Lexer(object):
         if self.pos >= len(self.buf):
             return None
         else:
+            #This one can just be omitted. It's only used if we try to skip whitespaces
             if self.skip_whitespace:
+                #Get the first space from starting position
                 m = self.re_ws_skip.search(self.buf, self.pos)
 
                 if m:
+                    #Get new starting position for regex searching
                     self.pos = m.start()
                 else:
+                    #No match means end of file
                     return None
 
+            #Do regex search. This is the only codeblock needed
             m = self.regex.match(self.buf, self.pos)
             if m:
+                #Get the group that was matched
                 groupname = m.lastgroup
+                #Get the type of the token using the groupname
                 tok_type = self.group_type[groupname]
+                #Get the current token using the groupname. The actual token is in m.group(groupname)
                 tok = Token(tok_type, m.group(groupname), self.pos)
+                #Update the position
                 self.pos = m.end()
                 return tok
 
             # if we're here, no rule matched
+            # We can replace this one or outright remove it
             raise LexerError(self.pos)
 
     def tokens(self):
         """ Returns an iterator to the tokens found in the buffer.
         """
+        #Get all tokens
         while 1:
             tok = self.token()
             if tok is None: break
