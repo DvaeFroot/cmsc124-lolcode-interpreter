@@ -100,14 +100,15 @@ class Lexer(object):
                     #No match means end of file
                     return None
 
-            #Do regex search. This is the only codeblock needed
+            #Do regex match. This is the only codeblock needed
             m = self.regex.match(self.buf, self.pos)
             if m:
                 #Get the group that was matched
                 groupname = m.lastgroup
                 #Get the type of the token using the groupname
                 tok_type = self.group_type[groupname]
-                #Get the current token using the groupname. The actual token is in m.group(groupname)
+                #Get the current token using the groupname. The actual token is in m.group(groupname). 
+                #The Token class is just a struct to store information about the current token.
                 tok = Token(tok_type, m.group(groupname), self.pos)
                 #Update the position
                 self.pos = m.end()
