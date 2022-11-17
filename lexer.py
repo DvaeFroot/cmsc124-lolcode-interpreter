@@ -4,10 +4,6 @@ import sys
 
 
 class Token(object):
-    """ A simple Token structure.
-        Contains the token type, value and position.
-    """
-
     def __init__(self, type, val, pos):
         self.type = type
         self.val = val
@@ -18,39 +14,12 @@ class Token(object):
 
 
 class LexerError(Exception):
-    """ Lexer error exception.
-        pos:
-            Position in the input line where the error occurred.
-    """
-
     def __init__(self, pos):
         self.pos = pos
 
 
 class Lexer(object):
-    """ A simple regex-based lexer/tokenizer.
-        See below for an example of usage.
-    """
-
     def __init__(self, rules, skip_whitespace=True):
-        """ Create a lexer.
-            rules:
-                A list of rules. Each rule is a `regex, type`
-                pair, where `regex` is the regular expression used
-                to recognize the token and `type` is the type
-                of the token to return when it's recognized.
-            skip_whitespace:
-                If True, whitespace (\s+) will be skipped and not
-                reported by the lexer. Otherwise, you have to
-                specify your rules for whitespace, or it will be
-                flagged as an error.
-        """
-        # All the regexes are concatenated into a single one
-        # with named groups. Since the group names must be valid
-        # Python identifiers, but the token types used by the
-        # user are arbitrary strings, we auto-generate the group
-        # names and map them to token types.
-        #
         idx = 1
         regex_parts = []
         self.group_type = {}
@@ -72,19 +41,10 @@ class Lexer(object):
         self.re_ws_skip = re.compile('\S')
 
     def input(self, buf):
-        """ Initialize the lexer with a buffer as input.
-        """
         self.buf = buf
         self.pos = 0
 
     def token(self):
-        """ Return the next token (a Token object) found in the
-            input buffer. None is returned if the end of the
-            buffer was reached.
-            In case of a lexing error (the current chunk of the
-            buffer matches no rule), a LexerError is raised with
-            the position of the error.
-        """
         if self.pos >= len(self.buf):
             return None
         else:
@@ -119,8 +79,6 @@ class Lexer(object):
             raise LexerError(self.pos)
 
     def tokens(self):
-        """ Returns an iterator to the tokens found in the buffer.
-        """
         #Get all tokens
         while 1:
             tok = self.token()
@@ -132,86 +90,83 @@ class Lexer(object):
 if __name__ == '__main__':
     rules = [
         # litereal
-        ('\".*\"',             'YARN'),
-        ('TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE', 'TYPE'),
-        ('WIN|FAIL',           'TROOF'),
-        ('-?\d+.\d+',          'NUMBAR'),
-        ('0|-?[1-9][0-9]*',    'NUMBR'),
+        (r'\".*\"',                                 'YARN'),
+        (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE',    'TYPE'),
+        (r'\bWIN|FAIL',                             'TROOF'),
+        (r'\b-?\d+.\d+',                            'NUMBAR'),
+        (r'\b0|-?[1-9][0-9]*\b',                    'NUMBR'),
         # keywords
-        ('IF\sU\sSAY\sSO', 'IF U SAY SO'),
-        ('IM\sOUTTA\sYR', 'IM OUTTA YR'),
-        ('QUOSHUNT\sOF', 'QUOSHUNT OF'),
-        ('PRODUKT\sOF', 'PRODUKT OF'),
-        ('BOTH\sSAEM', 'BOTH SAEM'),
-        ('EITHER\sOF', 'EITHER OF'),
-        ('HOW\sIZ\sI', 'HOW IZ I'),
-        ('IM\sIN\sYR', 'IM IN YR'),
-        ('IS\sNOW\sA', 'IS NOW A'),
-        ('SMALLR\sOF', 'SMALLR OF'),
-        ('BIGGR\sOF', 'BIGGR OF'),
-        ('I\sHAS\sA', 'I HAS A'),
-        ('BOTH\sOF', 'BOTH OF'),
-        ('DIFF\sOF', 'DIFF OF'),
-        ('DIFFRINT', 'DIFFRINT'),
-        ('O\sRLY\?', 'O RLY?'),
-        ('ALL\sOF', 'ALL OF'),
-        ('ANY\sOF', 'ANY OF'),
-        ('KTHXBYE', 'KTHXBYE'),
-        ('MOD\sOF', 'MOD OF'),
-        ('NO\sWAI', 'NO WAI'),
-        ('SUM\sOF', 'SUM OF'),
-        ('VISIBLE', 'VISIBLE'),
-        ('WON\sOF', 'WON OF'),
-        ('YA\sRLY', 'YA RLY'),
-        ('GIMMEH', 'GIMMEH'),
-        ('NERFIN', 'NERFIN'),
-        ('OMGWTF', 'OMGWTF'),
-        ('SMOOSH', 'SMOOSH'),
-        ('FOUND', 'FOUND'),
-        ('I\sIZ', 'I IZ'),
-        ('MEBBE', 'MEBBE'),
-        ('UPPIN', 'UPPIN'),
-        ('WTF\?', 'WTF?'),
-        ('GTFO', 'GTFO'),
-        ('MAEK', 'MAEK'),
-        ('MKAY', 'MKAY'),
-        ('OBTW', 'OBTW'),
-        ('TLDR', 'TLDR'),
-        ('WILE', 'WILE'),
-        ('BTW', 'BTW'),
-        ('HAI', 'HAI'),
-        ('ITZ', 'ITZ'),
-        ('NOT', 'NOT'),
-        ('OIC', 'OIC'),
-        ('OMG', 'OMG'),
-        ('TIL', 'TIL'),
-        ('AN', 'AN'),
-        ('YR', 'YR'),
-        ('A', 'A'),
-        ('R', 'R'),
+        (r'\bIF\sU\sSAY\sSO',                       'IF U SAY SO'),
+        (r'\bIM\sOUTTA\sYR',                        'IM OUTTA YR'),
+        (r'\bQUOSHUNT\sOF',                         'QUOSHUNT OF'),
+        (r'\bPRODUKT\sOF',                          'PRODUKT OF'),
+        (r'\bBOTH\sSAEM',                           'BOTH SAEM'),
+        (r'\bEITHER\sOF',                           'EITHER OF'),
+        (r'\bHOW\sIZ\sI',                           'HOW IZ I'),
+        (r'\bIM\sIN\sYR',                           'IM IN YR'),
+        (r'\bIS\sNOW\sA',                           'IS NOW A'),
+        (r'\bSMALLR\sOF',                           'SMALLR OF'),
+        (r'\bBIGGR\sOF',                            'BIGGR OF'),
+        (r'\bI\sHAS\sA',                            'I HAS A'),
+        (r'\bBOTH\sOF',                             'BOTH OF'),
+        (r'\bDIFF\sOF',                             'DIFF OF'),
+        (r'\bDIFFRINT',                             'DIFFRINT'),
+        (r'\bO\sRLY\?',                             'O RLY?'),
+        (r'\bALL\sOF',                              'ALL OF'),
+        (r'\bANY\sOF',                              'ANY OF'),
+        (r'\bKTHXBYE',                              'KTHXBYE'),
+        (r'\bMOD\sOF',                              'MOD OF'),
+        (r'\bNO\sWAI',                              'NO WAI'),
+        (r'\bSUM\sOF',                              'SUM OF'),
+        (r'\bVISIBLE',                              'VISIBLE'),
+        (r'\bWON\sOF',                              'WON OF'),
+        (r'\bYA\sRLY',                              'YA RLY'),
+        (r'\bGIMMEH',                               'GIMMEH'),
+        (r'\bNERFIN',                               'NERFIN'),
+        (r'\bOMGWTF',                               'OMGWTF'),
+        (r'\bSMOOSH',                               'SMOOSH'),
+        (r'\bFOUND',                                'FOUND'),
+        (r'\bI\sIZ',                                'I IZ'),
+        (r'\bMEBBE',                                'MEBBE'),
+        (r'\bUPPIN',                                'UPPIN'),
+        (r'\bWTF\?',                                'WTF?'),
+        (r'\bGTFO',                                 'GTFO'),
+        (r'\bMAEK',                                 'MAEK'),
+        (r'\bMKAY',                                 'MKAY'),
+        (r'\bOBTW',                                 'OBTW'),
+        (r'\bTLDR',                                 'TLDR'),
+        (r'\bWILE',                                 'WILE'),
+        (r'\bBTW',                                  'BTW'),
+        (r'\bHAI',                                  'HAI'),
+        (r'\bITZ',                                  'ITZ'),
+        (r'\bNOT',                                  'NOT'),
+        (r'\bOIC',                                  'OIC'),
+        (r'\bOMG',                                  'OMG'),
+        (r'\bTIL',                                  'TIL'),
+        (r'\bAN',                                   'AN'),
+        (r'\bYR',                                   'YR'),
+        (r'\bA',                                    'A'),
+        (r'\bR',                                    'R'),
         #  identifier
-        ('[a-z][a-z0-9_]+',    'IDENTIFIER'),
-
+        (r'\b[a-z][a-z0-9_]+',                      'IDENTIFIER'),
     ]
 
     lx = Lexer(rules, skip_whitespace=True)
-    lx.input("""
-    HAI 1.2
-    BTW this is how we declare variables
-    I HAS A food
-    I HAS A bird
-    BTW this is how we assign variables
-    food R 1
-    bird R 5
-    BTW this is how initialize variables
-    I HAS A biz ITZ "OMG!"
-    VISIBLE food
-    VISIBLE biz
-    VISIBLE bird
-    "HAI"
-    "KTHXBYE"
-    KTHXBYE
-    """)
+    lx.input("""HAI 1.2
+BTW this is how we declare variables
+I HAS A food
+I HAS A bird
+BTW this is how we assign variables
+food R 1
+bird R 5
+BTW this is how initialize variables
+I HAS A biz ITZ "OMG!"
+VISIBLE food
+VISIBLE biz
+VISIBLE 1bird
+"HAI"
+"KTHXBYE"
+KTHXBYE""")
 
     try:
         for tok in lx.tokens():
