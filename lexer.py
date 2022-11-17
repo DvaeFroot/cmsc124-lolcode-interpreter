@@ -122,6 +122,35 @@ class Lexer(object):
             
             #Get new starting position for regex searching
             self.pos = m.start()
+        
+        #Do regex match. This is the only codeblock needed
+        m = self.regex.match(self.buf, self.pos)
+        if m:
+            groupname = m.lastgroup
+            if str(m.group(groupname)) == "BTW":
+                    newline = re.compile(r"\n")
+                    m = newline.search(self.buf, self.pos)
+
+                    if m:
+                        #Get new starting position for regex searching
+                        self.pos = m.start()
+            elif str(m.group(groupname)) == "OBTW":
+                newline = re.compile(r"TLDR")
+                m = newline.search(self.buf, self.pos)
+
+                if m:
+                    #Get new starting position for regex searching
+                    self.pos = m.start()
+            
+            #Get the first space from starting position
+            m = self.re_ws_skip.search(self.buf, self.pos)
+
+            if m == None:
+                #No match means end of file
+                return None
+            
+            #Get new starting position for regex searching
+            self.pos = m.start()
 
         #Do regex match. This is the only codeblock needed
         m = self.regex.match(self.buf, self.pos)
@@ -134,22 +163,7 @@ class Lexer(object):
             #The Token class is just a struct to store information about the current token.
             tok = Token(tok_type, m.group(groupname), self.pos)
             #Update the position
-            if str(m.group(groupname)) == "BTW":
-                newline = re.compile(r"\n")
-                m = newline.search(self.buf, self.pos)
-
-                if m:
-                    #Get new starting position for regex searching
-                    self.pos = m.start()
-            elif str(m.group(groupname)) == "OBTW":
-                newline = re.compile(r"TLDR")
-                m = newline.search(self.buf, self.pos)
-
-                if m:
-                    #Get new starting position for regex searching
-                    self.pos = m.start()
-            else:
-                self.pos = m.end()
+            self.pos = m.end()
             return tok
 
         # if we're here, no rule matched
