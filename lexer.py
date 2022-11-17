@@ -44,7 +44,7 @@ class Lexer(object):
             (r'\bBOTH\sOF\b',                             'And Operator'),
             (r'\bDIFF\sOF\b',                             'Subtraction Operator'),
             (r'\bDIFFRINT\b',                             'Not Equal Operator'),
-            (r'O\sRLY\?',                             'If conditional'),
+            (r'\bO\sRLY\?',                             'If conditional'),
             (r'\bALL\sOF\b',                              'Infinite Arity And Operator'),
             (r'\bANY\sOF\b',                              'Infinite Arity Or Operator'),
             (r'\bKTHXBYE\b',                              'Code End Delimiter'),
@@ -62,7 +62,7 @@ class Lexer(object):
             (r'\bI\sIZ\b',                                'Function Call'),
             (r'\bMEBBE\b',                                'Else If Keyword'),
             (r'\bUPPIN\b',                                'Increment Keyword'),
-            (r'\bWTF\?\b',                                'Switch Case Keyword'),
+            (r'\bWTF\?',                                'Switch Case Keyword'),
             (r'\bGTFO\b',                                 'Return Keyword with no value'),
             (r'\bMAEK\b',                                 'Typecast Keyword'),
             (r'\bMKAY\b',                                 'MKAY Keyword'),
@@ -81,7 +81,7 @@ class Lexer(object):
             (r'\bA\b',                                    'A Keyword'),
             (r'\bR\b',                                    'Value Assignment Operator'),
             #  identifier
-            (r'\b[a-zA-Z]\w+\b',                      'Variable Identifier'),
+            (r'\b[a-zA-Z]\w*\b',                      'Variable Identifier'),
         ]
         idx = 1
         regex_parts = []
