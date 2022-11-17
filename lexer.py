@@ -126,12 +126,14 @@ class Lexer(object):
         if m:
             groupname = m.lastgroup
             if str(m.group(groupname)) == "BTW":
-                    newline = re.compile(r"\n")
-                    m = newline.search(self.buf, self.pos)
+                newline = re.compile(r"\n")
+                m = newline.search(self.buf, self.pos)
 
-                    if m:
-                        #Get new starting position for regex searching
-                        self.pos = m.start()
+                if m:
+                    #Get new starting position for regex searching
+                    self.pos = m.start()
+                else:
+                    self.pos = len(self.buf)
             elif str(m.group(groupname)) == "OBTW":
                 newline = re.compile(r"TLDR")
                 m = newline.search(self.buf, self.pos)
@@ -139,6 +141,8 @@ class Lexer(object):
                 if m:
                     #Get new starting position for regex searching
                     self.pos = m.start()
+                else:
+                    self.pos = len(self.buf)
             
             #Get the first space from starting position
             m = self.regex_whitespace.search(self.buf, self.pos)
