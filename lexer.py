@@ -78,6 +78,13 @@ class Lexer(object):
                     if m:
                         #Get new starting position for regex searching
                         self.pos = m.start()
+                elif str(m.group(groupname)) == "OBTW":
+                    newline = re.compile(r"TLDR")
+                    m = newline.search(self.buf, self.pos)
+
+                    if m:
+                        #Get new starting position for regex searching
+                        self.pos = m.start()
                 else:
                     self.pos = m.end()
                 return tok
@@ -98,7 +105,7 @@ class Lexer(object):
 if __name__ == '__main__':
     rules = [
         # litereal
-        (r'\".*\"',                                   'String Literal'),
+        (r'\"[^\"]*\"',                                   'String Literal'),
         (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE\b',    'Type Literal'),
         (r'\bWIN|FAIL\b',                             'Boolean Literal'),
         (r'\b-?\d+.\d+\b',                            'Float Literal'),
