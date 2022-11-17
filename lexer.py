@@ -44,7 +44,7 @@ class Lexer(object):
             (r'\bBOTH\sOF\b',                             'And Operator'),
             (r'\bDIFF\sOF\b',                             'Subtraction Operator'),
             (r'\bDIFFRINT\b',                             'Not Equal Operator'),
-            (r'\bO\sRLY\?\b',                             'If conditional'),
+            (r'O\sRLY\?',                             'If conditional'),
             (r'\bALL\sOF\b',                              'Infinite Arity And Operator'),
             (r'\bANY\sOF\b',                              'Infinite Arity Or Operator'),
             (r'\bKTHXBYE\b',                              'Code End Delimiter'),
@@ -81,7 +81,7 @@ class Lexer(object):
             (r'\bA\b',                                    'A Keyword'),
             (r'\bR\b',                                    'Value Assignment Operator'),
             #  identifier
-            (r'\b[a-z][a-z0-9_]+\b',                      'Variable Identifier'),
+            (r'\b[a-zA-Z]\w+\b',                      'Variable Identifier'),
         ]
         idx = 1
         regex_parts = []
@@ -101,7 +101,7 @@ class Lexer(object):
 
         #For white space checking
         self.skip_whitespace = skip_whitespace
-        self.re_ws_skip = re.compile('\S')
+        self.re_ws_skip = re.compile('[^\s,]')
 
     def input(self, buf):
         self.buf = buf
@@ -167,24 +167,30 @@ class Lexer(object):
 
 if __name__ == '__main__':
     lx = Lexer()
-    lx.input("""HAI 1.2
-BTW this is how we declare variables
-I HAS A food
-I HAS A bird
-BTW this is how we assign variables
-food R 1
-bird R 5
-BTW this is how initialize variables
-I HAS A biz ITZ "OMG!"
-VISIBLE food
-VISIBLE biz
-VISIBLE bird
-"HAI"
-"KTHXBYE"
-KTHXBYE""")
+    txt = """HAI 1.2
+HOW IZ I POWERTWO YR NUM
+   BTW RETURN 1 IF 2 TO POWER OF 0
+   BOTH SAEM NUM AN 0, O RLY?
+      YA RLY, FOUND YR 1
+   OIC
+  
+   BTW CALCULATE 2 TO POWER OF NUM
+   I HAS A INDEX ITZ 0
+   I HAS A TOTAL ITZ 1
+   IM IN YR LOOP UPPIN YR INDEX TIL BOTH SAEM INDEX AN NUM
+      TOTAL R PRODUKT OF TOTAL AN 2
+   IM OUTTA YR LOOP
+  
+   FOUND YR TOTAL
+   IF U SAY SO
+   BTW OUTPUT: 8
+   VISIBLE I IZ POWERTWO YR 4 MKAY
+KTHXBYE"""
+    lx.input(txt)
 
     try:
         for tok in lx.tokens():
             print(tok)
     except LexerError as err:
         print('LexerError at position %s' % err.pos)
+    
