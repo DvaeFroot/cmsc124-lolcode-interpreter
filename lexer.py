@@ -121,7 +121,7 @@ class Lexer(object):
             #Get new starting position for regex searching
             self.pos = m.start()
         
-        #Do regex match. This is the only codeblock needed
+        #Do regex match. check for comments and skip them.
         m = self.regex.match(self.buf, self.pos)
         if m:
             groupname = m.lastgroup
@@ -167,9 +167,9 @@ class Lexer(object):
         # if we're here, no rule matched
         # We can replace this one or outright remove it
         raise LexerError(self.pos)
-
+    
     def tokens(self):
-        #Get all tokens
+        #generator to get all tokens
         while 1:
             tok = self.token()
             if tok is None:
