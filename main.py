@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import Scrollbar, ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+from lexer import *
 
 def open_file():
     """Open a file for editing."""
@@ -28,6 +29,14 @@ def save_file():
         text = txt_edit.get(1.0, tk.END)
         output_file.write(text)
     window.title(f"LOLCODE INTERPRETER - {filepath}")
+
+def getTokens():
+    """Insert tokens in the Lexemes Treeview"""
+    lx = Lexer()
+    lx.input(txt_edit.get("1.0",END))
+    for index,token in enumerate(lx.tokens()):
+        tbl_lex.insert("",'end',iid=index,
+		values=(token.val,token.type))
 
 window = tk.Tk()
 window.title("LOLCODE INTERPRETER")
@@ -121,7 +130,7 @@ sb_sym.config(command=tbl_sym.yview)
 tbl_sym.pack()
 
 #Execute Button
-btn_execute = tk.Button(fr_run, text="EXECUTE")
+btn_execute = tk.Button(fr_run, text="EXECUTE", command=getTokens)
 btn_execute.pack()
 
 #Console
