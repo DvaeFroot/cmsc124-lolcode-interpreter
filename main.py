@@ -34,6 +34,10 @@ def getTokens():
     """Insert tokens in the Lexemes Treeview"""
     lx = Lexer()
     lx.input(txt_edit.get("1.0",END))
+    # clear previous items in the lexemes treeview
+    for x in tbl_lex.get_children():
+        tbl_lex.delete(x)
+    # insert the generated tokin in the lexemes treeview
     for index,token in enumerate(lx.tokens()):
         tbl_lex.insert("",'end',iid=index,
 		values=(token.val,token.type))
