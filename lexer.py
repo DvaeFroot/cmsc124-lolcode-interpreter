@@ -71,7 +71,15 @@ class Lexer(object):
                 #The Token class is just a struct to store information about the current token.
                 tok = Token(tok_type, m.group(groupname), self.pos)
                 #Update the position
-                self.pos = m.end()
+                if str(m.group(groupname)) == "BTW":
+                    newline = re.compile(r"\n")
+                    m = newline.search(self.buf, self.pos)
+
+                    if m:
+                        #Get new starting position for regex searching
+                        self.pos = m.start()
+                else:
+                    self.pos = m.end()
                 return tok
 
             # if we're here, no rule matched
@@ -90,11 +98,11 @@ class Lexer(object):
 if __name__ == '__main__':
     rules = [
         # litereal
-        (r'\".*\"',                                 'YARN'),
-        (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE',    'TYPE'),
-        (r'\bWIN|FAIL',                             'TROOF'),
-        (r'\b-?\d+.\d+',                            'NUMBAR'),
-        (r'\b0|-?[1-9][0-9]*\b',                    'NUMBR'),
+        (r'\".*\"',                                 'String Literal'),
+        (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE',    'Type Literal'),
+        (r'\bWIN|FAIL',                             'Boolean Literal'),
+        (r'\b-?\d+.\d+',                            'Float Literal'),
+        (r'\b0|-?[1-9][0-9]*\b',                    'Integer Literal'),
         # keywords
         (r'\bIF\sU\sSAY\sSO',                       'IF U SAY SO'),
         (r'\bIM\sOUTTA\sYR',                        'IM OUTTA YR'),
@@ -148,7 +156,7 @@ if __name__ == '__main__':
         (r'\bA',                                    'A'),
         (r'\bR',                                    'R'),
         #  identifier
-        (r'\b[a-z][a-z0-9_]+',                      'IDENTIFIER'),
+        (r'\b[a-z][a-z0-9_]+',                      'Variable Identifier'),
     ]
 
     lx = Lexer(rules, skip_whitespace=True)
@@ -163,7 +171,7 @@ BTW this is how initialize variables
 I HAS A biz ITZ "OMG!"
 VISIBLE food
 VISIBLE biz
-VISIBLE 1bird
+VISIBLE bird
 "HAI"
 "KTHXBYE"
 KTHXBYE""")
