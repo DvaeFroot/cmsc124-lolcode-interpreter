@@ -7,7 +7,7 @@ from lexer import *
 def open_file():
     """Open a file for editing."""
     filepath = askopenfilename(
-        filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+        filetypes=[("LOLCode", ".lol")]
     )
     if not filepath:
         return
