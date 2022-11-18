@@ -164,6 +164,8 @@ class Lexer(object):
                     self.pos = m.start()
                 else:
                     self.pos = len(self.buf)
+                
+                return tok
 
             #Get the first space from starting position
             m = self.regex_whitespace.search(self.buf, self.pos)
