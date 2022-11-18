@@ -44,7 +44,7 @@ class Lexer(object):
             (r'\bBOTH\sOF\b',                             'And Operator'),
             (r'\bDIFF\sOF\b',                             'Subtraction Operator'),
             (r'\bDIFFRINT\b',                             'Not Equal Operator'),
-            (r'\bO\sRLY\?',                             'If conditional'),
+            (r'\bO\sRLY\?',                               'If conditional'),
             (r'\bALL\sOF\b',                              'Infinite Arity And Operator'),
             (r'\bANY\sOF\b',                              'Infinite Arity Or Operator'),
             (r'\bKTHXBYE\b',                              'Code End Delimiter'),
@@ -62,7 +62,7 @@ class Lexer(object):
             (r'\bI\sIZ\b',                                'Function Call'),
             (r'\bMEBBE\b',                                'Else If Keyword'),
             (r'\bUPPIN\b',                                'Increment Keyword'),
-            (r'\bWTF\?',                                'Switch Case Keyword'),
+            (r'\bWTF\?',                                  'Switch Case Keyword'),
             (r'\bGTFO\b',                                 'Return Keyword with no value'),
             (r'\bMAEK\b',                                 'Typecast Keyword'),
             (r'\bMKAY\b',                                 'MKAY Keyword'),
@@ -81,27 +81,25 @@ class Lexer(object):
             (r'\bA\b',                                    'A Keyword'),
             (r'\bR\b',                                    'Value Assignment Operator'),
             #  identifier
-            (r'\b[a-zA-Z]\w*\b',                      'Variable Identifier'),
+            (r'\b[a-zA-Z]\w*\b',                          'Variable Identifier'),
         ]
-        idx = 1
         regex_parts = []
         self.group_type = {}
 
-        for regex, type in rules:
+        for index, (regex, classification) in enumerate(rules):
             #Define the name of the group
-            groupname = 'GROUP%s' % idx
+            groupname = 'GROUP%s' % index
             #Define Capture Groupname and the corresponding regex
             regex_parts.append('(?P<%s>%s)' % (groupname, regex))
             #Define the type of the groupname
-            self.group_type[groupname] = type
-            idx += 1
+            self.group_type[groupname] = classification
 
         #This is where all the rules get compiled separated by '|'. This is the only regex that will be used for checking Lexemes
         self.regex = re.compile('|'.join(regex_parts))
 
         #For white space checking
         self.skip_whitespace = skip_whitespace
-        self.re_ws_skip = re.compile('[^\s,]')
+        self.regex_whitespace = re.compile('[^\s,]')
 
     def input(self, buf):
         self.buf = buf
@@ -114,7 +112,7 @@ class Lexer(object):
         #This one can just be omitted. It's only used if we try to skip whitespaces
         if self.skip_whitespace:
             #Get the first space from starting position
-            m = self.re_ws_skip.search(self.buf, self.pos)
+            m = self.regex_whitespace.search(self.buf, self.pos)
 
             if m == None:
                 #No match means end of file
@@ -123,17 +121,19 @@ class Lexer(object):
             #Get new starting position for regex searching
             self.pos = m.start()
         
-        #Do regex match. This is the only codeblock needed
+        #Do regex match. check for comments and skip them.
         m = self.regex.match(self.buf, self.pos)
         if m:
             groupname = m.lastgroup
             if str(m.group(groupname)) == "BTW":
-                    newline = re.compile(r"\n")
-                    m = newline.search(self.buf, self.pos)
+                newline = re.compile(r"\n")
+                m = newline.search(self.buf, self.pos)
 
-                    if m:
-                        #Get new starting position for regex searching
-                        self.pos = m.start()
+                if m:
+                    #Get new starting position for regex searching
+                    self.pos = m.start()
+                else:
+                    self.pos = len(self.buf)
             elif str(m.group(groupname)) == "OBTW":
                 newline = re.compile(r"TLDR")
                 m = newline.search(self.buf, self.pos)
@@ -141,9 +141,11 @@ class Lexer(object):
                 if m:
                     #Get new starting position for regex searching
                     self.pos = m.start()
+                else:
+                    self.pos = len(self.buf)
             
             #Get the first space from starting position
-            m = self.re_ws_skip.search(self.buf, self.pos)
+            m = self.regex_whitespace.search(self.buf, self.pos)
 
             if m == None:
                 #No match means end of file
@@ -169,9 +171,9 @@ class Lexer(object):
         # if we're here, no rule matched
         # We can replace this one or outright remove it
         raise LexerError(self.pos)
-
+    
     def tokens(self):
-        #Get all tokens
+        #generator to get all tokens
         while 1:
             tok = self.token()
             if tok is None:
