@@ -126,15 +126,37 @@ class Lexer(object):
         if m:
             groupname = m.lastgroup
             if str(m.group(groupname)) == "BTW":
+                #Get the group that was matched
+                groupname = m.lastgroup
+                #Get the type of the token using the groupname
+                tok_type = self.group_type[groupname]
+                #Get the current token using the groupname. The actual token is in m.group(groupname). 
+                #The Token class is just a struct to store information about the current token.
+                tok = Token(tok_type, m.group(groupname), self.pos)
+                #Update the position
+                self.pos = m.end()
+                
                 newline = re.compile(r"\n")
                 m = newline.search(self.buf, self.pos)
-
+                
                 if m:
                     #Get new starting position for regex searching
                     self.pos = m.start()
                 else:
                     self.pos = len(self.buf)
+                return tok
             elif str(m.group(groupname)) == "OBTW":
+                #Get the group that was matched
+                groupname = m.lastgroup
+                #Get the type of the token using the groupname
+                tok_type = self.group_type[groupname]
+                #Get the current token using the groupname. The actual token is in m.group(groupname). 
+                #The Token class is just a struct to store information about the current token.
+                tok = Token(tok_type, m.group(groupname), self.pos)
+                # print(tok)
+                #Update the position
+                self.pos = m.end()
+                
                 newline = re.compile(r"TLDR")
                 m = newline.search(self.buf, self.pos)
 
@@ -143,16 +165,7 @@ class Lexer(object):
                     self.pos = m.start()
                 else:
                     self.pos = len(self.buf)
-            
-            #Get the first space from starting position
-            m = self.regex_whitespace.search(self.buf, self.pos)
-
-            if m == None:
-                #No match means end of file
-                return None
-            
-            #Get new starting position for regex searching
-            self.pos = m.start()
+                return tok
 
         #Do regex match. This is the only codeblock needed
         m = self.regex.match(self.buf, self.pos)
