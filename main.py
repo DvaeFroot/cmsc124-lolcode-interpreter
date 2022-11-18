@@ -45,6 +45,8 @@ def getTokens():
 window = tk.Tk()
 window.title("LOLCODE INTERPRETER")
 window.columnconfigure(0, weight=1)
+window.rowconfigure(0, weight=1)
+window.rowconfigure(1, weight=1)
 
 #Frame for upper subwindows
 fr_upper = tk.Frame(window)
