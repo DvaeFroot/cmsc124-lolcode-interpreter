@@ -134,10 +134,10 @@ class Lexer(object):
                 tok = Token(tok_type, m.group(groupname), self.pos)
                 #Update the position
                 self.pos = m.end()
-                
+
                 newline = re.compile(r"\n")
                 m = newline.search(self.buf, self.pos)
-                
+
                 if m:
                     #Get new starting position for regex searching
                     self.pos = m.start()
@@ -155,7 +155,7 @@ class Lexer(object):
                 # print(tok)
                 #Update the position
                 self.pos = m.end()
-                
+
                 newline = re.compile(r"TLDR")
                 m = newline.search(self.buf, self.pos)
 
@@ -164,7 +164,6 @@ class Lexer(object):
                     self.pos = m.start()
                 else:
                     self.pos = len(self.buf)
-<<<<<<< HEAD
 
             #Get the first space from starting position
             m = self.regex_whitespace.search(self.buf, self.pos)
@@ -175,9 +174,6 @@ class Lexer(object):
 
             #Get new starting position for regex searching
             self.pos = m.start()
-=======
-                return tok
->>>>>>> f52fb2e6b30e8dba66e765aa2940743b82405b01
 
         #Do regex match. This is the only codeblock needed
         m = self.regex.match(self.buf, self.pos)
