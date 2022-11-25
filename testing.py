@@ -271,19 +271,35 @@ doTest("MOD Numbar",
 
 print("\n SWITCH \n")
 
-doTest("Switch All",
+doTest("Switch OMG",
        """
         HAI
-        WTF? BTW uses value in IT
-        OMG "<value literal>"
-            VISIBLE "OMG"
-        OMG 10
-            VISIBLE "OMG"
-        OMGWTF
-            VISIBLE "OMGWTF"
+        WTF?
+            OMG "A"
+                VISIBLE "ABCD"
+                GTFO
+            OMG "E"
+                VISIBLE "EFGH"
+                GTFO
         OIC
         KTHXBYE
        """)
+
+doTest("Switch OMG and OMGWTF",
+       """
+        HAI
+        WTF?
+            OMG "A"
+                VISIBLE "ABCD"
+                GTFO
+            OMG "E"
+                VISIBLE "EFGH"
+                GTFO
+            OMGWTF
+                VISIBLE "IJKL"
+        OIC
+        KTHXBYE
+       """,printOutput=True)
 
 doTest("Switch 1 omg",
        """
