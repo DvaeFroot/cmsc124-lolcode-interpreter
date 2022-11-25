@@ -22,12 +22,10 @@ doTest("Blank Program",
        """
        HAI
        WTF?
-       OMG 1 VISIBLE hai
-       OMG 2 VISIBLE hai
-       OMG 3 VISIBLE hai
-       OMG 4 VISIBLE hai
-       OMG 5 VISIBLE hai
-       OMG 6 VISIBLE hai
+       OMG 1 VISIBLE hai GTFO
+       OMG 2 VISIBLE hai GTFO
+       OMG 3 VISIBLE hai GTFO
+       OIC
     KTHXBYE
        """)
 

@@ -173,14 +173,19 @@ class Parser:
             res = BooleanShortNode(op_token, expr)
             return res
 
+
     def casebody(self):
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type not in (TT_CASE,TT_CONTROL_END):
                 if self.token_idx < len(self.tokens):
-                    yield self.statement()
+                    if self.current_tok.type in (TT_CASEBREAK):
+                        yield CaseBreakNode(self.current_tok)
+                    else:
+                        yield self.statement()
                     self.advance()
             else:
                  break
+
 
     def switchcase(self):
         while(self.token_idx < len(self.tokens)):
