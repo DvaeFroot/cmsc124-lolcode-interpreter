@@ -1,6 +1,7 @@
 #Forked from https://gist.github.com/eliben/5797351
 import re
 from token_types import *
+from parser import Parser
 
 
 class Token(object):
@@ -10,7 +11,7 @@ class Token(object):
         self.pos = pos
 
     def __str__(self):
-        return '%s(%s) at %s' % (self.type, self.val, self.pos)
+        return '%s: %s' % (self.type, self.val)
 
 
 class LexerError(Exception):
@@ -229,31 +230,38 @@ class Lexer(object):
 
 if __name__ == '__main__':
     lx = Lexer()
-    txt = """HAI 1.2
-HOW IZ I POWERTWO YR NUM
-   BTW RETURN 1 IF 2 TO POWER OF 0
-   BOTH SAEM NUM AN 0, O RLY?
-      YA RLY, FOUND YR 1
-   OIC
-
-   BTW CALCULATE 2 TO POWER OF NUM
-   I HAS A INDEX ITZ 0
-   I HAS A TOTAL ITZ 1
-   IM IN YR LOOP UPPIN YR INDEX TIL BOTH SAEM INDEX AN NUM
-      TOTAL R PRODUKT OF TOTAL AN 2
-   IM OUTTA YR LOOP
-
-   FOUND YR TOTAL
-   IF U SAY SO
-   BTW OUTPUT: 8
-   VISIBLE I IZ POWERTWO YR 4 MKAY
-   "HELLO"
-KTHXBYE"""
+#      txt = """HAI 1.2
+#  HOW IZ I POWERTWO YR NUM
+#     BTW RETURN 1 IF 2 TO POWER OF 0
+#     BOTH SAEM NUM AN 0, O RLY?
+#        YA RLY, FOUND YR 1
+#     OIC
+#
+#     BTW CALCULATE 2 TO POWER OF NUM
+#     I HAS A INDEX ITZ 0
+#     I HAS A TOTAL ITZ 1
+#     IM IN YR LOOP UPPIN YR INDEX TIL BOTH SAEM INDEX AN NUM
+#        TOTAL R PRODUKT OF TOTAL AN 2
+#     IM OUTTA YR LOOP
+#
+#     FOUND YR TOTAL
+#     IF U SAY SO
+#     BTW OUTPUT: 8
+#     VISIBLE I IZ POWERTWO YR 4 MKAY
+#     "HELLO"
+#  KTHXBYE"""
+    txt = """HAI
+        I HAS A
+    KTHXBYE"""
     lx.input(txt)
 
-    try:
-        for tok in lx.tokens():
-            print(tok)
-    except LexerError as err:
-        print('LexerError at position %s' % err.pos)
+    #  try:
+    #      for tok in lx.tokens():
+    #          print(tok)
+    #  except LexerError as err:
+    #      print('LexerError at position %s' % err.pos)
+
+    res = Parser(list(lx.tokens()))
+    print(res.parse())
+
 

@@ -77,3 +77,4 @@ TT_MKAY =               'MKAY Keyword'
 
 TT_STR_DELIMITER =      'String Delimiter'
 TT_IDENTIFIER =         'Identifier'
+TT_EOF =                'EOF'
