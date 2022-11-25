@@ -2,16 +2,17 @@ from lexer import *
 from parser import *
 
 
-def doTest(name, txt, shouldFail=False,printOutput=False):
+def doTest(name, txt, shouldFail=False,printOutput=True):
     lx = Lexer()
     lx.input(txt)
     res = Parser(list(lx.tokens()))
     output = str(res.parse())
-    hasError = 'Error LOL' in output
+    hasError = 'Error' in output
     if hasError == (not shouldFail):
-        print("FAILED:", name)
+        print("\x1B[31m FAILED:", name)
     else:
-        print("PASSED:", name)
+        print("\x1B[32m PASSED:", name)
+    print("\x1B[37m")
 
     if printOutput:
         print(output)
@@ -74,21 +75,21 @@ doTest("Invalid Input Yarn",
         HAI
         GIMMEH "x yarn"
         KTHXBYE
-       """,shouldFail=True)
+       """, shouldFail=True)
 
 doTest("Invalid Input Numbr",
        """
         HAI
         GIMMEH 69
         KTHXBYE
-       """,shouldFail=True)
+       """, shouldFail=True)
 
 doTest("Invalid Input Numbar",
        """
         HAI
         GIMMEH 1.23
         KTHXBYE
-       """,shouldFail=True)
+       """, shouldFail=True)
 
 print("\n USER OUTPUT \n")
 
