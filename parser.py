@@ -33,7 +33,7 @@ class Parser:
     def print(self):
         if self.current_tok.type in (TT_OUTPUT):
             left = self.current_tok
-            
+
             self.advance()
             right = self.expr()
 
@@ -95,6 +95,8 @@ class Parser:
             return TroofNode(self.current_tok)
         elif self.current_tok.type in (TT_IDENTIFIER):
             return VariableNode(self.current_tok)
+        elif self.current_tok.type in (GP_COMPARISON):
+            return self.comparison()
 
         raise Error(self.current_tok)
 
@@ -237,6 +239,61 @@ class Parser:
         return Error(self.current_tok)
 
 
+    def loopbody(self):
+        while(self.token_idx < len(self.tokens)):
+            if self.tokens[self.token_idx].type not in (TT_LOOP_END):
+                if self.token_idx < len(self.tokens):
+                    yield self.statement()
+                    self.advance()
+            else:
+                 break
+
+
+    def loop(self):
+        if self.current_tok.type in (TT_LOOP_STRT):
+            del_start = self.current_tok
+            label_start = self.advance()
+            if label_start.type not in (TT_IDENTIFIER):
+                raise Error(self.current_tok)
+            operation = self.advance()
+            if operation.type not in (TT_INC, TT_DEC):
+                raise Error(self.current_tok)
+            yr = self.advance()
+            if yr.type not in (TT_YR):
+                raise Error(self.current_tok)
+            var = self.advance()
+            if var.type not in (TT_IDENTIFIER):
+                raise Error(self.current_tok)
+            cond = self.advance()
+            if cond.type in (TT_WHILE, TT_UNTIL):
+                self.advance()
+                cond_expr = self.expr()
+                self.advance()
+
+                codeblock = list(self.loopbody())
+                del_end = self.current_tok
+
+                if del_end.type not in (TT_LOOP_END):
+                    raise Error(self.current_tok)
+                label_end = self.advance()
+                if label_end.type not in (TT_IDENTIFIER):
+                    raise Error(self.current_tok)
+
+                res = LoopNodeLong(del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end)
+                return res
+
+            codeblock = list(self.loopbody())
+            del_end = self.current_tok
+            if del_end.type not in (TT_LOOP_END):
+                raise Error(self.current_tok)
+            label_end = self.advance()
+            if label_end.type not in (TT_IDENTIFIER):
+                raise Error(self.current_tok)
+
+            res = LoopNodeShort(del_start, label_start, operation, yr, var, codeblock, del_end, label_end)
+            return res
+
+
     def statement(self):
         res = None
         if self.current_tok.type in (GP_ARITHMETIC):
@@ -259,6 +316,8 @@ class Parser:
             res = self.switch()
         elif self.current_tok.type in (TT_STR_DELIMITER):
             res = self.string()
+        elif self.current_tok.type in (TT_LOOP_STRT):
+            res = self.loop()
 
         return StatementNode("",res)
 

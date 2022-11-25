@@ -23,26 +23,30 @@ class BasicNode():
     def __repr__(self) -> str:
         return f'({self.token})'
 
+
 class NoobNode(BasicNode):
     pass
+
 
 class NumbrNode(BasicNode):
     pass
 
+
 class NumbarNode(BasicNode):
     pass
+
 
 class YarnNode(BasicNode):
     pass
 
-class TroofNode(BasicNode):
-    pass
 
 class OperatorNode(BasicNode):
     pass
 
+
 class VariableNode(BasicNode):
     pass
+
 
 class Program:
     def __init__(self, start_node, body_node,end_node) -> None:
@@ -74,11 +78,14 @@ class StatementNode():
 class ArithmeticNode(BinOpNode):
     pass
 
+
 class GimmehNode(UnaryOpNode):
     pass
 
+
 class VisibleNode(UnaryOpNode):
     pass
+
 
 class AssignmentShlongNode():
     def __init__(self,ihasa,variable):
@@ -87,6 +94,7 @@ class AssignmentShlongNode():
 
     def __repr__(self) -> str:
         return f'({self.ihasa}, {self.variable})'
+
 
 class AssignmentLongNode():
     def __init__(self,ihasa,variable,itz,expr):
@@ -97,6 +105,7 @@ class AssignmentLongNode():
 
     def __repr__(self) -> str:
         return f'({self.ihasa}, {self.variable}, {self.itz}, {self.expr})'
+
 
 class AssignmentShortNode():
     def __init__(self,variable,r,expr):
@@ -111,11 +120,14 @@ class AssignmentShortNode():
 class ComparisonNode(BinOpNode):
     pass
 
+
 class BooleanLongNode(BinOpNode):
     pass
 
+
 class BooleanShortNode(UnaryOpNode):
     pass
+
 
 class TypecastLongNode():
     def __init__(self,maek,expr,a,type):
@@ -127,6 +139,7 @@ class TypecastLongNode():
     def __repr__(self) -> str:
         return f'({self.maek}, {self.expr}, {self.a}, {self.type})'
 
+
 class TypecastShortNode():
     def __init__(self,maek,expr,type):
         self.maek = maek
@@ -136,6 +149,7 @@ class TypecastShortNode():
     def __repr__(self) -> str:
         return f'({self.maek}, {self.expr}, {self.type})'
 
+
 class SwitchNode:
     def __init__(self, op_token, expr) -> None:
         self.op_token = op_token
@@ -143,6 +157,7 @@ class SwitchNode:
 
     def __repr__(self) -> str:
         return f'({self.op_token}, {self.expr})'
+
 
 class SwitchCaseNode:
     def __init__(self, omg, value, statement) -> None:
@@ -153,8 +168,10 @@ class SwitchCaseNode:
     def __repr__(self) -> str:
         return f'({self.omg}, {self.value}, {self.statement})'
 
+
 class CaseBreakNode(BasicNode):
     pass
+
 
 class StringNode:
     def __init__(self, qt1, string, qt2) -> None:
@@ -165,5 +182,38 @@ class StringNode:
     def __repr__(self) -> str:
         return f'({self.qt1}, {self.string}, {self.qt2})'
 
+
 class TroofNode(BasicNode):
     pass
+
+
+class LoopNodeShort:
+    def __init__(self, del_start, label_start, operation, yr, var, codeblock, del_end, label_end) -> None:
+        self.del_start = del_start
+        self.label_start = label_start
+        self.operation = operation
+        self.yr = yr
+        self.var = var
+        self.codeblock = codeblock
+        self.del_end = del_end
+        self.label_end = label_end
+
+    def __repr__(self) -> str:
+        return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.codeblock}, {self.del_end}, {self.label_end})'
+
+class LoopNodeLong:
+    def __init__(self, del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end) -> None:
+        self.del_start = del_start
+        self.label_start = label_start
+        self.operation = operation
+        self.yr = yr
+        self.var = var
+        self.cond = cond
+        self.cond_expr = cond_expr
+        self.codeblock = codeblock
+        self.del_end = del_end
+        self.label_end = label_end
+
+    def __repr__(self) -> str:
+        return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
+
