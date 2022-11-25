@@ -47,11 +47,11 @@ class Parser:
             left = self.current_tok
             right = self.advance()
             if right.type not in (TT_IDENTIFIER):
-                return Error()
+                raise Error()
 
             res = GimmehNode(left, right)
             return res
-        return Error()
+        raise Error()
 
     def comparison(self):
         if self.current_tok.type in (GP_COMPARISON):
@@ -74,7 +74,7 @@ class Parser:
             left = self.expr()
             an = self.advance()
             if an.type not in (TT_ARG_SEP):
-                return Error()
+                raise Error()
             self.advance()
             right = self.expr()
 
@@ -87,7 +87,7 @@ class Parser:
             elif tok.type in (TT_INTEGER):
                 return NumbrNode(tok)
 
-        return Error()
+        raise Error()
 
 
     def variableLong(self):
@@ -96,11 +96,11 @@ class Parser:
 
             variable = self.advance()
             if variable.type not in (TT_IDENTIFIER):
-                return Error()
+                raise Error()
             variable = VariableNode(self.current_tok)
             itz = self.advance()
             if itz.type not in (TT_VAR_ASSIGN):
-                return Error()
+                raise Error()
             self.advance()
             expr = self.expr()
 
@@ -113,13 +113,13 @@ class Parser:
 
             variable = self.current_tok
             if variable.type not in (TT_IDENTIFIER):
-                return Error()
+                raise Error()
 
             variable = VariableNode(self.current_tok)
 
             r = self.advance()
             if r.type not in (TT_VAR_VAL_ASSIGN):
-                return Error()
+                raise Error()
 
             self.advance()
             expr = self.expr()
@@ -141,11 +141,11 @@ class Parser:
             elif possibleA.type in (TT_TYPE):
                 return TypecastShortNode(maek,expr,possibleA)
             else:
-                return Error()
+                raise Error()
 
             ttype = self.advance()
             if ttype.type not in (TT_TYPE):
-                return Error()
+                raise Error()
 
             res = TypecastLongNode(maek,expr,possibleA,ttype)
             return res
@@ -208,7 +208,7 @@ class Parser:
         try:
             #Start of code
             if self.current_tok.type != TT_CODE_STRT:
-                return Error()
+                raise Error()
 
             start_node = self.current_tok
             self.advance()
@@ -218,7 +218,7 @@ class Parser:
             #End of code
             end_node = self.advance()
             if self.current_tok.type != TT_CODE_END:
-                return Error()
+                raise Error()
 
             res = Program(start_node, body_node, end_node)
 

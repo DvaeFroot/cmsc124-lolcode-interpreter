@@ -1,3 +1,21 @@
+class UnaryOpNode:
+    def __init__(self,left, right):
+        self.left = left
+        self.right = right
+
+    def __repr__(self) -> str:
+        return f'({self.left}, {self.right})'
+
+class BinOpNode:
+    def __init__(self, op_token, expr1, an, expr2) -> None:
+        self.op_token = op_token
+        self.expr1 = expr1
+        self.an = an
+        self.expr2 = expr2
+
+    def __repr__(self) -> str:
+        return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
+
 class BasicNode():
     def __init__(self,token):
         self.token = token
@@ -53,32 +71,14 @@ class StatementNode():
         return f'({self.statement})\n'
 
 
-class ArithmeticNode():
-    def __init__(self,operator,left,an,right):
-        self.operator = operator
-        self.left = left
-        self.an = an
-        self.right = right
+class ArithmeticNode(BinOpNode):
+    pass
 
-    def __repr__(self) -> str:
-        return f'({self.operator}, {self.left}, {self.an}, {self.right})\n'
+class GimmehNode(UnaryOpNode):
+    pass
 
-class GimmehNode():
-    def __init__(self,left, right):
-        self.left = left
-        self.right = right
-
-    def __repr__(self) -> str:
-        return f'({self.left}, {self.right})'
-
-
-class VisibleNode():
-    def __init__(self,left, right):
-        self.left = left
-        self.right = right
-
-    def __repr__(self) -> str:
-        return f'({self.left}, {self.right})'
+class VisibleNode(UnaryOpNode):
+    pass
 
 class AssignmentLongNode():
     def __init__(self,ihasa,variable,itz,expr):
@@ -99,41 +99,23 @@ class AssignmentShortNode():
     def __repr__(self) -> str:
         return f'({self.variable}, {self.r}, {self.expr})'
 
-class ComparisonNode:
-    def __init__(self, op_token, expr1, an, expr2) -> None:
-        self.op_token = op_token
-        self.expr1 = expr1
-        self.an = an
-        self.expr2 = expr2
 
-    def __repr__(self) -> str:
-        return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
+class ComparisonNode(BinOpNode):
+    pass
 
-class BooleanLongNode:
-    def __init__(self, op_token, expr1, an, expr2) -> None:
-        self.op_token = op_token
-        self.expr1 = expr1
-        self.an = an
-        self.expr2 = expr2
+class BooleanLongNode(BinOpNode):
+    pass
 
-    def __repr__(self) -> str:
-        return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
+class BooleanShortNode(UnaryOpNode):
+    pass
 
-
-class BooleanShortNode:
-    def __init__(self, op_token, expr) -> None:
-        self.op_token = op_token
-        self.expr = expr
-
-    def __repr__(self) -> str:
-        return f'({self.op_token}, {self.expr})'
 class TypecastLongNode():
     def __init__(self,maek,expr,a,type):
         self.maek = maek
         self.expr = expr
         self.a = a
         self.type = type
-    
+
     def __repr__(self) -> str:
         return f'({self.maek}, {self.expr}, {self.a}, {self.type})'
 
@@ -142,6 +124,6 @@ class TypecastShortNode():
         self.maek = maek
         self.expr = expr
         self.type = type
-    
+
     def __repr__(self) -> str:
         return f'({self.maek}, {self.expr}, {self.type})'
