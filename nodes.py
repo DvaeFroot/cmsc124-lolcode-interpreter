@@ -168,6 +168,14 @@ class SwitchCaseNode:
     def __repr__(self) -> str:
         return f'({self.omg}, {self.value}, {self.statement})'
 
+class DefaultCaseNode:
+    def __init__(self, omgwtf, casebody) -> None:
+        self.omgwtf = omgwtf
+        self.casebody = casebody
+
+    def __repr__(self) -> str:
+        return f'({self.omgwtf}, {self.casebody})'
+
 
 class CaseBreakNode(BasicNode):
     pass

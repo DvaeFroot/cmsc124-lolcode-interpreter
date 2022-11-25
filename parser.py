@@ -22,12 +22,28 @@ class Parser:
         self.token_idx += 1
         if self.token_idx < len(self.tokens):
             self.current_tok = self.tokens[self.token_idx]
+        if self.current_tok.type in (TT_COMMENT_STRT, TT_COMMENT_MULTI_STRT, TT_COMMENT_MULTI_END):
+            self.advance()
         return self.current_tok
 
 
     def parse(self):
         res = self.code()
         return res
+    
+    def literal(self):
+        if self.current_tok.type in (TT_FLOAT, TT_INTEGER):
+            tok = self.current_tok
+            if tok.type in (TT_FLOAT):
+                return NumbarNode(tok)
+            elif tok.type in (TT_INTEGER):
+                return NumbrNode(tok)
+        elif self.current_tok.type in (TT_STR_DELIMITER):
+            return self.string()
+        elif self.current_tok.type in (TT_BOOLEAN):
+            return TroofNode(self.current_tok)
+        
+        return Error(self.current_tok)
 
 
     def print(self):
@@ -186,7 +202,7 @@ class Parser:
 
     def casebody(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type not in (TT_CASE,TT_CONTROL_END):
+            if self.tokens[self.token_idx].type not in (TT_BREAK, TT_CASE,TT_CONTROL_END):
                 if self.token_idx < len(self.tokens):
                     if self.current_tok.type in (TT_CASEBREAK):
                         yield CaseBreakNode(self.current_tok)
@@ -202,11 +218,17 @@ class Parser:
             if self.tokens[self.token_idx].type not in (TT_CONTROL_END):
                 if self.token_idx < len(self.tokens):
                     omg = self.current_tok
-                    value = self.advance()
-                    if value.type not in (GP_LITERAL):
-                        raise Error(self.current_tok)
-                    casebody = list(self.casebody())
-                    yield SwitchCaseNode(omg, value, casebody)
+                    if omg.type not in (TT_BREAK):
+                        self.advance()
+                        value = self.literal()
+                        self.advance()
+                        casebody = list(self.casebody())
+                        yield SwitchCaseNode(omg, value, casebody)
+                    elif omg.type in (TT_BREAK):
+                        self.advance()
+                        casebody = list(self.casebody())
+                        yield DefaultCaseNode(omg, casebody)
+                        break
             else:
                  break
 
