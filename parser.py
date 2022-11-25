@@ -106,7 +106,8 @@ class Parser:
             variable = VariableNode(self.current_tok)
             itz = self.advance()
             if itz.type not in (TT_VAR_ASSIGN):
-                raise Error(self.current_tok)
+                res = AssignmentShlongNode(ihasa_token, variable)
+                return res
             self.advance()
             expr = self.expr()
 
