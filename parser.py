@@ -79,20 +79,57 @@ class Parser:
 
         return Error()
 
+    def variableLong(self):
+        if self.current_tok.type in (TT_VAR_DEC):
+            ihasa_token = self.current_tok
+
+            variable = self.advance()
+            if variable.type not in (TT_IDENTIFIER):
+                return Error()
+            variable = VariableNode(self.current_tok)
+            itz = self.advance()
+            if itz.type not in (TT_VAR_ASSIGN):
+                return Error()
+            self.advance()
+            expr = self.expr()
+
+            res = AssignmentLongNode(ihasa_token, variable, itz, expr)
+            return res
+
+    def variableShort(self):
+        if self.current_tok.type in (TT_IDENTIFIER):
+
+            variable = self.current_tok
+            if variable.type not in (TT_IDENTIFIER):
+                return Error()
+
+            variable = VariableNode(self.current_tok)
+
+            r = self.advance()
+            if r.type not in (TT_VAR_VAL_ASSIGN):
+                return Error()
+
+            self.advance()
+            expr = self.expr()
+
+            res = AssignmentShortNode(variable, r, expr)
+            return res
+
 
     def statement(self):
+        res = None
         if self.current_tok.type in (GP_ARITHMETIC):
             res = self.expr()
-            return res
         elif self.current_tok.type in (TT_READ):
             res = self.get_input()
-            return res
         elif self.current_tok.type in (TT_OUTPUT):
             res = self.print()
-            return res
-        elif self.current_tok.type in (TT_):
-            res = self.print()
-            return res
+        elif self.current_tok.type in (TT_VAR_DEC):
+            res = self.variableLong()
+        elif self.current_tok.type in (TT_IDENTIFIER):
+            res = self.variableShort()
+
+        return StatementNode("",res)
 
 
     def body(self):

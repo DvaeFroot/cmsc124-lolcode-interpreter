@@ -251,7 +251,9 @@ if __name__ == '__main__':
 #     "HELLO"
 #  KTHXBYE"""
     txt = """HAI
-        VISIBLE
+        PRODUKT OF SUM OF 8 AN 10 AN DIFF OF 5 AN 6
+        THISISAVARIABLE R DIFF OF 5 AN 6
+        I HAS A VAR 6
         NEXT
     KTHXBYE"""
     lx.input(txt)
