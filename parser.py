@@ -128,6 +128,26 @@ class Parser:
             return res
 
 
+    def boolean(self):
+        if self.current_tok.type in (GP_BOOLEAN_LONG):
+            op_token = self.current_tok
+            self.advance()
+            expr1 = self.expr()
+            an = self.advance()
+            if an.type not in (TT_ARG_SEP):
+                raise Error()
+            self.advance()
+            expr2 = self.expr()
+            res = BooleanLongNode(op_token, expr1, an, expr2)
+            return res
+        elif self.current_tok.type in (GP_BOOLEAN_SHORT):
+            op_token = self.current_tok
+            self.advance()
+            expr = self.expr()
+            res = BooleanShortNode(op_token, expr)
+            return res
+
+
     def statement(self):
         res = None
         if self.current_tok.type in (GP_ARITHMETIC):
@@ -142,6 +162,8 @@ class Parser:
             res = self.variableShort()
         elif self.current_tok.type in (GP_COMPARISON):
             res = self.comparison()
+        elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
+            res = self.boolean()
 
         return StatementNode("",res)
 
@@ -152,10 +174,8 @@ class Parser:
                 if self.token_idx+1 < len(self.tokens):
                     yield self.statement()
                     self.advance()
-                elif self.token_idx+1 >= len(self.tokens):
-                    raise Error()
-                else:
-                    yield None
+            else:
+                 break
 
 
     def code(self):

@@ -57,8 +57,8 @@ class Lexer(object):
 
             #RELATIONAL
             (r'\bBOTH\sSAEM\b',                           TT_EQU_OP),
-            (r'\bBOTH\sOF\b',                             TT_AND),
             (r'\bDIFFRINT\b',                             TT_NEQU),
+            (r'\bBOTH\sOF\b',                             TT_AND),
             (r'\bALL\sOF\b',                              TT_AND_INF),
             (r'\bANY\sOF\b',                              TT_OR_INF),
             (r'\bNO\sWAI\b',                              TT_ELSE),
@@ -230,28 +230,8 @@ class Lexer(object):
 
 if __name__ == '__main__':
     lx = Lexer()
-#      txt = """HAI 1.2
-#  HOW IZ I POWERTWO YR NUM
-#     BTW RETURN 1 IF 2 TO POWER OF 0
-#     BOTH SAEM NUM AN 0, O RLY?
-#        YA RLY, FOUND YR 1
-#     OIC
-#
-#     BTW CALCULATE 2 TO POWER OF NUM
-#     I HAS A INDEX ITZ 0
-#     I HAS A TOTAL ITZ 1
-#     IM IN YR LOOP UPPIN YR INDEX TIL BOTH SAEM INDEX AN NUM
-#        TOTAL R PRODUKT OF TOTAL AN 2
-#     IM OUTTA YR LOOP
-#
-#     FOUND YR TOTAL
-#     IF U SAY SO
-#     BTW OUTPUT: 8
-#     VISIBLE I IZ POWERTWO YR 4 MKAY
-#     "HELLO"
-#  KTHXBYE"""
     txt = """HAI
-        BOTH SAEM SUM OF 1 AN 1 AN PRODUKT OF 2 AN 4
+        BOTH OF PRODUKT OF 1 AN 2 AN 4
     KTHXBYE"""
     lx.input(txt)
 

@@ -109,3 +109,22 @@ class ComparisonNode:
     def __repr__(self) -> str:
         return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
 
+
+class BooleanLongNode:
+    def __init__(self, op_token, expr1, an, expr2) -> None:
+        self.op_token = op_token
+        self.expr1 = expr1
+        self.an = an
+        self.expr2 = expr2
+
+    def __repr__(self) -> str:
+        return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
+
+
+class BooleanShortNode:
+    def __init__(self, op_token, expr) -> None:
+        self.op_token = op_token
+        self.expr = expr
+
+    def __repr__(self) -> str:
+        return f'({self.op_token}, {self.expr})'
