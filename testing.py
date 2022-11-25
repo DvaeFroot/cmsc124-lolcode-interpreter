@@ -134,7 +134,6 @@ doTest("Assignment Numbar",
         I HAS A VAR ITZ 10.0
         KTHXBYE
        """)
->>>>>>> eea471bacebea36e28940ffdbed3813c886049fe
 
 doTest("Assignment Yarn",
        """
@@ -144,16 +143,6 @@ doTest("Assignment Yarn",
         KTHXBYE
        """)
 
-<<<<<<< HEAD
-#  doTest("Invalid Assignment Variable",
-#         """
-#          HAI
-#          VARIABLE R VARIABLE
-#          I HAS A VAR ITZ VAR
-#          KTHXBYE
-#         """,
-#         shouldFail=True)
-=======
 doTest("Assignment Troof",
        """
         HAI
