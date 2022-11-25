@@ -30,7 +30,8 @@ class Parser:
     def parse(self):
         res = self.code()
         return res
-    
+
+
     def literal(self):
         if self.current_tok.type in (TT_FLOAT, TT_INTEGER):
             tok = self.current_tok
@@ -42,7 +43,7 @@ class Parser:
             return self.string()
         elif self.current_tok.type in (TT_BOOLEAN):
             return TroofNode(self.current_tok)
-        
+
         return Error(self.current_tok)
 
 
@@ -125,10 +126,11 @@ class Parser:
             if variable.type not in (TT_IDENTIFIER):
                 raise Error(self.current_tok)
             variable = VariableNode(self.current_tok)
-            itz = self.advance()
+            itz = self.tokens[self.token_idx+1]
             if itz.type not in (TT_VAR_ASSIGN):
                 res = AssignmentShlongNode(ihasa_token, variable)
                 return res
+            itz = self.advance()
             self.advance()
             expr = self.expr()
 
@@ -351,7 +353,7 @@ class Parser:
                     yield self.statement()
                     self.advance()
             else:
-                 break
+                break
 
 
     def code(self):
@@ -367,6 +369,7 @@ class Parser:
 
             #End of code
             end_node = self.advance()
+
             if self.current_tok.type not in (TT_CODE_END):
                 raise Error(self.current_tok)
 

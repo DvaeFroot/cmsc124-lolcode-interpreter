@@ -16,19 +16,19 @@ def doTest(name, txt, shouldFail=False,printOutput=False):
     if printOutput:
         print(output)
 
-doTest("Invalid Typo Blank Program",
-       """
-       HAI
-IM IN YR umum UPPIN YR udud TIL BOTH SAEM udud AN 1
-  VISIBLE hai
-  VISIBLE hai
-  VISIBLE hai
-  VISIBLE hai
-  VISIBLE hai
-IM OUTTA YR umum
-    KTHXBYE
-       """, printOutput=False)
-
+#  doTest("Invalid Typo Blank Program",
+#         """
+#         HAI
+#  IM IN YR umum UPPIN YR udud TIL BOTH SAEM udud AN 1
+#    VISIBLE hai
+#    VISIBLE hai
+#    VISIBLE hai
+#    VISIBLE hai
+#    VISIBLE hai
+#  IM OUTTA YR umum
+#      KTHXBYE
+#         """, printOutput=False)
+#
 print("\n COMMENTS \n")
 
 doTest("Multiline Comment",
@@ -48,7 +48,7 @@ doTest("Multiline Comment",
         OBTW this
             Way
         TLDR
-        KTHXBYE""")
+        KTHXBYE""", printOutput=True)
 
 print("\n USER INPUT \n")
 

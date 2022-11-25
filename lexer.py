@@ -226,3 +226,25 @@ class Lexer(object):
             if tok is None:
                 break
             yield tok
+
+
+if __name__ == '__main__':
+    lx = Lexer()
+    txt = """HAI
+        BOTH OF PRODUKT OF 1 AN 2 AN 4
+        BOTH OF PRODUKT OF 1 AN 2 AN 4
+        BOTH OF PRODUKT OF 1 AN 2 AN 4
+        BOTH OF PRODUKT OF 1 AN 2 AN 4
+    KTHXBYE"""
+    lx.input(txt)
+
+    #  try:
+    #      for tok in lx.tokens():
+    #          print(tok)
+    #  except LexerError as err:
+    #      print('LexerError at position %s' % err.pos)
+
+    res = Parser(list(lx.tokens()))
+    print(res.parse())
+
+
