@@ -7,6 +7,7 @@ def doTest(name, txt, shouldFail=False,printOutput=False):
     lx.input(txt)
     res = Parser(list(lx.tokens()))
     output = str(res.parse())
+    print(output)
     hasError = 'Error LOL' in output
     if hasError == (not shouldFail):
         print("FAILED:", name)
@@ -20,6 +21,13 @@ def doTest(name, txt, shouldFail=False,printOutput=False):
 doTest("Blank Program",
        """
        HAI
+       WTF?
+       OMG 1 VISIBLE hai
+       OMG 2 VISIBLE hai
+       OMG 3 VISIBLE hai
+       OMG 4 VISIBLE hai
+       OMG 5 VISIBLE hai
+       OMG 6 VISIBLE hai
     KTHXBYE
        """)
 
