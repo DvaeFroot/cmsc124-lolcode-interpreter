@@ -97,7 +97,7 @@ class Lexer(object):
             (r'\bAN\b',                                   TT_ARG_SEP),
             (r'\bYR\b',                                   TT_YR),
             (r'\bA\b',                                    TT_A),
-            (r'\"',                                       TT_STRING),
+            (r'\"',                                       TT_STR_DELIMITER),
 
             #identifier
             (r'\b[a-zA-Z]\w*\b',                          'Identifier'),

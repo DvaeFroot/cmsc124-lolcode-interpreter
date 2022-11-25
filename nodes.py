@@ -147,3 +147,12 @@ class SwitchCaseNode:
 
 class CaseBreakNode(BasicNode):
     pass
+
+class StringNode:
+    def __init__(self, qt1, string, qt2) -> None:
+        self.qt1 = qt1
+        self.string = string
+        self.qt2 = qt2
+
+    def __repr__(self) -> str:
+        return f'({self.qt1}, {self.string}, {self.qt2})'

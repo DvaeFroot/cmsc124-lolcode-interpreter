@@ -88,6 +88,8 @@ class Parser:
                 return NumbarNode(tok)
             elif tok.type in (TT_INTEGER):
                 return NumbrNode(tok)
+        elif self.current_tok.type in (TT_STR_DELIMITER):
+            return self.string()
 
         raise Error(self.current_tok)
 
@@ -215,6 +217,19 @@ class Parser:
             raise Error(self.current_tok)
 
 
+    def string(self):
+        if self.current_tok.type in (TT_STR_DELIMITER):
+            qt1 = self.current_tok
+            string = self.advance()
+            if string.type not in (TT_STRING):
+                raise Error(self.current_tok)
+            qt2 = self.advance()
+            if qt2.type not in (TT_STR_DELIMITER):
+                raise Error(self.current_tok)
+            res = StringNode(qt1, string, qt2)
+            return res
+        return Error(self.current_tok)
+
 
     def statement(self):
         res = None
@@ -236,6 +251,8 @@ class Parser:
             res = self.typecast()
         elif self.current_tok.type in (TT_SWITCH):
             res = self.switch()
+        elif self.current_tok.type in (TT_STR_DELIMITER):
+            res = self.string()
 
         return StatementNode("",res)
 
