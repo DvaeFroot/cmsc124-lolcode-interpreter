@@ -33,9 +33,9 @@ class Parser:
     def print(self):
         if self.current_tok.type in (TT_OUTPUT):
             left = self.current_tok
-            right = self.advance()
-            if right.type not in (TT_IDENTIFIER):
-                raise Error(right)
+            
+            self.advance()
+            right = self.expr()
 
             res = VisibleNode(left, right)
             return res
@@ -92,6 +92,8 @@ class Parser:
             return self.string()
         elif self.current_tok.type in (TT_BOOLEAN):
             return TroofNode(self.current_tok)
+        elif self.current_tok.type in (TT_IDENTIFIER):
+            return VariableNode(self.current_tok)
 
         raise Error(self.current_tok)
 
