@@ -181,6 +181,33 @@ class CaseBreakNode(BasicNode):
     pass
 
 
+class IfNode:
+    def __init__(self, orly, ifbody) -> None:
+        self.orly = orly
+        self.ifbody = ifbody
+
+    def __repr__(self) -> str:
+        return f'({self.orly}, {self.ifbody})'
+
+
+class ElseIfNode:
+    def __init__(self, mebbe, value, elsebody) -> None:
+        self.mebbe = mebbe
+        self.value = value
+        self.elsebody = elsebody
+
+    def __repr__(self) -> str:
+        return f'({self.mebbe}, {self.value}, {self.elsebody})'
+
+class ElseNode:
+    def __init__(self, nowai, elsebody) -> None:
+        self.nowai = nowai
+        self.elsebody = elsebody
+
+    def __repr__(self) -> str:
+        return f'({self.nowai}, {self.elsebody})'
+
+
 class StringNode:
     def __init__(self, qt1, string, qt2) -> None:
         self.qt1 = qt1

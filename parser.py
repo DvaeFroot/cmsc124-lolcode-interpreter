@@ -318,6 +318,57 @@ class Parser:
             return res
 
 
+    def ifbody(self):
+        while(self.token_idx < len(self.tokens)):
+            if self.tokens[self.token_idx].type not in (TT_BREAK, TT_CASE,TT_CONTROL_END):
+                if self.token_idx < len(self.tokens):
+                    if self.current_tok.type in (TT_CASEBREAK):
+                        yield CaseBreakNode(self.current_tok)
+                    else:
+                        yield self.statement()
+                    self.advance()
+            else:
+                 break
+
+
+    def elsecase(self):
+        if self.current_tok.type not in (TT_TRUTH):
+            raise Error(self.current_tok)
+        yield IfNode(self.current_tok, list(self.ifbody()))
+        self.advance()
+        while(self.token_idx < len(self.tokens)):
+            if self.tokens[self.token_idx].type not in (TT_CONTROL_END):
+                if self.token_idx < len(self.tokens):
+                    omg = self.current_tok
+                    if omg.type in (TT_ELIF):
+                        self.advance()
+                        value = self.literal()
+                        self.advance()
+                        ifbody = list(self.ifbody())
+                        yield ElseIfNode(omg, value, ifbody)
+                    elif omg.type in (TT_ELSE):
+                        self.advance()
+                        casebody = list(self.ifbody())
+                        yield ElseNode(omg, casebody)
+                        break
+            else:
+                 break
+
+
+    def ifelse(self):
+        if self.current_tok.type in (TT_IF):
+            op_token = self.current_tok
+            self.advance()
+            expr = list(self.elsecase())
+            oic = self.current_tok
+            if oic.type not in (TT_CONTROL_END):
+                raise Error(self.current_tok)
+            res = IfNode(op_token, expr)
+            return res
+        else:
+            raise Error(self.current_tok)
+
+
     def statement(self):
         res = None
         if self.current_tok.type in (GP_ARITHMETIC):
@@ -342,6 +393,8 @@ class Parser:
             res = self.string()
         elif self.current_tok.type in (TT_LOOP_STRT):
             res = self.loop()
+        elif self.current_tok.type in (TT_IF):
+            res = self.ifelse()
 
         return StatementNode("",res)
 
@@ -378,6 +431,3 @@ class Parser:
             return res
         except Error as err:
             return err
-
-
-
