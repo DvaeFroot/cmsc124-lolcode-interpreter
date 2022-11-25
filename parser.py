@@ -332,7 +332,6 @@ class Parser:
         if self.current_tok.type not in (TT_TRUTH):
             raise Error(self.current_tok)
         yield IfNode(self.current_tok, list(self.ifbody()))
-        self.advance()
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type not in (TT_CONTROL_END):
                 if self.token_idx < len(self.tokens):
@@ -345,11 +344,11 @@ class Parser:
                         yield ElseIfNode(omg, value, ifbody)
                     elif omg.type in (TT_ELSE):
                         self.advance()
-                        casebody = list(self.ifbody())
-                        yield ElseNode(omg, casebody)
+                        elsebody = list(self.ifbody())
+                        yield ElseNode(omg, elsebody)
                         break
             else:
-                 break
+                break
 
 
     def ifelse(self):
