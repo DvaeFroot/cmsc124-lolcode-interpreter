@@ -261,7 +261,7 @@ class Parser:
 
             return res
         except Error as err:
-            print(err)
+            return err
 
 
 
