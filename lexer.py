@@ -71,7 +71,7 @@ class Lexer(object):
             (r'\bOMGWTF\b',                               TT_BREAK),
             (r'\bMEBBE\b',                                TT_ELIF),
             (r'\bWTF\?',                                  TT_SWITCH),
-            (r'\bGTFO\b',                                 TT_SWITCH),
+            (r'\bGTFO\b',                                 TT_CASEBREAK),
             (r'\bWILE\b',                                 TT_WHILE),
             (r'\bOIC\b',                                  TT_CONTROL_END),
             (r'\bOMG\b',                                  TT_CASE),

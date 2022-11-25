@@ -49,6 +49,7 @@ TT_ELSE =               'Else Keyword'
 TT_SWITCH =             'Switch Case Keyword'
 TT_TRUTH =              'Truth Codeblock keyword'
 TT_BREAK =              'Break Default Keyword'
+TT_CASEBREAK =          'Case Break Keyword'
 TT_CONTROL_END =        'End of control statement'
 TT_CASE =               'Case Keyword'
 
