@@ -58,3 +58,29 @@ class NumbarNode():
 
     def __repr__(self) -> str:
         return f'({self.token})'
+
+class VariableNode():
+    def __init__(self,token):
+        self.token = token
+
+    def __repr__(self) -> str:
+        return f'({self.token})'
+
+class AssignmentLongNode():
+    def __init__(self,ihasa,variable,itz,expr):
+        self.ihasa = ihasa
+        self.variable = variable
+        self.itz = itz
+        self.expr = expr
+
+    def __repr__(self) -> str:
+        return f'({self.ihasa}, {self.variable}, {self.itz}, {self.expr})'
+
+class AssignmentShortNode():
+    def __init__(self,variable,r,expr):
+        self.variable = variable
+        self.r = r
+        self.expr = expr
+
+    def __repr__(self) -> str:
+        return f'({self.variable}, {self.r}, {self.expr})'
