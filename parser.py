@@ -1,4 +1,12 @@
 from token_types import *
+from nodes import *
+
+class Error:
+    def __init__(self) -> None:
+        pass
+
+    def __repr__(self) -> str:
+        return 'Error LOL'
 
 
 class Parser:
@@ -14,10 +22,19 @@ class Parser:
 
     def parse(self):
         res = self.code()
+        return res
 
     # OTHER STUFF
 
     def code(self):
-        pass
+        #Start of code
+        if self.current_tok.type != TT_CODE_STRT or self.current_tok.type == TT_EOF:
+            return Error()
+
+        self.advance()
+
+        #End of code
+
+        return
 
 
