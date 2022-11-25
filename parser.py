@@ -53,8 +53,16 @@ class Parser:
             return res
         return Error()
 
-    #  def comparison(self):
-    #      if self.current_tok.type in (TT_)
+    def comparison(self):
+        if self.current_tok.type in (GP_COMPARISON):
+            op_token = self.current_tok
+            expr1 = self.expr()
+            an = self.advance()
+            if an.type not in (TT_ARG_SEP):
+                raise Error()
+            expr2 = self.expr()
+            res = ComparisonNode(op_token, expr1, an, expr2)
+            return res
 
     def expr(self):
         if self.current_tok.type in (GP_ARITHMETIC):
@@ -79,6 +87,7 @@ class Parser:
 
         return Error()
 
+
     def variableLong(self):
         if self.current_tok.type in (TT_VAR_DEC):
             ihasa_token = self.current_tok
@@ -95,6 +104,7 @@ class Parser:
 
             res = AssignmentLongNode(ihasa_token, variable, itz, expr)
             return res
+
 
     def variableShort(self):
         if self.current_tok.type in (TT_IDENTIFIER):
@@ -128,6 +138,8 @@ class Parser:
             res = self.variableLong()
         elif self.current_tok.type in (TT_IDENTIFIER):
             res = self.variableShort()
+        elif self.current_tok.type in (GP_COMPARISON):
+            res = self.comparison()
 
         return StatementNode("",res)
 
