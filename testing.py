@@ -151,14 +151,13 @@ doTest("Assignment Troof",
         KTHXBYE
        """)
 
-doTest("Invalid Assignment Variable",
+doTest("Assignment Variable",
        """
         HAI
         VARIABLE R VARIABLE
         I HAS A VAR ITZ VAR
         KTHXBYE
-       """,
-       shouldFail=True)
+       """)
 
 print("\n OPERATIONS: Arithmetic \n")
 
