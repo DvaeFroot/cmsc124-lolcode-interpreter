@@ -320,12 +320,9 @@ class Parser:
 
     def ifbody(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type not in (TT_BREAK, TT_CASE,TT_CONTROL_END):
+            if self.tokens[self.token_idx].type not in (TT_ELIF, TT_ELSE, TT_CONTROL_END):
                 if self.token_idx < len(self.tokens):
-                    if self.current_tok.type in (TT_CASEBREAK):
-                        yield CaseBreakNode(self.current_tok)
-                    else:
-                        yield self.statement()
+                    yield self.statement()
                     self.advance()
             else:
                  break
