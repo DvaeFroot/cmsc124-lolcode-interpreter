@@ -48,7 +48,17 @@ doTest("Multiline Comment",
         OBTW this
             Way
         TLDR
-        KTHXBYE""", printOutput=False)
+        KTHXBYE""")
+
+doTest("Invalid Multiline Comment",
+       """
+       HAI
+       I HAS A var ITZ 2 OBTW Hi! TLDR
+       I HAS A var OBTW noot TLDR ITZ 2
+       I HAS A num OBTW konnichiwa
+       TLDR
+       KTHXBYE"""
+        ,shouldFail=True)
 
 print("\n USER INPUT \n")
 
@@ -343,6 +353,44 @@ doTest("Relational Comparison",
         BOTH SAEM x AN SMALLR OF x AN y BTW x <= y
         DIFFRINT x AN SMALLR OF x AN y BTW x > y
         DIFFRINT x AN BIGGR OF x AN y BTW x < y
+        KTHXBYE
+       """)
+
+print("\n IF THEN \n")
+
+doTest("if statement minimum",
+       """
+        HAI
+       O RLY?
+       YA RLY
+              VISIBLE "TEST"
+       OIC
+        KTHXBYE
+       """)
+
+doTest("if statement with else",
+       """
+        HAI
+       O RLY?
+       YA RLY
+       VISIBLE "TEST"
+       NO WAI
+       VISIBLE "TEST"
+       OIC
+        KTHXBYE
+       """)
+
+doTest("if statement with else and mebber",
+       """
+        HAI
+       O RLY?
+       YA RLY
+              VISIBLE "TEST"
+       MEBBE "1"
+              VISIBLE "TEST"
+       NO WAI BTW else
+              VISIBLE "TEST"
+       OIC
         KTHXBYE
        """)
 
