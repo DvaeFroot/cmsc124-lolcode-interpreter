@@ -35,6 +35,36 @@ doTest("Invalid Typo Blank Program",
        """,
        shouldFail=True)
 
+print("\n USER INPUT \n")
+
+doTest("Input Variable",
+       """
+        HAI
+        GIMMEH x
+        KTHXBYE
+       """)
+
+doTest("Invalid Input Yarn",
+       """
+        HAI
+        GIMMEH "x yarn"
+        KTHXBYE
+       """,shouldFail=True)
+
+doTest("Invalid Input Numbr",
+       """
+        HAI
+        GIMMEH 69
+        KTHXBYE
+       """,shouldFail=True)
+
+doTest("Invalid Input Numbar",
+       """
+        HAI
+        GIMMEH 1.23
+        KTHXBYE
+       """,shouldFail=True)
+
 print("\n USER OUTPUT \n")
 
 doTest("Print Yarn",
