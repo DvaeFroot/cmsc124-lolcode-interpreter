@@ -2,6 +2,7 @@
 import re
 from token_types import *
 
+
 class Token(object):
     def __init__(self, type, val, pos):
         self.type = type
@@ -100,6 +101,7 @@ class Lexer(object):
             #identifier
             (r'\b[a-zA-Z]\w*\b',                          'Identifier'),
         ]
+
         regex_parts = []
         self.group_type = {}
 
@@ -122,6 +124,7 @@ class Lexer(object):
     def input(self, buf):
         self.buf = buf
         self.pos = 0
+
 
     def token(self):
         if self.pos >= len(self.buf):
@@ -183,7 +186,7 @@ class Lexer(object):
                     self.pos = m.start()
                 else:
                     self.pos = len(self.buf)
-                
+
                 return tok
 
             #Get the first space from starting position
@@ -191,6 +194,7 @@ class Lexer(object):
 
             if m == None:
                 #No match means end of file
+                tok = Token(TT_EOF, )
                 return None
 
             #Get new starting position for regex searching
@@ -231,14 +235,14 @@ HOW IZ I POWERTWO YR NUM
    BOTH SAEM NUM AN 0, O RLY?
       YA RLY, FOUND YR 1
    OIC
-  
+
    BTW CALCULATE 2 TO POWER OF NUM
    I HAS A INDEX ITZ 0
    I HAS A TOTAL ITZ 1
    IM IN YR LOOP UPPIN YR INDEX TIL BOTH SAEM INDEX AN NUM
       TOTAL R PRODUKT OF TOTAL AN 2
    IM OUTTA YR LOOP
-  
+
    FOUND YR TOTAL
    IF U SAY SO
    BTW OUTPUT: 8
@@ -252,4 +256,4 @@ KTHXBYE"""
             print(tok)
     except LexerError as err:
         print('LexerError at position %s' % err.pos)
-    
+
