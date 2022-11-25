@@ -29,6 +29,27 @@ IM OUTTA YR umum
     KTHXBYE
        """, printOutput=False)
 
+print("\n COMMENTS \n")
+
+doTest("Multiline Comment",
+       """
+        HAI
+        OBTW what way?
+        TLDR I HAS A var2
+        I HAS A var3
+        KTHXBYE""")
+
+doTest("Multiline Comment",
+       """
+        HAI
+        OBTW what way?
+        TLDR I HAS A var2
+        I HAS A var3
+        OBTW this
+            Way
+        TLDR
+        KTHXBYE""")
+
 print("\n USER INPUT \n")
 
 doTest("Input Variable",
@@ -260,6 +281,68 @@ doTest("MOD Numbar",
        """
         HAI
         MOD OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+doTest("BIGGR Numbr",
+       """
+        HAI
+        MOD OF 1 AN 2
+        KTHXBYE
+       """)
+
+doTest("BIGGR Numbar",
+       """
+        HAI
+        BIGGR OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+doTest("SMALLR Numbr",
+       """
+        HAI
+        SMALLR OF 1 AN 2
+        KTHXBYE
+       """)
+
+doTest("SMALLR Numbar",
+       """
+        HAI
+        SMALLR OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+doTest("Chain Arithmetic 1",
+       """
+        HAI
+        SUM OF QUOSHUNT OF PRODUKT OF 3 AN 4 AN 2 AN 1
+        KTHXBYE
+       """)
+
+doTest("Chain Arithmetic 2",
+       """
+        HAI
+        SUM OF SUM OF SUM OF 3 AN 4 AN 2 AN 1
+        KTHXBYE
+       """)
+
+print("\n Operations: Comparison \n")
+
+doTest("Comparison",
+       """
+        HAI
+        BOTH SAEM x AN y
+        DIFFRINT x AN y
+        KTHXBYE
+       """)
+
+doTest("Relational Comparison",
+       """
+        HAI
+        BOTH SAEM x AN BIGGR OF x AN y BTW x >= y
+        BOTH SAEM x AN SMALLR OF x AN y BTW x <= y
+        DIFFRINT x AN SMALLR OF x AN y BTW x > y
+        DIFFRINT x AN BIGGR OF x AN y BTW x < y
         KTHXBYE
        """)
 
