@@ -48,7 +48,7 @@ doTest("Multiline Comment",
         OBTW this
             Way
         TLDR
-        KTHXBYE""", printOutput=True)
+        KTHXBYE""", printOutput=False)
 
 print("\n USER INPUT \n")
 
