@@ -143,4 +143,4 @@ class SwitchCaseNode:
         self.statement = statement
 
     def __repr__(self) -> str:
-        return f'({self.omg}, {self.value}, {self.statement}, {self.next})'
+        return f'({self.omg}, {self.value}, {self.statement})'

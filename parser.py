@@ -2,14 +2,14 @@ from token_types import *
 from nodes import *
 
 class Error(Exception):
-    def __init__(self) -> None:
-        pass
+    def __init__(self, token) -> None:
+        self.token = token
 
     def __repr__(self) -> str:
-        return 'Error LOL'
+        return f'Error LOL at {self.token}'
 
     def __str__(self) -> str:
-        return 'Error LOL'
+        return f'Error LOL at {self.token}'
 
 class Parser:
     def __init__(self, tokens) -> None:
@@ -35,11 +35,11 @@ class Parser:
             left = self.current_tok
             right = self.advance()
             if right.type not in (TT_IDENTIFIER):
-                raise Error()
+                raise Error(right)
 
-            res = GimmehNode(left, right)
+            res = VisibleNode(left, right)
             return res
-        raise Error()
+        raise Error(self.current_tok)
 
 
     def get_input(self):
@@ -47,11 +47,11 @@ class Parser:
             left = self.current_tok
             right = self.advance()
             if right.type not in (TT_IDENTIFIER):
-                raise Error()
+                raise Error(self.current_tok)
 
             res = GimmehNode(left, right)
             return res
-        raise Error()
+        raise Error(self.current_tok)
 
 
     def comparison(self):
@@ -61,7 +61,7 @@ class Parser:
             expr1 = self.expr()
             an = self.advance()
             if an.type not in (TT_ARG_SEP):
-                raise Error()
+                raise Error(self.current_tok)
             self.advance()
             expr2 = self.expr()
             res = ComparisonNode(op_token, expr1, an, expr2)
@@ -76,7 +76,7 @@ class Parser:
             left = self.expr()
             an = self.advance()
             if an.type not in (TT_ARG_SEP):
-                raise Error()
+                raise Error(self.current_tok)
             self.advance()
             right = self.expr()
 
@@ -89,7 +89,7 @@ class Parser:
             elif tok.type in (TT_INTEGER):
                 return NumbrNode(tok)
 
-        raise Error()
+        raise Error(self.current_tok)
 
 
     def variableLong(self):
@@ -98,11 +98,11 @@ class Parser:
 
             variable = self.advance()
             if variable.type not in (TT_IDENTIFIER):
-                raise Error()
+                raise Error(self.current_tok)
             variable = VariableNode(self.current_tok)
             itz = self.advance()
             if itz.type not in (TT_VAR_ASSIGN):
-                raise Error()
+                raise Error(self.current_tok)
             self.advance()
             expr = self.expr()
 
@@ -115,13 +115,13 @@ class Parser:
 
             variable = self.current_tok
             if variable.type not in (TT_IDENTIFIER):
-                raise Error()
+                raise Error(self.current_tok)
 
             variable = VariableNode(self.current_tok)
 
             r = self.advance()
             if r.type not in (TT_VAR_VAL_ASSIGN):
-                raise Error()
+                raise Error(self.current_tok)
 
             self.advance()
             expr = self.expr()
@@ -144,11 +144,11 @@ class Parser:
             elif possibleA.type in (TT_TYPE):
                 return TypecastShortNode(maek,expr,possibleA)
             else:
-                raise Error()
+                raise Error(self.current_tok)
 
             ttype = self.advance()
             if ttype.type not in (TT_TYPE):
-                raise Error()
+                raise Error(self.current_tok)
 
             res = TypecastLongNode(maek,expr,possibleA,ttype)
             return res
@@ -161,7 +161,7 @@ class Parser:
             expr1 = self.expr()
             an = self.advance()
             if an.type not in (TT_ARG_SEP):
-                raise Error()
+                raise Error(self.current_tok)
             self.advance()
             expr2 = self.expr()
             res = BooleanLongNode(op_token, expr1, an, expr2)
@@ -174,25 +174,24 @@ class Parser:
             return res
 
     def casebody(self):
-        while(self.token_idx+1 < len(self.tokens)):
-            if self.tokens[self.token_idx+1].type not in (TT_CASE+TT_CONTROL_END):
-                if self.token_idx+1 < len(self.tokens):
+        while(self.token_idx < len(self.tokens)):
+            if self.tokens[self.token_idx].type not in (TT_CASE,TT_CONTROL_END):
+                if self.token_idx < len(self.tokens):
                     yield self.statement()
                     self.advance()
             else:
                  break
 
     def switchcase(self):
-        while(self.token_idx+1 < len(self.tokens)):
-            if self.tokens[self.token_idx+1].type not in (TT_CONTROL_END):
-                if self.token_idx+1 < len(self.tokens):
+        while(self.token_idx < len(self.tokens)):
+            if self.tokens[self.token_idx].type not in (TT_CONTROL_END):
+                if self.token_idx < len(self.tokens):
                     omg = self.current_tok
                     value = self.advance()
-                    if value not in (GP_LITERAL):
-                        raise Error()
-                    casebody = self.casebody()
+                    if value.type not in (GP_LITERAL):
+                        raise Error(self.current_tok)
+                    casebody = list(self.casebody())
                     yield SwitchCaseNode(omg, value, casebody)
-                    self.advance()
             else:
                  break
 
@@ -200,10 +199,15 @@ class Parser:
     def switch(self):
         if self.current_tok.type in (TT_SWITCH):
             op_token = self.current_tok
-            expr = self.switchcase()
+            self.advance()
+            expr = list(self.switchcase())
+            oic = self.current_tok
+            if oic.type not in (TT_CONTROL_END):
+                raise Error(self.current_tok)
             res = SwitchNode(op_token, expr)
+            return res
         else:
-            raise Error()
+            raise Error(self.current_tok)
 
 
 
@@ -245,7 +249,7 @@ class Parser:
         try:
             #Start of code
             if self.current_tok.type not in (TT_CODE_STRT):
-                raise Error()
+                raise Error(self.current_tok)
 
             start_node = self.current_tok
             self.advance()
@@ -255,7 +259,7 @@ class Parser:
             #End of code
             end_node = self.advance()
             if self.current_tok.type not in (TT_CODE_END):
-                raise Error()
+                raise Error(self.current_tok)
 
             res = Program(start_node, body_node, end_node)
 
