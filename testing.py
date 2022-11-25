@@ -268,3 +268,29 @@ doTest("MOD Numbar",
         MOD OF 1.2 AN 2.1
         KTHXBYE
        """)
+
+print("\n SWITCH \n")
+
+doTest("Switch All",
+       """
+        HAI
+        WTF? BTW uses value in IT
+        OMG "<value literal>"
+            VISIBLE "OMG"
+        OMG 10
+            VISIBLE "OMG"
+        OMGWTF
+            VISIBLE "OMGWTF"
+        OIC
+        KTHXBYE
+       """)
+
+doTest("Switch 1 omg",
+       """
+        HAI
+        WTF? BTW uses value in IT
+        OMG "<value literal>"
+            VISIBLE "OMG"
+        OIC
+        KTHXBYE
+       """)
