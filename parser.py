@@ -53,6 +53,7 @@ class Parser:
             return res
         raise Error()
 
+
     def comparison(self):
         if self.current_tok.type in (GP_COMPARISON):
             op_token = self.current_tok
@@ -65,6 +66,7 @@ class Parser:
             expr2 = self.expr()
             res = ComparisonNode(op_token, expr1, an, expr2)
             return res
+
 
     def expr(self):
         if self.current_tok.type in (GP_ARITHMETIC):
@@ -127,6 +129,7 @@ class Parser:
             res = AssignmentShortNode(variable, r, expr)
             return res
 
+
     def typecast(self):
         if self.current_tok.type in (TT_TYPECAST_2):
 
@@ -151,7 +154,6 @@ class Parser:
             return res
 
 
-
     def boolean(self):
         if self.current_tok.type in (GP_BOOLEAN_LONG):
             op_token = self.current_tok
@@ -170,6 +172,39 @@ class Parser:
             expr = self.expr()
             res = BooleanShortNode(op_token, expr)
             return res
+
+    def casebody(self):
+        while(self.token_idx+1 < len(self.tokens)):
+            if self.tokens[self.token_idx+1].type not in (TT_CASE+TT_CONTROL_END):
+                if self.token_idx+1 < len(self.tokens):
+                    yield self.statement()
+                    self.advance()
+            else:
+                 break
+
+    def switchcase(self):
+        while(self.token_idx+1 < len(self.tokens)):
+            if self.tokens[self.token_idx+1].type not in (TT_CONTROL_END):
+                if self.token_idx+1 < len(self.tokens):
+                    omg = self.current_tok
+                    value = self.advance()
+                    if value not in (GP_LITERAL):
+                        raise Error()
+                    casebody = self.casebody()
+                    yield SwitchCaseNode(omg, value, casebody)
+                    self.advance()
+            else:
+                 break
+
+
+    def switch(self):
+        if self.current_tok.type in (TT_SWITCH):
+            op_token = self.current_tok
+            expr = self.switchcase()
+            res = SwitchNode(op_token, expr)
+        else:
+            raise Error()
+
 
 
     def statement(self):
@@ -190,6 +225,8 @@ class Parser:
             res = self.boolean()
         elif self.current_tok.type in (TT_TYPECAST_2):
             res = self.typecast()
+        elif self.current_tok.type in (TT_SWITCH):
+            res = self.switch()
 
         return StatementNode("",res)
 
@@ -207,7 +244,7 @@ class Parser:
     def code(self):
         try:
             #Start of code
-            if self.current_tok.type != TT_CODE_STRT:
+            if self.current_tok.type not in (TT_CODE_STRT):
                 raise Error()
 
             start_node = self.current_tok
@@ -217,7 +254,7 @@ class Parser:
 
             #End of code
             end_node = self.advance()
-            if self.current_tok.type != TT_CODE_END:
+            if self.current_tok.type not in (TT_CODE_END):
                 raise Error()
 
             res = Program(start_node, body_node, end_node)

@@ -127,3 +127,20 @@ class TypecastShortNode():
 
     def __repr__(self) -> str:
         return f'({self.maek}, {self.expr}, {self.type})'
+
+class SwitchNode:
+    def __init__(self, op_token, expr) -> None:
+        self.op_token = op_token
+        self.expr = expr
+
+    def __repr__(self) -> str:
+        return f'({self.op_token}, {self.expr})'
+
+class SwitchCaseNode:
+    def __init__(self, omg, value, statement) -> None:
+        self.omg = omg
+        self.value = value
+        self.statement = statement
+
+    def __repr__(self) -> str:
+        return f'({self.omg}, {self.value}, {self.statement}, {self.next})'
