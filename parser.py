@@ -33,12 +33,15 @@ class Parser:
     def print(self):
         if self.current_tok.type in (TT_OUTPUT):
             left = self.current_tok
-            right = self.advance()
-            if right.type not in (TT_IDENTIFIER):
-                raise Error(right)
-
-            res = VisibleNode(left, right)
-            return res
+            self.advance()
+            if self.current_tok.type in (TT_IDENTIFIER):
+                right = self.current_tok
+                res = VisibleNode(left, right)
+                return res
+            else:
+                right = self.expr()
+                res = VisibleNode(left, right)
+                return res
         raise Error(self.current_tok)
 
 
