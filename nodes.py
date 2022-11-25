@@ -22,7 +22,7 @@ class StatementNode():
         self.statement = statement
 
     def __repr__(self) -> str:
-        return f'({self.statement})'
+        return f'({self.statement})\n'
 
 
 class ArithmeticNode():
@@ -33,7 +33,7 @@ class ArithmeticNode():
         self.right = right
 
     def __repr__(self) -> str:
-        return f'({self.operator}, {self.left}, {self.an}, {self.right})'
+        return f'({self.operator}, {self.left}, {self.an}, {self.right})\n'
 
 
 class OperatorNode():

@@ -48,7 +48,6 @@ class Lexer(object):
             #Arithmetic
             (r'\bQUOSHUNT\sOF\b',                         TT_DIV_OP),
             (r'\bPRODUKT\sOF\b',                          TT_MUL_OP),
-            (r'\bBOTH\sSAEM\b',                           TT_EQU_OP),
             (r'\bEITHER\sOF\b',                           TT_OR_OP),
             (r'\bDIFF\sOF\b',                             TT_SUB),
             (r'\bMOD\sOF\b',                              TT_MOD),
@@ -57,6 +56,7 @@ class Lexer(object):
             (r'\bUPPIN\b',                                TT_INC),
 
             #RELATIONAL
+            (r'\bBOTH\sSAEM\b',                           TT_EQU_OP),
             (r'\bBOTH\sOF\b',                             TT_AND),
             (r'\bDIFFRINT\b',                             TT_NEQU),
             (r'\bALL\sOF\b',                              TT_AND_INF),
@@ -251,7 +251,11 @@ if __name__ == '__main__':
 #     "HELLO"
 #  KTHXBYE"""
     txt = """HAI
-        I HAS A
+        PRODUKT OF SUM OF 8 AN 10 AN DIFF OF 5 AN 6
+        PRODUKT OF SUM OF 8 AN 10 AN DIFF OF 5 AN 6
+        PRODUKT OF SUM OF 8 AN 10 AN DIFF OF 5 AN 6
+        PRODUKT OF SUM OF 8 AN 10 AN DIFF OF 5 AN 6
+        NEXT
     KTHXBYE"""
     lx.input(txt)
 

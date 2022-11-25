@@ -78,3 +78,6 @@ TT_MKAY =               'MKAY Keyword'
 TT_STR_DELIMITER =      'String Delimiter'
 TT_IDENTIFIER =         'Identifier'
 TT_EOF =                'EOF'
+
+#GROUPS
+GP_ARITHMETIC = (TT_SUMMATION, TT_SUB, TT_MUL_OP, TT_DIV_OP, TT_MOD, TT_DEC)
