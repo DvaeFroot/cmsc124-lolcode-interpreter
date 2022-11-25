@@ -1,81 +1,6 @@
 #Forked from https://gist.github.com/eliben/5797351
 import re
-
-TT_STRING =             'String Literal'
-TT_TYPE =               'Type Literal'
-TT_BOOLEAN =            'Boolean Literal'
-TT_FLOAT =              'Float Literal'
-TT_INTEGER =            'Integer Literal'
-
-#Keywords
-#END
-TT_FUNC_END =           'Function Closing Keyword'
-TT_LOOP_END =           'Loop Closing Keyword'
-
-#Operators
-#Arithmetic
-TT_DIV_OP =             'Division Operator'
-TT_MUL_OP =             'Multiplication Operator'
-TT_EQU_OP =             'Equality Operator'
-TT_OR_OP =              'Or Operator'
-
-
-TT_TYPECAST =           'Typecast Keyword'
-TT_MIN =                'Return Minimum Keyword'
-TT_MAX =                'Return Maximum Keyword'
-TT_VAR_DEC =            'Variable Declaration'
-
-#START
-TT_FUNC_STRT = 'Function Declaration'
-TT_LOOP_STRT = 'Loop Start Keyword'
-
-TT_VARIABLE='IS NOW A'
-TT_VARIABLE='Return Minimum Keyword'
-TT_VARIABLE='Return Maximum Keyword'
-TT_VARIABLE='Variable Declaration'
-TT_VARIABLE='And Operator'
-TT_VARIABLE='Subtraction Operator'
-TT_VARIABLE='Not Equal Operator'
-TT_VARIABLE='If conditional'
-TT_VARIABLE='Infinite Arity And Operator'
-TT_VARIABLE='Infinite Arity Or Operator'
-TT_VARIABLE='Code End Delimiter'
-TT_VARIABLE='Modulo Operator'
-TT_VARIABLE='Else Keyword'
-TT_VARIABLE='Summation Keyword'
-TT_VARIABLE='Output Keyword'
-TT_VARIABLE='XOR Operator'
-TT_VARIABLE='Truth Codeblock keyword'
-TT_VARIABLE='Read Keyword'
-TT_VARIABLE='Decrement Keyword'
-TT_BREAK='Break Default Keyword'
-TT_VARIABLE='Concatenation Keyword'
-TT_VARIABLE='Return Keyword'
-TT_VARIABLE='Function Call'
-TT_VARIABLE='Else If Keyword'
-TT_VARIABLE='Increment Keyword'
-TT_VARIABLE='Switch Case Keyword'
-TT_VARIABLE='Return Keyword with no value'
-TT_VARIABLE='Typecast Keyword'
-TT_VARIABLE='MKAY Keyword'
-TT_VARIABLE='Multiline Comment Start Delimiter'
-TT_VARIABLE='Multiline Comment End Delimiter'
-TT_VARIABLE='While Keyword'
-TT_VARIABLE='Comment Delimiter'
-TT_VARIABLE='Code Delimiter'
-TT_VARIABLE='Variable Assignment'
-TT_VARIABLE='Not Operator'
-TT_VARIABLE='End of control statement'
-TT_VARIABLE='Case Keyword'
-TT_VARIABLE='Until Keyword'
-TT_VARIABLE='Argument Separator'
-TT_VARIABLE='YR Keyword'
-TT_VARIABLE='A Keyword'
-TT_VARIABLE='Value Assignment Operator'
-TT_VARIABLE='String Delimiter'
-TT_VARIABLE='Identifier'
->>>>>>> 8118304c104dae14063551d049d4c92b60479bcc
-
+from token_types import *
 
 class Token(object):
     def __init__(self, type, val, pos):
@@ -103,69 +28,76 @@ class Lexer(object):
             (r'\b0|-?[1-9][0-9]*\b',                      TT_INTEGER),
 
             # keywords
+            #START
+            (r'\bHOW\sIZ\sI\b',                           TT_FUNC_STRT),
+            (r'\bIM\sIN\sYR\b',                           TT_LOOP_STRT),
+            (r'\bHAI\b',                                  TT_CODE_STRT),
+
             #END
-            (r'\bIF\sU\sSAY\sSO\b',                       TT_FUNC_NED),
+            (r'\bIF\sU\sSAY\sSO\b',                       TT_FUNC_END),
             (r'\bIM\sOUTTA\sYR\b',                        TT_LOOP_END),
+            (r'\bKTHXBYE\b',                              TT_CODE_END),
 
             #OPERATOR
+            (r'\bI\sHAS\sA\b',                            TT_VAR_DEC),
+            (r'\bIS\sNOW\sA\b',                           TT_TYPECAST_1),
+            (r'\bMAEK\b',                                 TT_TYPECAST_2),
+
             #Arithmetic
             (r'\bQUOSHUNT\sOF\b',                         TT_DIV_OP),
             (r'\bPRODUKT\sOF\b',                          TT_MUL_OP),
             (r'\bBOTH\sSAEM\b',                           TT_EQU_OP),
             (r'\bEITHER\sOF\b',                           TT_OR_OP),
+            (r'\bDIFF\sOF\b',                             TT_SUB),
+            (r'\bMOD\sOF\b',                              TT_MOD),
+            (r'\bSUM\sOF\b',                              TT_SUMMATION),
+            (r'\bNERFIN\b',                               TT_DEC),
+            (r'\bUPPIN\b',                                TT_INC),
 
             #RELATIONAL
+            (r'\bBOTH\sOF\b',                             TT_AND),
+            (r'\bDIFFRINT\b',                             TT_NEQU),
+            (r'\bALL\sOF\b',                              TT_AND_INF),
+            (r'\bANY\sOF\b',                              TT_OR_INF),
+            (r'\bNO\sWAI\b',                              TT_ELSE),
+            (r'\bWON\sOF\b',                              TT_XOR),
+            (r'\bNOT\b',                                  TT_NOT),
 
-            (r'\bIS\sNOW\sA\b',                           TT_TYPECAST),
+            #CONTROL
+            (r'\bO\sRLY\?',                               TT_IF),
+            (r'\bYA\sRLY\b',                              TT_TRUTH),
+            (r'\bOMGWTF\b',                               TT_BREAK),
+            (r'\bMEBBE\b',                                TT_ELIF),
+            (r'\bWTF\?',                                  TT_SWITCH),
+            (r'\bGTFO\b',                                 TT_SWITCH),
+            (r'\bWILE\b',                                 TT_WHILE),
+            (r'\bOIC\b',                                  TT_CONTROL_END),
+            (r'\bOMG\b',                                  TT_CASE),
+            (r'\bTIL\b',                                  TT_UNTIL),
+
+            (r'\bI\sIZ\b',                                TT_FUNCALL),
+            (r'\bFOUND\b',                                TT_RETURN),
+
+            #OPERATION
+            (r'\bVISIBLE\b',                              TT_OUTPUT),
+            (r'\bGIMMEH\b',                               TT_READ),
+            (r'\bSMOOSH\b',                               TT_CONCAT),
+            (r'\bITZ\b',                                  TT_VAR_ASSIGN),
             (r'\bSMALLR\sOF\b',                           TT_MIN),
             (r'\bBIGGR\sOF\b',                            TT_MAX),
-            (r'\bI\sHAS\sA\b',                            TT_VAR_DEC),
+            (r'\bR\b',                                    TT_VAR_VAL_ASSIGN),
 
-            #START
-            (r'\bHOW\sIZ\sI\b',                           TT_FUNC_STRT),
-            (r'\bIM\sIN\sYR\b',                           TT_LOOP_STRT),
+            #OTHERS
+            (r'\bOBTW\b',                                 TT_COMMENT_MULTI_STRT),
+            (r'\bTLDR\b',                                 TT_COMMENT_MULTI_END),
+            (r'\bBTW\b',                                  TT_COMMENT_STRT),
+            (r'\bMKAY\b',                                 TT_MKAY),
+            (r'\bAN\b',                                   TT_ARG_SEP),
+            (r'\bYR\b',                                   TT_YR),
+            (r'\bA\b',                                    TT_A),
+            (r'\"',                                       TT_STRING),
 
-            (r'\bBOTH\sOF\b',                             'And Operator'),
-            (r'\bDIFF\sOF\b',                             'Subtraction Operator'),
-            (r'\bDIFFRINT\b',                             'Not Equal Operator'),
-            (r'\bO\sRLY\?',                               'If conditional'),
-            (r'\bALL\sOF\b',                              'Infinite Arity And Operator'),
-            (r'\bANY\sOF\b',                              'Infinite Arity Or Operator'),
-            (r'\bKTHXBYE\b',                              'Code End Delimiter'),
-            (r'\bMOD\sOF\b',                              'Modulo Operator'),
-            (r'\bNO\sWAI\b',                              'Else Keyword'),
-            (r'\bSUM\sOF\b',                              'Summation Keyword'),
-            (r'\bVISIBLE\b',                              'Output Keyword'),
-            (r'\bWON\sOF\b',                              'XOR Operator'),
-            (r'\bYA\sRLY\b',                              'Truth Codeblock keyword'),
-            (r'\bGIMMEH\b',                               'Read Keyword'),
-            (r'\bNERFIN\b',                               'Decrement Keyword'),
-            (r'\bOMGWTF\b',                               'Break Default Keyword'),
-            (r'\bSMOOSH\b',                               'Concatenation Keyword'),
-            (r'\bFOUND\b',                                'Return Keyword'),
-            (r'\bI\sIZ\b',                                'Function Call'),
-            (r'\bMEBBE\b',                                'Else If Keyword'),
-            (r'\bUPPIN\b',                                'Increment Keyword'),
-            (r'\bWTF\?',                                  'Switch Case Keyword'),
-            (r'\bGTFO\b',                                 'Return Keyword with no value'),
-            (r'\bMAEK\b',                                 'Typecast Keyword'),
-            (r'\bMKAY\b',                                 'MKAY Keyword'),
-            (r'\bOBTW\b',                                 'Multiline Comment Start Delimiter'),
-            (r'\bTLDR\b',                                 'Multiline Comment End Delimiter'),
-            (r'\bWILE\b',                                 'While Keyword'),
-            (r'\bBTW\b',                                  'Comment Delimiter'),
-            (r'\bHAI\b',                                  'Code Delimiter'),
-            (r'\bITZ\b',                                  'Variable Assignment'),
-            (r'\bNOT\b',                                  'Not Operator'),
-            (r'\bOIC\b',                                  'End of control statement'),
-            (r'\bOMG\b',                                  'Case Keyword'),
-            (r'\bTIL\b',                                  'Until Keyword'),
-            (r'\bAN\b',                                   'Argument Separator'),
-            (r'\bYR\b',                                   'YR Keyword'),
-            (r'\bA\b',                                    'A Keyword'),
-            (r'\bR\b',                                    'Value Assignment Operator'),
-            (r'\"',                                        'String Delimiter'),
-            #  identifier
+            #identifier
             (r'\b[a-zA-Z]\w*\b',                          'Identifier'),
         ]
         regex_parts = []
