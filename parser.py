@@ -90,6 +90,8 @@ class Parser:
                 return NumbrNode(tok)
         elif self.current_tok.type in (TT_STR_DELIMITER):
             return self.string()
+        elif self.current_tok.type in (TT_BOOLEAN):
+            return TroofNode(self.current_tok)
 
         raise Error(self.current_tok)
 
@@ -104,7 +106,8 @@ class Parser:
             variable = VariableNode(self.current_tok)
             itz = self.advance()
             if itz.type not in (TT_VAR_ASSIGN):
-                raise Error(self.current_tok)
+                res = AssignmentShlongNode(ihasa_token, variable)
+                return res
             self.advance()
             expr = self.expr()
 

@@ -80,6 +80,14 @@ class GimmehNode(UnaryOpNode):
 class VisibleNode(UnaryOpNode):
     pass
 
+class AssignmentShlongNode():
+    def __init__(self,ihasa,variable):
+        self.ihasa = ihasa
+        self.variable = variable
+
+    def __repr__(self) -> str:
+        return f'({self.ihasa}, {self.variable})'
+
 class AssignmentLongNode():
     def __init__(self,ihasa,variable,itz,expr):
         self.ihasa = ihasa
@@ -156,3 +164,6 @@ class StringNode:
 
     def __repr__(self) -> str:
         return f'({self.qt1}, {self.string}, {self.qt2})'
+
+class TroofNode(BasicNode):
+    pass
