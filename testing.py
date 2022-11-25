@@ -1,26 +1,28 @@
 from lexer import *
 from parser import *
 
-def doTest(name,shouldPass,txt,):
+
+def doTest(name, txt, shouldFail=False):
     lx = Lexer()
     lx.input(txt)
     res = Parser(list(lx.tokens()))
-    hasError = 'Error LOL' in str(res.parse())
-    if not shouldPass:
-        hasError = not hasError
-    print(name, "failed" if hasError else "passed")
-    
+    output = str(res.parse())
+    hasError = 'Error LOL' in output
+    if hasError == (not shouldFail):
+        print("FAILED:", name)
+    else:
+        print("PASSED:", name)
+
 
 doTest("Blank Program",
-       True,
        """
        HAI
-       KTHXBYE
+    KTHXBYE
        """)
 
 doTest("Typo Blank Program",
-       False,
        """
        HA
        KTHXBYE
-       """)
+       """,
+       shouldFail=True)
