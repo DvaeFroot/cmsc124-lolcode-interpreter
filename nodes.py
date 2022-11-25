@@ -5,14 +5,22 @@ class BasicNode():
     def __repr__(self) -> str:
         return f'({self.token})'
 
-
-class OperatorNode(BasicNode):
+class NoobNode(BasicNode):
     pass
 
 class NumbrNode(BasicNode):
     pass
 
 class NumbarNode(BasicNode):
+    pass
+
+class YarnNode(BasicNode):
+    pass
+
+class TroofNode(BasicNode):
+    pass
+
+class OperatorNode(BasicNode):
     pass
 
 class VariableNode(BasicNode):
