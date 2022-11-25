@@ -189,6 +189,14 @@ doTest("Assignment Variable",
         KTHXBYE
        """)
 
+doTest("Assignment Expression",
+       """
+        HAI
+        VARIABLE R SUM OF 10 AN 20
+        I HAS A VAR ITZ DIFF OF 100 AN 50
+        KTHXBYE
+       """)
+
 print("\n OPERATIONS: Arithmetic \n")
 
 doTest("Sum Numbr",
