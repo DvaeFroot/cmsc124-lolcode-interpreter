@@ -35,6 +35,36 @@ doTest("Invalid Typo Blank Program",
        """,
        shouldFail=True)
 
+print("\n USER INPUT \n")
+
+doTest("Input Variable",
+       """
+        HAI
+        GIMMEH x
+        KTHXBYE
+       """)
+
+doTest("Invalid Input Yarn",
+       """
+        HAI
+        GIMMEH "x yarn"
+        KTHXBYE
+       """,shouldFail=True)
+
+doTest("Invalid Input Numbr",
+       """
+        HAI
+        GIMMEH 69
+        KTHXBYE
+       """,shouldFail=True)
+
+doTest("Invalid Input Numbar",
+       """
+        HAI
+        GIMMEH 1.23
+        KTHXBYE
+       """,shouldFail=True)
+
 print("\n USER OUTPUT \n")
 
 doTest("Print Yarn",
@@ -159,6 +189,14 @@ doTest("Assignment Variable",
         KTHXBYE
        """)
 
+doTest("Assignment Expression",
+       """
+        HAI
+        VARIABLE R SUM OF 10 AN 20
+        I HAS A VAR ITZ DIFF OF 100 AN 50
+        KTHXBYE
+       """)
+
 print("\n OPERATIONS: Arithmetic \n")
 
 doTest("Sum Numbr",
@@ -228,5 +266,47 @@ doTest("MOD Numbar",
        """
         HAI
         MOD OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+print("\n SWITCH \n")
+
+doTest("Switch OMG",
+       """
+        HAI
+        WTF?
+            OMG "A"
+                VISIBLE "ABCD"
+                GTFO
+            OMG "E"
+                VISIBLE "EFGH"
+                GTFO
+        OIC
+        KTHXBYE
+       """)
+
+doTest("Switch OMG and OMGWTF",
+       """
+        HAI
+        WTF?
+            OMG "A"
+                VISIBLE "ABCD"
+                GTFO
+            OMG "E"
+                VISIBLE "EFGH"
+                GTFO
+            OMGWTF
+                VISIBLE "IJKL"
+        OIC
+        KTHXBYE
+       """,printOutput=True)
+
+doTest("Switch 1 omg",
+       """
+        HAI
+        WTF? BTW uses value in IT
+        OMG "<value literal>"
+            VISIBLE "OMG"
+        OIC
         KTHXBYE
        """)

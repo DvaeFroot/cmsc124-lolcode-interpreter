@@ -28,6 +28,20 @@ class Parser:
     def parse(self):
         res = self.code()
         return res
+    
+    def literal(self):
+        if self.current_tok.type in (TT_FLOAT, TT_INTEGER):
+            tok = self.current_tok
+            if tok.type in (TT_FLOAT):
+                return NumbarNode(tok)
+            elif tok.type in (TT_INTEGER):
+                return NumbrNode(tok)
+        elif self.current_tok.type in (TT_STR_DELIMITER):
+            return self.string()
+        elif self.current_tok.type in (TT_BOOLEAN):
+            return TroofNode(self.current_tok)
+        
+        return Error(self.current_tok)
 
 
     def print(self):
@@ -200,9 +214,9 @@ class Parser:
             if self.tokens[self.token_idx].type not in (TT_CONTROL_END):
                 if self.token_idx < len(self.tokens):
                     omg = self.current_tok
-                    value = self.advance()
-                    if value.type not in (GP_LITERAL):
-                        raise Error(self.current_tok)
+                    self.advance()
+                    value = self.literal()
+                    self.advance()
                     casebody = list(self.casebody())
                     yield SwitchCaseNode(omg, value, casebody)
             else:
