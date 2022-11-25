@@ -39,6 +39,7 @@ class Parser:
 
             res = VisibleNode(left, right)
             return res
+
         raise Error(self.current_tok)
 
 
