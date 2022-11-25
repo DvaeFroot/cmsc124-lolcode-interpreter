@@ -1,28 +1,33 @@
 #Forked from https://gist.github.com/eliben/5797351
 import re
 
-TT_STRING = 'String Literal'
-TT_TYPE = 'Type Literal'
-TT_BOOLEAN = 'Boolean Literal'
-TT_FLOAT = 'Float Literal'
-TT_INTEGER = 'Integer Literal'
+TT_STRING =             'String Literal'
+TT_TYPE =               'Type Literal'
+TT_BOOLEAN =            'Boolean Literal'
+TT_FLOAT =              'Float Literal'
+TT_INTEGER =            'Integer Literal'
 
 #Keywords
 #END
-TT_FUNC_END = 'Function Closing Keyword'
-TT_LOOP_END = 'Loop Closing Keyword'
+TT_FUNC_END =           'Function Closing Keyword'
+TT_LOOP_END =           'Loop Closing Keyword'
 
 #Operators
-TT_DIV_OP = 'Division Operator'
-TT_MUL_OP = 'Multiplication Operator'
-TT_EQU_OP = 'Equality Operator'
-TT_OR_OP = 'Or Operator'
+#Arithmetic
+TT_DIV_OP =             'Division Operator'
+TT_MUL_OP =             'Multiplication Operator'
+TT_EQU_OP =             'Equality Operator'
+TT_OR_OP =              'Or Operator'
+
+
+TT_TYPECAST =           'Typecast Keyword'
+TT_MIN =                'Return Minimum Keyword'
+TT_MAX =                'Return Maximum Keyword'
+TT_VAR_DEC =            'Variable Declaration'
 
 #START
-TT_FUNC_STRT = 'Function Declaration'
-TT_LOOP_STRT = 'Loop Start Keyword'
-
-
+TT_FUNC_STRT =          'Function Declaration'
+TT_LOOP_STRT =          'Loop Start Keyword'
 
 
 class Token(object):
@@ -43,25 +48,36 @@ class LexerError(Exception):
 class Lexer(object):
     def __init__(self, skip_whitespace=True):
         rules = [
-            # litereal
-            (r'(?<=\")[^\"]*(?=\")',                      'String Literal'),
-            (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE\b',    'Type Literal'),
-            (r'\bWIN|FAIL\b',                             'Boolean Literal'),
-            (r'\b-?\d+.\d+\b',                            'Float Literal'),
-            (r'\b0|-?[1-9][0-9]*\b',                      'Integer Literal'),
+            # literal
+            (r'(?<=\")[^\"]*(?=\")',                      TT_STRING),
+            (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE\b',    TT_TYPE),
+            (r'\bWIN|FAIL\b',                             TT_BOOLEAN),
+            (r'\b-?\d+.\d+\b',                            TT_FLOAT),
+            (r'\b0|-?[1-9][0-9]*\b',                      TT_INTEGER),
+
             # keywords
-            (r'\bIF\sU\sSAY\sSO\b',                       'Function Closing Keyword'),
-            (r'\bIM\sOUTTA\sYR\b',                        'Loop Closing Keyword'),
-            (r'\bQUOSHUNT\sOF\b',                         'Division Operator'),
-            (r'\bPRODUKT\sOF\b',                          'Multiplication Operator'),
-            (r'\bBOTH\sSAEM\b',                           'Equality Operator'),
-            (r'\bEITHER\sOF\b',                           'Or Operator'),
-            (r'\bHOW\sIZ\sI\b',                           'Function Declaration'),
-            (r'\bIM\sIN\sYR\b',                           'Loop Start Keyword'),
-            (r'\bIS\sNOW\sA\b',                           'IS NOW A'),
-            (r'\bSMALLR\sOF\b',                           'Return Minimum Keyword'),
-            (r'\bBIGGR\sOF\b',                            'Return Maximum Keyword'),
-            (r'\bI\sHAS\sA\b',                            'Variable Declaration'),
+            #END
+            (r'\bIF\sU\sSAY\sSO\b',                       TT_FUNC_NED),
+            (r'\bIM\sOUTTA\sYR\b',                        TT_LOOP_END),
+
+            #OPERATOR
+            #Arithmetic
+            (r'\bQUOSHUNT\sOF\b',                         TT_DIV_OP),
+            (r'\bPRODUKT\sOF\b',                          TT_MUL_OP),
+            (r'\bBOTH\sSAEM\b',                           TT_EQU_OP),
+            (r'\bEITHER\sOF\b',                           TT_OR_OP),
+
+            #RELATIONAL
+
+            (r'\bIS\sNOW\sA\b',                           TT_TYPECAST),
+            (r'\bSMALLR\sOF\b',                           TT_MIN),
+            (r'\bBIGGR\sOF\b',                            TT_MAX),
+            (r'\bI\sHAS\sA\b',                            TT_VAR_DEC),
+
+            #START
+            (r'\bHOW\sIZ\sI\b',                           TT_FUNC_STRT),
+            (r'\bIM\sIN\sYR\b',                           TT_LOOP_STRT),
+
             (r'\bBOTH\sOF\b',                             'And Operator'),
             (r'\bDIFF\sOF\b',                             'Subtraction Operator'),
             (r'\bDIFFRINT\b',                             'Not Equal Operator'),
