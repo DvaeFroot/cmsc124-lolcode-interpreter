@@ -1,3 +1,23 @@
+class BasicNode():
+    def __init__(self,token):
+        self.token = token
+
+    def __repr__(self) -> str:
+        return f'({self.token})'
+
+
+class OperatorNode(BasicNode):
+    pass
+
+class NumbrNode(BasicNode):
+    pass
+
+class NumbarNode(BasicNode):
+    pass
+
+class VariableNode(BasicNode):
+    pass
+
 class Program:
     def __init__(self, start_node, body_node,end_node) -> None:
         self.start_node = start_node
@@ -35,31 +55,6 @@ class ArithmeticNode():
     def __repr__(self) -> str:
         return f'({self.operator}, {self.left}, {self.an}, {self.right})\n'
 
-
-class OperatorNode():
-    def __init__(self,token):
-        self.token = token
-
-    def __repr__(self) -> str:
-        return f'({self.token})'
-
-
-class NumbrNode():
-    def __init__(self,token):
-        self.token = token
-
-    def __repr__(self) -> str:
-        return f'({self.token})'
-
-
-class NumbarNode():
-    def __init__(self,token):
-        self.token = token
-
-    def __repr__(self) -> str:
-        return f'({self.token})'
-
-
 class GimmehNode():
     def __init__(self,left, right):
         self.left = left
@@ -76,13 +71,6 @@ class VisibleNode():
 
     def __repr__(self) -> str:
         return f'({self.left}, {self.right})'
-
-class VariableNode():
-    def __init__(self,token):
-        self.token = token
-
-    def __repr__(self) -> str:
-        return f'({self.token})'
 
 class AssignmentLongNode():
     def __init__(self,ihasa,variable,itz,expr):
