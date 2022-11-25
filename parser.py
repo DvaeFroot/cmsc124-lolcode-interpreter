@@ -2,14 +2,15 @@ from token_types import *
 from nodes import *
 
 class Error(Exception):
-    def __init__(self, token) -> None:
+    def __init__(self, token, cause) -> None:
         self.token = token
+        self.cause = cause
 
     def __repr__(self) -> str:
-        return f'Error LOL at {self.token}'
+        return f'Error at {self.token}: {self.cause}'
 
     def __str__(self) -> str:
-        return f'Error LOL at {self.token}'
+        return f'Error at {self.token}: {self.cause}'
 
 class Parser:
     def __init__(self, tokens) -> None:
@@ -44,7 +45,7 @@ class Parser:
         elif self.current_tok.type in (TT_BOOLEAN):
             return TroofNode(self.current_tok)
 
-        return Error(self.current_tok)
+        return Error(self.current_tok, "")
 
 
     def print(self):
@@ -57,7 +58,7 @@ class Parser:
             res = VisibleNode(left, right)
             return res
 
-        raise Error(self.current_tok)
+        raise Error(self.current_tok, f"Expected VISIBLE instead of {self.current_tok}")
 
 
     def get_input(self):
@@ -65,7 +66,7 @@ class Parser:
             left = self.current_tok
             right = self.advance()
             if right.type not in (TT_IDENTIFIER):
-                raise Error(self.current_tok)
+                raise Error(self.current_tok, f"Expected ")
 
             res = GimmehNode(left, right)
             return res

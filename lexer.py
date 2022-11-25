@@ -90,7 +90,7 @@ class Lexer(object):
             (r'\bR\b',                                    TT_VAR_VAL_ASSIGN),
 
             #OTHERS
-            (r'\bOBTW\b',                                 TT_COMMENT_MULTI_STRT),
+            (r'\bOBTW\b',                        TT_COMMENT_MULTI_STRT),
             (r'\bTLDR\b',                                 TT_COMMENT_MULTI_END),
             (r'\bBTW\b',                                  TT_COMMENT_STRT),
             (r'\bMKAY\b',                                 TT_MKAY),
@@ -99,8 +99,10 @@ class Lexer(object):
             (r'\bA\b',                                    TT_A),
             (r'\"',                                       TT_STR_DELIMITER),
 
+            {r'\n',                                       TT_NEWLINE},
+
             #identifier
-            (r'\b[a-zA-Z]\w*\b',                          'Identifier'),
+            (r'\b[a-zA-Z]\w*\b',                          TT_IDENTIFIER),
         ]
 
         regex_parts = []

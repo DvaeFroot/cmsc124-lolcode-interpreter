@@ -79,6 +79,7 @@ TT_MKAY =               'MKAY Keyword'
 TT_STR_DELIMITER =      'String Delimiter'
 TT_IDENTIFIER =         'Identifier'
 TT_EOF =                'EOF'
+TT_NEWLINE =            'New Line'
 
 #GROUPS
 GP_LITERAL =            (TT_STRING, TT_FLOAT, TT_INTEGER, TT_TYPE, TT_BOOLEAN)
