@@ -1,6 +1,29 @@
 #Forked from https://gist.github.com/eliben/5797351
 import re
 
+TT_STRING = 'String Literal'
+TT_TYPE = 'Type Literal'
+TT_BOOLEAN = 'Boolean Literal'
+TT_FLOAT = 'Float Literal'
+TT_INTEGER = 'Integer Literal'
+
+#Keywords
+#END
+TT_FUNC_END = 'Function Closing Keyword'
+TT_LOOP_END = 'Loop Closing Keyword'
+
+#Operators
+TT_DIV_OP = 'Division Operator'
+TT_MUL_OP = 'Multiplication Operator'
+TT_EQU_OP = 'Equality Operator'
+TT_OR_OP = 'Or Operator'
+
+#START
+TT_FUNC_STRT = 'Function Declaration'
+TT_LOOP_STRT = 'Loop Start Keyword'
+
+
+
 
 class Token(object):
     def __init__(self, type, val, pos):
@@ -21,7 +44,7 @@ class Lexer(object):
     def __init__(self, skip_whitespace=True):
         rules = [
             # litereal
-            (r'(?<=\")[^\"]*(?=\")',                               'String Literal'),
+            (r'(?<=\")[^\"]*(?=\")',                      'String Literal'),
             (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE\b',    'Type Literal'),
             (r'\bWIN|FAIL\b',                             'Boolean Literal'),
             (r'\b-?\d+.\d+\b',                            'Float Literal'),
@@ -99,6 +122,7 @@ class Lexer(object):
         #For white space checking
         self.skip_whitespace = skip_whitespace
         self.regex_whitespace = re.compile('[^\s,]')
+
 
     def input(self, buf):
         self.buf = buf

@@ -4,6 +4,7 @@ from tkinter import Scrollbar, ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from lexer import *
 
+
 def open_file():
     """Open a file for editing."""
     filepath = askopenfilename(
