@@ -90,6 +90,8 @@ class Parser:
                 return NumbrNode(tok)
         elif self.current_tok.type in (TT_STR_DELIMITER):
             return self.string()
+        elif self.current_tok.type in (TT_BOOLEAN):
+            return TroofNode(self.current_tok)
 
         raise Error(self.current_tok)
 
