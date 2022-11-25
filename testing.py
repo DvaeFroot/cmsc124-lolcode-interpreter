@@ -356,6 +356,44 @@ doTest("Relational Comparison",
         KTHXBYE
        """)
 
+print("\n IF THEN \n")
+
+doTest("if statement minimum",
+       """
+        HAI
+       O RLY?
+       YA RLY
+              VISIBLE "TEST"
+       OIC
+        KTHXBYE
+       """)
+
+doTest("if statement with else",
+       """
+        HAI
+       O RLY?
+       YA RLY
+       VISIBLE "TEST"
+       NO WAI
+       VISIBLE "TEST"
+       OIC
+        KTHXBYE
+       """)
+
+doTest("if statement with else and mebber",
+       """
+        HAI
+       O RLY?
+       YA RLY
+              VISIBLE "TEST"
+       MEBBE "1"
+              VISIBLE "TEST"
+       NO WAI BTW else
+              VISIBLE "TEST"
+       OIC
+        KTHXBYE
+       """)
+
 print("\n SWITCH \n")
 
 doTest("Switch OMG",
