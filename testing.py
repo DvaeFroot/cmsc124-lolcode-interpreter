@@ -7,7 +7,6 @@ def doTest(name, txt, shouldFail=False,printOutput=False):
     lx.input(txt)
     res = Parser(list(lx.tokens()))
     output = str(res.parse())
-    print(output)
     hasError = 'Error LOL' in output
     if hasError == (not shouldFail):
         print("FAILED:", name)
@@ -160,3 +159,78 @@ doTest("Invalid Assignment Variable",
         KTHXBYE
        """,
        shouldFail=True)
+
+print("\n OPERATIONS: Arithmetic \n")
+
+doTest("Sum Numbr",
+       """
+        HAI
+        SUM OF 1 AN 2
+        KTHXBYE
+       """)
+
+doTest("Sum Numbar",
+       """
+        HAI
+        SUM OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+doTest("DIFF Numbr",
+       """
+        HAI
+        DIFF OF 1 AN 2
+        KTHXBYE
+       """)
+
+doTest("DIFF Numbar",
+       """
+        HAI
+        DIFF OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+doTest("PRODUKT Numbr",
+       """
+        HAI
+        PRODUKT OF 1 AN 2
+        KTHXBYE
+       """)
+
+doTest("PRODUKT Numbar",
+       """
+        HAI
+        PRODUKT OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+doTest("QUOSHUNT Numbr",
+       """
+        HAI
+        QUOSHUNT OF 1 AN 2
+        KTHXBYE
+       """)
+
+doTest("QUOSHUNT Numbar",
+       """
+        HAI
+        QUOSHUNT OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+doTest("MOD Numbr",
+       """
+        HAI
+        MOD OF 1 AN 2
+        KTHXBYE
+       """)
+
+doTest("MOD Numbar",
+       """
+        HAI
+        MOD OF 1.2 AN 2.1
+        KTHXBYE
+       """)
+
+
+
