@@ -48,7 +48,17 @@ doTest("Multiline Comment",
         OBTW this
             Way
         TLDR
-        KTHXBYE""", printOutput=False)
+        KTHXBYE""")
+
+doTest("Invalid Multiline Comment",
+       """
+       HAI
+       I HAS A var ITZ 2 OBTW Hi! TLDR
+       I HAS A var OBTW noot TLDR ITZ 2
+       I HAS A num OBTW konnichiwa
+       TLDR
+       KTHXBYE"""
+        ,shouldFail=True)
 
 print("\n USER INPUT \n")
 
