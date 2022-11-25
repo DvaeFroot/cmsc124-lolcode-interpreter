@@ -8,6 +8,8 @@ class Error(Exception):
     def __repr__(self) -> str:
         return 'Error LOL'
 
+    def __str__(self) -> str:
+        return 'Error LOL'
 
 class Parser:
     def __init__(self, tokens) -> None:
@@ -27,6 +29,32 @@ class Parser:
         res = self.code()
         return res
 
+
+    def print(self):
+        if self.current_tok.type in (TT_OUTPUT):
+            left = self.current_tok
+            right = self.advance()
+            if right.type not in (TT_IDENTIFIER):
+                raise Error()
+
+            res = GimmehNode(left, right)
+            return res
+        raise Error()
+
+
+    def get_input(self):
+        if self.current_tok.type in (TT_READ):
+            left = self.current_tok
+            right = self.advance()
+            if right.type not in (TT_IDENTIFIER):
+                return Error()
+
+            res = GimmehNode(left, right)
+            return res
+        return Error()
+
+    #  def comparison(self):
+    #      if self.current_tok.type in (TT_)
 
     def expr(self):
         if self.current_tok.type in (GP_ARITHMETIC):
@@ -55,9 +83,16 @@ class Parser:
     def statement(self):
         if self.current_tok.type in (GP_ARITHMETIC):
             res = self.expr()
+            return res
+        elif self.current_tok.type in (TT_READ):
+            res = self.get_input()
+            return res
         elif self.current_tok.type in (TT_OUTPUT):
             res = self.print()
-        return res
+            return res
+        elif self.current_tok.type in (TT_):
+            res = self.print()
+            return res
 
 
     def body(self):
@@ -65,13 +100,15 @@ class Parser:
             if self.token_idx+1 < len(self.tokens):
                 yield self.statement()
                 self.advance()
+                if self.token_idx+1 >= len(self.tokens):
+                    raise Error()
             elif self.token_idx+1 >= len(self.tokens):
                 raise Error()
             else:
                 yield None
 
-    def code(self):
 
+    def code(self):
         try:
             #Start of code
             if self.current_tok.type != TT_CODE_STRT:

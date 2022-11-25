@@ -58,3 +58,21 @@ class NumbarNode():
 
     def __repr__(self) -> str:
         return f'({self.token})'
+
+
+class GimmehNode():
+    def __init__(self,left, right):
+        self.left = left
+        self.right = right
+
+    def __repr__(self) -> str:
+        return f'({self.left}, {self.right})'
+
+
+class VisibleNode():
+    def __init__(self,left, right):
+        self.left = left
+        self.right = right
+
+    def __repr__(self) -> str:
+        return f'({self.left}, {self.right})'
