@@ -109,7 +109,6 @@ class ComparisonNode:
     def __repr__(self) -> str:
         return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
 
-
 class BooleanLongNode:
     def __init__(self, op_token, expr1, an, expr2) -> None:
         self.op_token = op_token
@@ -128,3 +127,21 @@ class BooleanShortNode:
 
     def __repr__(self) -> str:
         return f'({self.op_token}, {self.expr})'
+class TypecastLongNode():
+    def __init__(self,maek,expr,a,type):
+        self.maek = maek
+        self.expr = expr
+        self.a = a
+        self.type = type
+    
+    def __repr__(self) -> str:
+        return f'({self.maek}, {self.expr}, {self.a}, {self.type})'
+
+class TypecastShortNode():
+    def __init__(self,maek,expr,type):
+        self.maek = maek
+        self.expr = expr
+        self.type = type
+    
+    def __repr__(self) -> str:
+        return f'({self.maek}, {self.expr}, {self.type})'

@@ -127,6 +127,30 @@ class Parser:
             res = AssignmentShortNode(variable, r, expr)
             return res
 
+    def typecast(self):
+        if self.current_tok.type in (TT_TYPECAST_2):
+
+            maek = self.current_tok
+
+            self.advance()
+            expr = self.expr()
+
+            possibleA = self.advance()
+            if possibleA.type in (TT_A):
+                pass
+            elif possibleA.type in (TT_TYPE):
+                return TypecastShortNode(maek,expr,possibleA)
+            else:
+                return Error()
+
+            ttype = self.advance()
+            if ttype.type not in (TT_TYPE):
+                return Error()
+
+            res = TypecastLongNode(maek,expr,possibleA,ttype)
+            return res
+
+
 
     def boolean(self):
         if self.current_tok.type in (GP_BOOLEAN_LONG):
@@ -164,6 +188,8 @@ class Parser:
             res = self.comparison()
         elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
             res = self.boolean()
+        elif self.current_tok.type in (TT_TYPECAST_2):
+            res = self.typecast()
 
         return StatementNode("",res)
 
