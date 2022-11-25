@@ -251,7 +251,7 @@ if __name__ == '__main__':
 #     "HELLO"
 #  KTHXBYE"""
     txt = """HAI
-        BOTH SAEM 1 AN 2
+        BOTH SAEM SUM OF 1 AN 1 AN PRODUKT OF 2 AN 4
     KTHXBYE"""
     lx.input(txt)
 

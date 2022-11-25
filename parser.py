@@ -56,10 +56,12 @@ class Parser:
     def comparison(self):
         if self.current_tok.type in (GP_COMPARISON):
             op_token = self.current_tok
+            self.advance()
             expr1 = self.expr()
             an = self.advance()
             if an.type not in (TT_ARG_SEP):
                 raise Error()
+            self.advance()
             expr2 = self.expr()
             res = ComparisonNode(op_token, expr1, an, expr2)
             return res
@@ -145,16 +147,15 @@ class Parser:
 
 
     def body(self):
-        while(self.tokens[self.token_idx+1].type not in (TT_CODE_END)):
-            if self.token_idx+1 < len(self.tokens):
-                yield self.statement()
-                self.advance()
-                if self.token_idx+1 >= len(self.tokens):
+        while(self.token_idx+1 < len(self.tokens)):
+            if self.tokens[self.token_idx+1].type not in (TT_CODE_END):
+                if self.token_idx+1 < len(self.tokens):
+                    yield self.statement()
+                    self.advance()
+                elif self.token_idx+1 >= len(self.tokens):
                     raise Error()
-            elif self.token_idx+1 >= len(self.tokens):
-                raise Error()
-            else:
-                yield None
+                else:
+                    yield None
 
 
     def code(self):
