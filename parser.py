@@ -56,6 +56,7 @@ class Parser:
             right = self.expr()
 
             res = VisibleNode(left, right)
+            res()
             return res
 
         raise Error(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")

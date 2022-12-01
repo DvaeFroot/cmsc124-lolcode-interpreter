@@ -5,6 +5,9 @@ class UnaryOpNode:
 
     def __repr__(self) -> str:
         return f'({self.left}, {self.right})'
+    
+    def value(self):
+        return self.right
 
 class BinOpNode:
     def __init__(self, op_token, expr1, an, expr2) -> None:
@@ -15,6 +18,7 @@ class BinOpNode:
 
     def __repr__(self) -> str:
         return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
+    
 
 class BasicNode():
     def __init__(self,token):
@@ -22,6 +26,9 @@ class BasicNode():
 
     def __repr__(self) -> str:
         return f'({self.token})'
+    
+    def value(self):
+        return self.token.val
 
 
 class NoobNode(BasicNode):
@@ -84,6 +91,9 @@ class GimmehNode(UnaryOpNode):
 
 
 class VisibleNode(UnaryOpNode):
+
+    def __call__(self):
+        print("PRINTED",self.right.value())
     pass
 
 
