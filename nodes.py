@@ -135,7 +135,7 @@ class ArithmeticNode(BinOpNode):
                 elif OP_TOKEN.type in (TT_MOD):
                     ST[0]["value"] = eval(str(EXPR1.value) + "%" + str(EXPR2.value))
 
-        if EXPR1.OP_TOKEN.type in (TT_STRING) or EXPR2.OP_TOKEN.type in (TT_STRING):
+        if isinstance(EXPR1, StringNode) or isinstance(EXPR2, StringNode):
             raise Error(self.OP_TOKEN,"Invalid Strings")
 
         self.value=ST[0]["value"]

@@ -20,12 +20,7 @@ def doTest(name, txt, shouldFail=False,printOutput=True):
 doTest("Semantic Analyzer",
        """
        HAI
-<<<<<<< HEAD
-       I HAS A rope ITZ SUM OF SUM OF 1 AN 3 AN SUM OF 1 AN SUM OF 1 AN 1
-=======
-       I HAS A snippet ITZ PRODUKT OF 3 AN "A"
-       I HAS A rope ITZ SUM OF SUM OF SUM OF 1 AN 2 AN 2 AN 2
->>>>>>> ba722a3198e0221f3107a7c600a4bf99d99742ec
+       I HAS A rope ITZ SUM OF SUM OF "1" AN 3 AN SUM OF 1 AN SUM OF 1 AN 1
     KTHXBYE
        """)
 #
