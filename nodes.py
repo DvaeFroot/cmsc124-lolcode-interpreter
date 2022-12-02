@@ -1,3 +1,11 @@
+class BasicNode:
+    def __init__(self,token):
+        self.token = token
+
+    def __repr__(self) -> str:
+        return f'({self.token})'
+
+
 class UnaryOpNode:
     def __init__(self,left, right):
         self.left = left
@@ -5,6 +13,7 @@ class UnaryOpNode:
 
     def __repr__(self) -> str:
         return f'({self.left}, {self.right})'
+
 
 class BinOpNode:
     def __init__(self, op_token, expr1, an, expr2) -> None:
@@ -16,12 +25,15 @@ class BinOpNode:
     def __repr__(self) -> str:
         return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
 
-class BasicNode:
-    def __init__(self,token):
-        self.token = token
+
+class DoubleOpNode:
+    def __init__(self, left, middle, right) -> None:
+        self.left = left
+        self.middle = middle
+        self.right = right
 
     def __repr__(self) -> str:
-        return f'({self.token})'
+        return f'({self.left}, {self.middle}, {self.right})'
 
 
 class NoobNode(BasicNode):
@@ -93,14 +105,10 @@ class AssignmentLongNode(BinOpNode):
     def __init__(self, op_token, expr1, an, expr2) -> None:
         super().__init__(op_token, expr1, an, expr2)
 
-class AssignmentShortNode():
-    def __init__(self,variable,r,expr):
-        self.variable = variable
-        self.r = r
-        self.expr = expr
-
-    def __repr__(self) -> str:
-        return f'({self.variable}, {self.r}, {self.expr})'
+#VAR R EXPR
+class AssignmentShortNode(DoubleOpNode):
+    def __init__(self, left, middle, right) -> None:
+        super().__init__(left, middle, right)
 
 
 class ComparisonNode(BinOpNode):
@@ -123,14 +131,9 @@ class TypecastLongNode(BinOpNode):
         super().__init__(op_token, expr1, an, expr2)
 
 
-class TypecastShortNode():
-    def __init__(self,maek,expr,type):
-        self.maek = maek
-        self.expr = expr
-        self.type = type
-
-    def __repr__(self) -> str:
-        return f'({self.maek}, {self.expr}, {self.type})'
+class TypecastShortNode(DoubleOpNode):
+    def __init__(self, left, middle, right) -> None:
+        super().__init__(left, middle, right)
 
 
 class SwitchNode(UnaryOpNode):
@@ -138,14 +141,10 @@ class SwitchNode(UnaryOpNode):
         super().__init__(left, right)
 
 
-class SwitchCaseNode:
-    def __init__(self, omg, value, statement) -> None:
-        self.omg = omg
-        self.value = value
-        self.statement = statement
-
-    def __repr__(self) -> str:
-        return f'({self.omg}, {self.value}, {self.statement})'
+#OMG VALUE STATEMENT
+class SwitchCaseNode(DoubleOpNode):
+    def __init__(self, left, middle, right) -> None:
+        super().__init__(left, middle, right)
 
 #OMGWTF
 class DefaultCaseNode(UnaryOpNode):
@@ -153,6 +152,7 @@ class DefaultCaseNode(UnaryOpNode):
         super().__init__(left, right)
 
 
+#
 class CaseBreakNode(BasicNode):
     def __init__(self, token):
         super().__init__(token)
@@ -164,14 +164,11 @@ class IfNode(UnaryOpNode):
         super().__init__(left, right)
 
 
-class ElseIfNode:
-    def __init__(self, mebbe, value, elsebody) -> None:
-        self.mebbe = mebbe
-        self.value = value
-        self.elsebody = elsebody
+#MEBBE VALUE ELSEBODY
+class ElseIfNode(DoubleOpNode):
+    def __init__(self, left, middle, right) -> None:
+        super().__init__(left, middle, right)
 
-    def __repr__(self) -> str:
-        return f'({self.mebbe}, {self.value}, {self.elsebody})'
 
 #NOWAI
 class ElseNode(UnaryOpNode):
@@ -179,14 +176,9 @@ class ElseNode(UnaryOpNode):
         super().__init__(left, right)
 
 
-class StringNode:
-    def __init__(self, qt1, string, qt2) -> None:
-        self.qt1 = qt1
-        self.string = string
-        self.qt2 = qt2
-
-    def __repr__(self) -> str:
-        return f'({self.qt1}, {self.string}, {self.qt2})'
+class StringNode(DoubleOpNode):
+    def __init__(self, left, middle, right) -> None:
+        super().__init__(left, middle, right)
 
 
 class TroofNode(BasicNode):
