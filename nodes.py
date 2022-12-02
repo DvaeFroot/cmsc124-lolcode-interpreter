@@ -160,13 +160,13 @@ class ComparisonNode(BinOpNode):
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
 #
-class BooleANLongNode(BinOpNode):
+class BooleanLongNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
 
 #OPERATION EXPR
-class BooleANShortNode(UnaryOpNode):
+class BooleanShortNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
