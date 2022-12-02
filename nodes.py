@@ -1,5 +1,5 @@
 #  from main import printToConsole
-from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION
+from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION, TT_IDENTIFIER
 from error import *
 from tkinter import *
 from tkinter import simpledialog
@@ -105,6 +105,10 @@ class ArithmeticNode(BinOpNode):
         else:
             left = str(ST[0]["value"]) if isinstance(EXPR1, ArithmeticNode) else str(EXPR1.token.val)
             right = str(ST[0]["value"]) if isinstance(EXPR2, ArithmeticNode) else str(EXPR2.token.val)
+            if  isinstance(EXPR1, VariableNode):
+                left = str(VT[EXPR1.token.val])
+            if  isinstance(EXPR2, VariableNode):
+                right = str(VT[EXPR2.token.val])
         
         if OP_TOKEN.type in (TT_SUMMATION):
             ST[0]["value"] = eval(left + "+" + right)
