@@ -2,7 +2,7 @@
 from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION
 from error import *
 from tkinter import *
-from tkinter.messagebox import messagebox
+from tkinter import simpledialog
 #  import main
 
 ST = [{"type": "IT", "value": None}]
@@ -156,6 +156,10 @@ class ArithmeticNode(BinOpNode):
 class GimmehNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
+        answer = simpledialog.askstring("Input", f"Value for: {right.val}")
+        ST[0]["value"] = answer
+        VT["IT"] = ST[0]["value"]
+        VT[right.val] = answer
 
 
 #VISIBLE
