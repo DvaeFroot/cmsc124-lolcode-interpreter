@@ -1,7 +1,6 @@
 #Forked from https://gist.github.com/eliben/5797351
 import re
 from token_types import *
-from parser import Parser
 
 
 class Token(object):

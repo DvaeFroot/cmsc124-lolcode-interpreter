@@ -1,3 +1,9 @@
+from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION
+
+
+ST = [{"type": "IT", "value": None}]
+VT = {}
+
 class BasicNode:
     def __init__(self,token):
         self.token = token
@@ -36,6 +42,13 @@ class DoubleOpNode:
         return f'({self.left}, {self.middle}, {self.right})'
 
 
+class Program(DoubleOpNode):
+    def __init__(self, start_node, body_node,end_node) -> None:
+        super().__init__(start_node, body_node, end_node)
+        printST()
+        print(VT)
+
+
 class NoobNode(BasicNode):
     def __init__(self, token):
         super().__init__(token)
@@ -66,76 +79,92 @@ class VariableNode(BasicNode):
         super().__init__(token)
 
 
-class Program:
-    def __init__(self, start_node, body_node,end_node) -> None:
-        self.start_node = start_node
-        self.body_node = body_node
-        self.end_node = end_node
-
-    def __repr__(self):
-        return f'({self.start_node}, {self.body_node}, {self.end_node})'
-
-
 class StatementNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
 
+#ARITHMETICOP EXPR AN EXPR
 class ArithmeticNode(BinOpNode):
     def __init__(self, op_token, expr1, an, expr2) -> None:
         super().__init__(op_token, expr1, an, expr2)
+        if op_token.type in (TT_SUMMATION):
+            ST[0]["value"] = eval(expr1.token.val + "+" + expr2.token.val)
+        elif op_token.type in (TT_SUB):
+            ST[0]["value"] = eval(expr1.token.val + "-" + expr2.token.val)
+        elif op_token.type in (TT_MUL_OP):
+            ST[0]["value"] = eval(expr1.token.val + "*" + expr2.token.val)
+        elif op_token.type in (TT_DIV_OP):
+            ST[0]["value"] = eval(expr1.token.val + "/" + expr2.token.val)
+        elif op_token.type in (TT_MOD):
+            ST[0]["value"] = eval(expr1.token.val + "%" + expr2.token.val)
 
 
+#GIMMEH VAR
 class GimmehNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
 
+#VISIBLE
 class VisibleNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
 
+#I HAS A Variable
 class AssignmentShlongNode(UnaryOpNode):
-    def __init__(self, left, right):
-        super().__init__(left, right)
+    def __init__(self, IHASA, VAR):
+        super().__init__(IHASA, VAR)
+        ST.append({"type": "variable", "token": VAR.token.val, "value": None})
 
 
 class AssignmentLongNode(BinOpNode):
-    def __init__(self, op_token, expr1, an, expr2) -> None:
-        super().__init__(op_token, expr1, an, expr2)
+    def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
+        super().__init__(IHASA, VAR, ITZ, EXPR)
+        ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
+        ST[0]["value"] = EXPR.token.val
+
+        if VAR.token.type not in TT_STRING:
+            if VAR.token.val.isdigit():
+                VT[VAR.token.val] = eval(EXPR.token.val)
+        VT[VAR.token.val] = EXPR.token.val
 
 #VAR R EXPR
 class AssignmentShortNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
 
-
+#OPERATION EXPR AN EXPR
 class ComparisonNode(BinOpNode):
     def __init__(self, op_token, expr1, an, expr2) -> None:
         super().__init__(op_token, expr1, an, expr2)
 
-
+#
 class BooleanLongNode(BinOpNode):
     def __init__(self, op_token, expr1, an, expr2) -> None:
         super().__init__(op_token, expr1, an, expr2)
 
 
+#OPERATION EXPR
 class BooleanShortNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
 
+#MAEK EXPR AN TYPE
 class TypecastLongNode(BinOpNode):
     def __init__(self, op_token, expr1, an, expr2) -> None:
         super().__init__(op_token, expr1, an, expr2)
 
 
+#MAEK EXPR possible
 class TypecastShortNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
 
 
+#OPERATION EXPR
 class SwitchNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
@@ -145,6 +174,7 @@ class SwitchNode(UnaryOpNode):
 class SwitchCaseNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
+
 
 #OMGWTF
 class DefaultCaseNode(UnaryOpNode):
@@ -175,12 +205,13 @@ class ElseNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
-
+#"STRINGBODY"
 class StringNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
 
 
+#TRUE OR FALSE
 class TroofNode(BasicNode):
     def __init__(self, token):
         super().__init__(token)
@@ -216,4 +247,9 @@ class LoopNodeLong:
 
     def __repr__(self) -> str:
         return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
+
+
+def printST():
+    for entry in ST:
+        print(entry)
 
