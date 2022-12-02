@@ -1,5 +1,5 @@
 from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION
-
+from error import *
 
 ST = [{"type": "IT", "value": None}]
 VT = {}
@@ -89,6 +89,9 @@ class ArithmeticNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
         if not isinstance(EXPR1, ArithmeticNode):
+            if EXPR1.token.type in (TT_STRING) or EXPR2.token.type in (TT_STRING):
+                raise Error(self.OP_TOKEN,"Invalid Strings")
+
             if OP_TOKEN.type in (TT_SUMMATION):
                 ST[0]["value"] = eval(EXPR1.token.val + "+" + EXPR2.token.val)
             elif OP_TOKEN.type in (TT_SUB):
@@ -160,13 +163,13 @@ class ComparisonNode(BinOpNode):
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
 #
-class BooleANLongNode(BinOpNode):
+class BooleanLongNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
 
 #OPERATION EXPR
-class BooleANShortNode(UnaryOpNode):
+class BooleanShortNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
@@ -225,9 +228,9 @@ class ElseNode(UnaryOpNode):
         super().__init__(left, right)
 
 #"STRINGBODY"
-class StringNode(DoubleOpNode):
-    def __init__(self, left, middle, right) -> None:
-        super().__init__(left, middle, right)
+class StringNode(BasicNode):
+    def __init__(self, token) -> None:
+        super().__init__(token)
 
 
 #TRUE OR FALSE

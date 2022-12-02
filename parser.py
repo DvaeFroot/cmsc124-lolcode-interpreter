@@ -1,19 +1,8 @@
 from token_types import *
 from nodes import *
+from error import *
 
 ST = []
-
-class Error(Exception):
-    def __init__(self, token, cause) -> None:
-        self.token = token
-        self.cause = cause
-
-    def __repr__(self) -> str:
-        return f'Error at {self.token}: {self.cause}'
-
-    def __str__(self) -> str:
-        return f'Error at {self.token}: {self.cause}'
-
 
 class Parser:
     def __init__(self, tokens) -> None:
@@ -262,7 +251,7 @@ class Parser:
             qt2 = self.advance()
             if qt2.type not in (TT_STR_DELIMITER):
                 raise Error(self.current_tok, f"Expected \" at pos {self.current_tok.pos}")
-            res = StringNode(qt1, string, qt2)
+            res = StringNode(string)
             return res
         return Error(self.current_tok, f"Expected \" at pos {self.current_tok.pos}")
 
