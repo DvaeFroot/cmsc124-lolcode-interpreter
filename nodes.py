@@ -122,18 +122,23 @@ class AssignmentShlongNode(UnaryOpNode):
 class AssignmentLongNode(BinOpNode):
     def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
         super().__init__(IHASA, VAR, ITZ, EXPR)
-        ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
-        ST[0]["value"] = EXPR.token.val
+        print(isinstance(EXPR, VariableNode))
+        if isinstance(EXPR, VariableNode):
+            ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
+            ST[0]["value"] = EXPR.token.val
+            if VAR.token.type not in TT_STRING:
+                if VAR.token.val.isdigit():
+                    VT[VAR.token.val] = eval(EXPR.token.val)
+            VT[VAR.token.val] = EXPR.token.val
+        else:
+            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
 
-        if VAR.token.type not in TT_STRING:
-            if VAR.token.val.isdigit():
-                VT[VAR.token.val] = eval(EXPR.token.val)
-        VT[VAR.token.val] = EXPR.token.val
 
 #VAR R EXPR
 class AssignmentShortNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
+
 
 #OPERATION EXPR AN EXPR
 class ComparisonNode(BinOpNode):

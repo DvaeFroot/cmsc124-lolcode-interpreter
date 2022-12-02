@@ -1,7 +1,7 @@
 from token_types import *
 from nodes import *
 
-VARTABLE = {}
+ST = []
 
 class Error(Exception):
     def __init__(self, token, cause) -> None:

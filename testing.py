@@ -20,10 +20,7 @@ def doTest(name, txt, shouldFail=False,printOutput=True):
 doTest("Invalid Typo Blank Program",
        """
        HAI
-       I HAS A var ITZ 1
-       I HAS A snip
-       I HAS A snippet ITZ 45
-       PRODUKT OF 3 AN 2
+       I HAS A snippet ITZ PRODUKT OF 3 AN 2
     KTHXBYE
        """)
 #
