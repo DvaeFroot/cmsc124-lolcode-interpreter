@@ -1,5 +1,5 @@
 #  from main import printToConsole
-from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION
+from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION, TT_IDENTIFIER
 from error import *
 from tkinter import *
 from tkinter import simpledialog
@@ -98,55 +98,28 @@ class StatementNode(UnaryOpNode):
 class ArithmeticNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        if not isinstance(EXPR1, ArithmeticNode):
-            expr1 = EXPR1.token.val if not isinstance(EXPR1, VariableNode) else VT[EXPR1.token.val]
-            if not isinstance(EXPR2, ArithmeticNode):
-                expr2 = EXPR2.token.val if not isinstance(EXPR2, VariableNode) else VT[EXPR2.token.val]
-                if OP_TOKEN.type in (TT_SUMMATION):
-                    ST[0]["value"] = eval(expr1 + "+" + expr2)
-                elif OP_TOKEN.type in (TT_SUB):
-                    ST[0]["value"] = eval(expr1 + "-" + expr2)
-                elif OP_TOKEN.type in (TT_MUL_OP):
-                    ST[0]["value"] = eval(expr1 + "*" + expr2)
-                elif OP_TOKEN.type in (TT_DIV_OP):
-                    ST[0]["value"] = eval(expr1 + "/" + expr2)
-                elif OP_TOKEN.type in (TT_MOD):
-                    ST[0]["value"] = eval(expr1 + "%" + expr2)
-            else:
-                if OP_TOKEN.type in (TT_SUMMATION):
-                    ST[0]["value"] = eval(expr1 + "+" + str(ST[0]["value"]))
-                elif OP_TOKEN.type in (TT_SUB):
-                    ST[0]["value"] = eval(expr1 + "-" + str(ST[0]["value"]))
-                elif OP_TOKEN.type in (TT_MUL_OP):
-                    ST[0]["value"] = eval(expr1 + "*" + str(ST[0]["value"]))
-                elif OP_TOKEN.type in (TT_DIV_OP):
-                    ST[0]["value"] = eval(expr1 + "/" + str(ST[0]["value"]))
-                elif OP_TOKEN.type in (TT_MOD):
-                    ST[0]["value"] = eval(expr1 + "%" + str(ST[0]["value"]))
+        left,right = "",""
+        if isinstance(EXPR1, ArithmeticNode) and isinstance(EXPR2, ArithmeticNode):
+            left = str(EXPR1.value)
+            right = str(EXPR2.value)
         else:
-            if not isinstance(EXPR2, ArithmeticNode):
-                expr2 = EXPR2.token.val if not isinstance(EXPR2, VariableNode) else VT[EXPR2.token.val]
-                if OP_TOKEN.type in (TT_SUMMATION):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "+" + expr2)
-                elif OP_TOKEN.type in (TT_SUB):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "-" + expr2)
-                elif OP_TOKEN.type in (TT_MUL_OP):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "*" + expr2)
-                elif OP_TOKEN.type in (TT_DIV_OP):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "/" + expr2)
-                elif OP_TOKEN.type in (TT_MOD):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "%" + expr2)
-            else:
-                if OP_TOKEN.type in (TT_SUMMATION):
-                    ST[0]["value"] = eval(str(EXPR1.value) + "+" + str(EXPR2.value))
-                elif OP_TOKEN.type in (TT_SUB):
-                    ST[0]["value"] = eval(str(EXPR1.value) + "-" + str(EXPR2.value))
-                elif OP_TOKEN.type in (TT_MUL_OP):
-                    ST[0]["value"] = eval(str(EXPR1.value) + "*" + str(EXPR2.value))
-                elif OP_TOKEN.type in (TT_DIV_OP):
-                    ST[0]["value"] = eval(str(EXPR1.value) + "/" + str(EXPR2.value))
-                elif OP_TOKEN.type in (TT_MOD):
-                    ST[0]["value"] = eval(str(EXPR1.value) + "%" + str(EXPR2.value))
+            left = str(ST[0]["value"]) if isinstance(EXPR1, ArithmeticNode) else str(EXPR1.token.val)
+            right = str(ST[0]["value"]) if isinstance(EXPR2, ArithmeticNode) else str(EXPR2.token.val)
+            if  isinstance(EXPR1, VariableNode):
+                left = str(VT[EXPR1.token.val])
+            if  isinstance(EXPR2, VariableNode):
+                right = str(VT[EXPR2.token.val])
+
+        if OP_TOKEN.type in (TT_SUMMATION):
+            ST[0]["value"] = eval(left + "+" + right)
+        elif OP_TOKEN.type in (TT_SUB):
+            ST[0]["value"] = eval(left + "-" + right)
+        elif OP_TOKEN.type in (TT_MUL_OP):
+            ST[0]["value"] = eval(left + "*" + right)
+        elif OP_TOKEN.type in (TT_DIV_OP):
+            ST[0]["value"] = eval(left + "/" + right)
+        elif OP_TOKEN.type in (TT_MOD):
+            ST[0]["value"] = eval(left + "%" + right)
 
         if isinstance(EXPR1, StringNode) or isinstance(EXPR2, StringNode):
             raise Error(self.OP_TOKEN,"Invalid Strings")
