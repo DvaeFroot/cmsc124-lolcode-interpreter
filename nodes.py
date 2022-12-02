@@ -106,8 +106,12 @@ class ArithmeticNode(BinOpNode):
             left = str(ST[0]["value"]) if isinstance(EXPR1, ArithmeticNode) else str(EXPR1.token.val)
             right = str(ST[0]["value"]) if isinstance(EXPR2, ArithmeticNode) else str(EXPR2.token.val)
             if  isinstance(EXPR1, VariableNode):
+                if EXPR1.token.val not in VT:
+                    raise Error(EXPR1.token,"Variable not Initialized")
                 left = str(VT[EXPR1.token.val])
             if  isinstance(EXPR2, VariableNode):
+                if EXPR2.token.val not in VT:
+                    raise Error(EXPR2.token,"Variable not Initialized")
                 right = str(VT[EXPR2.token.val])
 
         if OP_TOKEN.type in (TT_SUMMATION):
@@ -147,6 +151,8 @@ class VisibleNode(UnaryOpNode):
             txt_console.insert(INSERT,str(right.token.val)+'\n')
             txt_console.configure(state=DISABLED)
         else:
+            if right.token.val not in VT:
+                raise Error(right.token,"Variable not Initialized")
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
             txt_console.configure(state=DISABLED)
