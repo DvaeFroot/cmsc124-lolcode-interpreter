@@ -17,10 +17,11 @@ def doTest(name, txt, shouldFail=False,printOutput=True):
     if printOutput:
         print(output)
 
-doTest("Invalid Typo Blank Program",
+doTest("Semantic Analyzer",
        """
        HAI
        I HAS A snippet ITZ PRODUKT OF 3 AN 2
+       I HAS A rope ITZ SUM OF SUM OF SUM OF 1 AN 2 AN 2 AN 2
     KTHXBYE
        """)
 #

@@ -22,14 +22,14 @@ class UnaryOpNode:
 
 
 class BinOpNode:
-    def __init__(self, op_token, expr1, an, expr2) -> None:
-        self.op_token = op_token
-        self.expr1 = expr1
-        self.an = an
-        self.expr2 = expr2
+    def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
+        self.OP_TOKEN = OP_TOKEN
+        self.EXPR1 = EXPR1
+        self.AN = AN
+        self.EXPR2 = EXPR2
 
     def __repr__(self) -> str:
-        return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
+        return f'({self.OP_TOKEN}, {self.EXPR1}, {self.AN}, {self.EXPR2})'
 
 
 class DoubleOpNode:
@@ -86,18 +86,31 @@ class StatementNode(UnaryOpNode):
 
 #ARITHMETICOP EXPR AN EXPR
 class ArithmeticNode(BinOpNode):
-    def __init__(self, op_token, expr1, an, expr2) -> None:
-        super().__init__(op_token, expr1, an, expr2)
-        if op_token.type in (TT_SUMMATION):
-            ST[0]["value"] = eval(expr1.token.val + "+" + expr2.token.val)
-        elif op_token.type in (TT_SUB):
-            ST[0]["value"] = eval(expr1.token.val + "-" + expr2.token.val)
-        elif op_token.type in (TT_MUL_OP):
-            ST[0]["value"] = eval(expr1.token.val + "*" + expr2.token.val)
-        elif op_token.type in (TT_DIV_OP):
-            ST[0]["value"] = eval(expr1.token.val + "/" + expr2.token.val)
-        elif op_token.type in (TT_MOD):
-            ST[0]["value"] = eval(expr1.token.val + "%" + expr2.token.val)
+    def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
+        super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
+        if not isinstance(EXPR1, ArithmeticNode):
+            if OP_TOKEN.type in (TT_SUMMATION):
+                ST[0]["value"] = eval(EXPR1.token.val + "+" + EXPR2.token.val)
+            elif OP_TOKEN.type in (TT_SUB):
+                ST[0]["value"] = eval(EXPR1.token.val + "-" + EXPR2.token.val)
+            elif OP_TOKEN.type in (TT_MUL_OP):
+                ST[0]["value"] = eval(EXPR1.token.val + "*" + EXPR2.token.val)
+            elif OP_TOKEN.type in (TT_DIV_OP):
+                ST[0]["value"] = eval(EXPR1.token.val + "/" + EXPR2.token.val)
+            elif OP_TOKEN.type in (TT_MOD):
+                ST[0]["value"] = eval(EXPR1.token.val + "%" + EXPR2.token.val)
+        else:
+            if not isinstance(EXPR2, ArithmeticNode):
+                if OP_TOKEN.type in (TT_SUMMATION):
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "+" + EXPR2.token.val)
+                elif OP_TOKEN.type in (TT_SUB):
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "-" + EXPR2.token.val)
+                elif OP_TOKEN.type in (TT_MUL_OP):
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "*" + EXPR2.token.val)
+                elif OP_TOKEN.type in (TT_DIV_OP):
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "/" + EXPR2.token.val)
+                elif OP_TOKEN.type in (TT_MOD):
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "%" + EXPR2.token.val)
 
 
 #GIMMEH VAR
@@ -122,8 +135,8 @@ class AssignmentShlongNode(UnaryOpNode):
 class AssignmentLongNode(BinOpNode):
     def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
         super().__init__(IHASA, VAR, ITZ, EXPR)
-        print(isinstance(EXPR, VariableNode))
-        if isinstance(EXPR, VariableNode):
+        print(EXPR)
+        if not isinstance(EXPR, ArithmeticNode):
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
             ST[0]["value"] = EXPR.token.val
             if VAR.token.type not in TT_STRING:
@@ -132,6 +145,7 @@ class AssignmentLongNode(BinOpNode):
             VT[VAR.token.val] = EXPR.token.val
         else:
             ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
+            VT[VAR.token.val] = ST[0]["value"]
 
 
 #VAR R EXPR
@@ -142,25 +156,25 @@ class AssignmentShortNode(DoubleOpNode):
 
 #OPERATION EXPR AN EXPR
 class ComparisonNode(BinOpNode):
-    def __init__(self, op_token, expr1, an, expr2) -> None:
-        super().__init__(op_token, expr1, an, expr2)
+    def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
+        super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
 #
-class BooleanLongNode(BinOpNode):
-    def __init__(self, op_token, expr1, an, expr2) -> None:
-        super().__init__(op_token, expr1, an, expr2)
+class BooleANLongNode(BinOpNode):
+    def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
+        super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
 
 #OPERATION EXPR
-class BooleanShortNode(UnaryOpNode):
+class BooleANShortNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
 
 #MAEK EXPR AN TYPE
 class TypecastLongNode(BinOpNode):
-    def __init__(self, op_token, expr1, an, expr2) -> None:
-        super().__init__(op_token, expr1, an, expr2)
+    def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
+        super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
 
 #MAEK EXPR possible
