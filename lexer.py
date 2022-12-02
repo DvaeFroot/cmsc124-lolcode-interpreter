@@ -99,7 +99,7 @@ class Lexer(object):
             (r'\bA\b',                                    TT_A),
             (r'\"',                                       TT_STR_DELIMITER),
 
-            {r'\n',                                       TT_NEWLINE},
+            #  {r'\n',                                       TT_NEWLINE},
 
             #identifier
             (r'\b[a-zA-Z]\w*\b',                          TT_IDENTIFIER),
@@ -127,6 +127,7 @@ class Lexer(object):
     def input(self, buf):
         self.buf = buf
         self.pos = 0
+        self.line = 1
 
 
     def token(self):
@@ -210,6 +211,10 @@ class Lexer(object):
             groupname = m.lastgroup
             #Get the type of the token using the groupname
             tok_type = self.group_type[groupname]
+            if tok_type in (TT_NEWLINE):
+                print(self.line)
+                self.line +=1
+                return
             #Get the current token using the groupname. The actual token is in m.group(groupname). 
             #The Token class is just a struct to store information about the current token.
             tok = Token(tok_type, m.group(groupname), self.pos)
@@ -240,13 +245,13 @@ if __name__ == '__main__':
     KTHXBYE"""
     lx.input(txt)
 
-    #  try:
-    #      for tok in lx.tokens():
-    #          print(tok)
-    #  except LexerError as err:
-    #      print('LexerError at position %s' % err.pos)
+    try:
+        for tok in lx.tokens():
+            print(tok)
+    except LexerError as err:
+        print('LexerError at position %s' % err.pos)
 
-    res = Parser(list(lx.tokens()))
-    print(res.parse())
+    #  res = Parser(list(lx.tokens()))
+    #  print(res.parse())
 
 

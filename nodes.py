@@ -16,7 +16,7 @@ class BinOpNode:
     def __repr__(self) -> str:
         return f'({self.op_token}, {self.expr1}, {self.an}, {self.expr2})'
 
-class BasicNode():
+class BasicNode:
     def __init__(self,token):
         self.token = token
 
@@ -25,27 +25,33 @@ class BasicNode():
 
 
 class NoobNode(BasicNode):
-    pass
+    def __init__(self, token):
+        super().__init__(token)
 
 
 class NumbrNode(BasicNode):
-    pass
+    def __init__(self, token):
+        super().__init__(token)
 
 
 class NumbarNode(BasicNode):
-    pass
+    def __init__(self, token):
+        super().__init__(token)
 
 
 class YarnNode(BasicNode):
-    pass
+    def __init__(self, token):
+        super().__init__(token)
 
 
 class OperatorNode(BasicNode):
-    pass
+    def __init__(self, token):
+        super().__init__(token)
 
 
 class VariableNode(BasicNode):
-    pass
+    def __init__(self, token):
+        super().__init__(token)
 
 
 class Program:
@@ -58,54 +64,34 @@ class Program:
         return f'({self.start_node}, {self.body_node}, {self.end_node})'
 
 
-class StatementListNode():
-    def __init__(self,statementList):
-        self.statementlist = statementList
-
-    def __repr__(self) -> str:
-        return f'({self.statementlist})'
-
-
-class StatementNode():
-    def __init__(self,type,statement):
-        self.type = type
-        self.statement = statement
-
-    def __repr__(self) -> str:
-        return f'({self.statement})\n'
+class StatementNode(UnaryOpNode):
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
 class ArithmeticNode(BinOpNode):
-    pass
+    def __init__(self, op_token, expr1, an, expr2) -> None:
+        super().__init__(op_token, expr1, an, expr2)
 
 
 class GimmehNode(UnaryOpNode):
-    pass
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
 class VisibleNode(UnaryOpNode):
-    pass
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
-class AssignmentShlongNode():
-    def __init__(self,ihasa,variable):
-        self.ihasa = ihasa
-        self.variable = variable
-
-    def __repr__(self) -> str:
-        return f'({self.ihasa}, {self.variable})'
+class AssignmentShlongNode(UnaryOpNode):
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
-class AssignmentLongNode():
-    def __init__(self,ihasa,variable,itz,expr):
-        self.ihasa = ihasa
-        self.variable = variable
-        self.itz = itz
-        self.expr = expr
-
-    def __repr__(self) -> str:
-        return f'({self.ihasa}, {self.variable}, {self.itz}, {self.expr})'
-
+class AssignmentLongNode(BinOpNode):
+    def __init__(self, op_token, expr1, an, expr2) -> None:
+        super().__init__(op_token, expr1, an, expr2)
 
 class AssignmentShortNode():
     def __init__(self,variable,r,expr):
@@ -118,26 +104,23 @@ class AssignmentShortNode():
 
 
 class ComparisonNode(BinOpNode):
-    pass
+    def __init__(self, op_token, expr1, an, expr2) -> None:
+        super().__init__(op_token, expr1, an, expr2)
 
 
 class BooleanLongNode(BinOpNode):
-    pass
+    def __init__(self, op_token, expr1, an, expr2) -> None:
+        super().__init__(op_token, expr1, an, expr2)
 
 
 class BooleanShortNode(UnaryOpNode):
-    pass
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
-class TypecastLongNode():
-    def __init__(self,maek,expr,a,type):
-        self.maek = maek
-        self.expr = expr
-        self.a = a
-        self.type = type
-
-    def __repr__(self) -> str:
-        return f'({self.maek}, {self.expr}, {self.a}, {self.type})'
+class TypecastLongNode(BinOpNode):
+    def __init__(self, op_token, expr1, an, expr2) -> None:
+        super().__init__(op_token, expr1, an, expr2)
 
 
 class TypecastShortNode():
@@ -150,13 +133,9 @@ class TypecastShortNode():
         return f'({self.maek}, {self.expr}, {self.type})'
 
 
-class SwitchNode:
-    def __init__(self, op_token, expr) -> None:
-        self.op_token = op_token
-        self.expr = expr
-
-    def __repr__(self) -> str:
-        return f'({self.op_token}, {self.expr})'
+class SwitchNode(UnaryOpNode):
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
 class SwitchCaseNode:
@@ -168,26 +147,21 @@ class SwitchCaseNode:
     def __repr__(self) -> str:
         return f'({self.omg}, {self.value}, {self.statement})'
 
-class DefaultCaseNode:
-    def __init__(self, omgwtf, casebody) -> None:
-        self.omgwtf = omgwtf
-        self.casebody = casebody
-
-    def __repr__(self) -> str:
-        return f'({self.omgwtf}, {self.casebody})'
+#OMGWTF
+class DefaultCaseNode(UnaryOpNode):
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
 class CaseBreakNode(BasicNode):
-    pass
+    def __init__(self, token):
+        super().__init__(token)
 
 
-class IfNode:
-    def __init__(self, orly, ifbody) -> None:
-        self.orly = orly
-        self.ifbody = ifbody
-
-    def __repr__(self) -> str:
-        return f'({self.orly}, {self.ifbody})'
+#ORLY
+class IfNode(UnaryOpNode):
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
 class ElseIfNode:
@@ -199,13 +173,10 @@ class ElseIfNode:
     def __repr__(self) -> str:
         return f'({self.mebbe}, {self.value}, {self.elsebody})'
 
-class ElseNode:
-    def __init__(self, nowai, elsebody) -> None:
-        self.nowai = nowai
-        self.elsebody = elsebody
-
-    def __repr__(self) -> str:
-        return f'({self.nowai}, {self.elsebody})'
+#NOWAI
+class ElseNode(UnaryOpNode):
+    def __init__(self, left, right):
+        super().__init__(left, right)
 
 
 class StringNode:
@@ -219,7 +190,8 @@ class StringNode:
 
 
 class TroofNode(BasicNode):
-    pass
+    def __init__(self, token):
+        super().__init__(token)
 
 
 class LoopNodeShort:
@@ -235,6 +207,7 @@ class LoopNodeShort:
 
     def __repr__(self) -> str:
         return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.codeblock}, {self.del_end}, {self.label_end})'
+
 
 class LoopNodeLong:
     def __init__(self, del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end) -> None:

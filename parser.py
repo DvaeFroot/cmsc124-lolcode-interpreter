@@ -1,6 +1,8 @@
 from token_types import *
 from nodes import *
 
+VARTABLE = {}
+
 class Error(Exception):
     def __init__(self, token, cause) -> None:
         self.token = token
@@ -11,6 +13,7 @@ class Error(Exception):
 
     def __str__(self) -> str:
         return f'Error at {self.token}: {self.cause}'
+
 
 class Parser:
     def __init__(self, tokens) -> None:

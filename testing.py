@@ -16,7 +16,7 @@ def doTest(name, txt, shouldFail=False,printOutput=True):
 
     if printOutput:
         print(output)
-
+    #
 #  doTest("Invalid Typo Blank Program",
 #         """
 #         HAI
@@ -42,7 +42,8 @@ doTest("Multiline Comment",
 
 doTest("Multiline Comment",
        """
-        HAI
+       OBTW alsdjflkasfjalksd
+       TLDR
         OBTW what way?
         TLDR I HAS A var2
         I HAS A var3
@@ -65,8 +66,7 @@ print("\n USER INPUT \n")
 
 doTest("Input Variable",
        """
-        HAI
-        GIMMEH x
+        GIMMEH 
         KTHXBYE
        """)
 
