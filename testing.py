@@ -20,7 +20,8 @@ def doTest(name, txt, shouldFail=False,printOutput=True):
 doTest("Semantic Analyzer",
        """
        HAI
-       I HAS A rope ITZ SUM OF SUM OF "1" AN 3 AN SUM OF 1 AN SUM OF 1 AN 1
+       VISIBLE "HELLo"
+       BTW I HAS A rope ITZ SUM OF SUM OF "1" AN 3 AN SUM OF 1 AN SUM OF 1 AN 1
     KTHXBYE
        """)
 #

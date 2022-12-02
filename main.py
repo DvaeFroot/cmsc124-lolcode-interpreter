@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import *
 from tkinter import Scrollbar, ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+from error import Error
 from lexer import *
+from parser import Parser
 
 
 def open_file():
@@ -43,7 +45,7 @@ def getTokens():
     # clear previous items in the lexemes treeview
     for x in tbl_lex.get_children():
         tbl_lex.delete(x)
-    
+
     # put tokens in a list
     tokens = list(lx.tokens())
 
@@ -51,13 +53,20 @@ def getTokens():
     for index,token in enumerate(tokens):
         tbl_lex.insert("",'end',iid=index,
 		values=(token.val,token.type))
-    
+
     # parse the tokens
-    res = Parser(tokens)
+    res = Parser(txt_console, tbl_sym, tokens)
 
     # put into console the output of the parser
+    parse = res.parse()
+    if isinstance(parse, Error):
+        txt_console.configure(state=NORMAL)
+        txt_console.insert(INSERT,str(parse))
+        txt_console.configure(state=DISABLED)
+
+def printToCon(toPrint):
     txt_console.configure(state=NORMAL)
-    txt_console.insert(INSERT,res.parse())
+    txt_console.insert(INSERT,str(toPrint))
     txt_console.configure(state=DISABLED)
 
 window = tk.Tk()

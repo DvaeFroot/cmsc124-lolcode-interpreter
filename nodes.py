@@ -1,8 +1,12 @@
+#  from main import printToConsole
 from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION
 from error import *
+from tkinter import *
+from tkinter.messagebox import messagebox
+#  import main
 
 ST = [{"type": "IT", "value": None}]
-VT = {}
+VT = {"IT": None}
 
 class BasicNode:
     def __init__(self,token):
@@ -43,10 +47,16 @@ class DoubleOpNode:
 
 
 class Program(DoubleOpNode):
-    def __init__(self, start_node, body_node,end_node) -> None:
+    def __init__(self, start_node, body_node,end_node, tbl_sym) -> None:
         super().__init__(start_node, body_node, end_node)
         printST()
         print(VT)
+        # clear previous items in the lexemes treeview
+        for x in tbl_sym.get_children():
+            tbl_sym.delete(x)
+        for index,key in enumerate(VT):
+            tbl_sym.insert("",'end',iid=index,
+            values=(key,VT[key]))
 
 
 class NoobNode(BasicNode):
@@ -139,18 +149,22 @@ class ArithmeticNode(BinOpNode):
             raise Error(self.OP_TOKEN,"Invalid Strings")
 
         self.value=ST[0]["value"]
+        VT["IT"] = ST[0]["value"]
 
 
 #GIMMEH VAR
 class GimmehNode(UnaryOpNode):
-    def __init__(self, left, right):
+    def __init__(self, left, right, txt_console):
         super().__init__(left, right)
 
 
 #VISIBLE
 class VisibleNode(UnaryOpNode):
-    def __init__(self, left, right):
+    def __init__(self, left, right, txt_console):
         super().__init__(left, right)
+        txt_console.configure(state=NORMAL)
+        txt_console.insert(INSERT,str(right.token.val)+'\n')
+        txt_console.configure(state=DISABLED)
 
 
 #I HAS A Variable
@@ -160,10 +174,10 @@ class AssignmentShlongNode(UnaryOpNode):
         ST.append({"type": "variable", "token": VAR.token.val, "value": None})
 
 
+#I HAS A VAR ITZ EPXR
 class AssignmentLongNode(BinOpNode):
     def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
         super().__init__(IHASA, VAR, ITZ, EXPR)
-        print(EXPR)
         if not isinstance(EXPR, ArithmeticNode):
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
             ST[0]["value"] = EXPR.token.val

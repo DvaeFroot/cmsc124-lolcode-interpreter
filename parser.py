@@ -3,10 +3,12 @@ from nodes import *
 from error import *
 
 class Parser:
-    def __init__(self, tokens) -> None:
+    def __init__(self,txt_console,tbl_sym,  tokens) -> None:
         self.tokens = tokens
         self.token_idx = -1
         self.advance()
+        self.txt_console = txt_console
+        self.tbl_sym = tbl_sym
 
 
     def advance(self):
@@ -45,7 +47,7 @@ class Parser:
             self.advance()
             right = self.expr()
 
-            res = VisibleNode(left, right)
+            res = VisibleNode(left, right, self.txt_console)
             return res
 
         raise Error(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")
@@ -413,7 +415,7 @@ class Parser:
             if self.current_tok.type not in (TT_CODE_END):
                 raise Error(self.current_tok, f"Expected KTHBYE at pos {self.current_tok.pos}")
 
-            res = Program(start_node, body_node, end_node)
+            res = Program(start_node, body_node, end_node, self.tbl_sym)
 
             return res
         except Error as err:
