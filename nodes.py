@@ -93,26 +93,12 @@ class StatementNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
-
 #ARITHMETICOP EXPR AN EXPR
 class ArithmeticNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        left,right = "",""
-        if isinstance(EXPR1, ArithmeticNode) and isinstance(EXPR2, ArithmeticNode):
-            left = str(EXPR1.value)
-            right = str(EXPR2.value)
-        else:
-            left = str(ST[0]["value"]) if isinstance(EXPR1, ArithmeticNode) else str(EXPR1.token.val)
-            right = str(ST[0]["value"]) if isinstance(EXPR2, ArithmeticNode) else str(EXPR2.token.val)
-            if  isinstance(EXPR1, VariableNode):
-                if EXPR1.token.val not in VT:
-                    raise Error(EXPR1.token,"Variable not Initialized")
-                left = str(VT[EXPR1.token.val])
-            if  isinstance(EXPR2, VariableNode):
-                if EXPR2.token.val not in VT:
-                    raise Error(EXPR2.token,"Variable not Initialized")
-                right = str(VT[EXPR2.token.val])
+        left = self.check(EXPR1)
+        right = self.check(EXPR2)
 
         if OP_TOKEN.type in (TT_SUMMATION):
             ST[0]["value"] = eval(left + "+" + right)
@@ -125,11 +111,25 @@ class ArithmeticNode(BinOpNode):
         elif OP_TOKEN.type in (TT_MOD):
             ST[0]["value"] = eval(left + "%" + right)
 
-        if isinstance(EXPR1, StringNode) or isinstance(EXPR2, StringNode):
-            raise Error(self.OP_TOKEN,"Invalid Strings")
-
         self.value=ST[0]["value"]
         VT["IT"] = ST[0]["value"]
+    
+    def check(self, INPUT):
+        if isinstance(INPUT,ArithmeticNode):
+            return str(INPUT.value)
+        elif isinstance(INPUT, VariableNode):
+            if INPUT.token.val not in VT:
+                    raise Error(INPUT.token,"Variable not Initialized")
+            return str(VT[INPUT.token.val])
+        elif isinstance(INPUT,StringNode):
+            try:
+                int(INPUT.token.val)
+                float(INPUT.token.val)
+            except ValueError:
+                raise Error(INPUT.token,"Unable to use Arithmetic operations on Yarn")
+            return str(INPUT.token.val)
+        else:
+            return str(INPUT.token.val)
 
 
 #GIMMEH VAR
