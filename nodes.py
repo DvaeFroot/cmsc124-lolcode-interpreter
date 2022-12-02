@@ -119,7 +119,12 @@ class ArithmeticNode(BinOpNode):
             return str(INPUT.value)
         elif isinstance(INPUT, VariableNode):
             if INPUT.token.val not in VT:
-                    raise Error(INPUT.token,"Variable not Initialized")
+                raise Error(INPUT.token,"Variable not Initialized")
+            try:
+                int(VT[INPUT.token.val])
+                float(VT[INPUT.token.val])
+            except ValueError:
+                raise Error(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
             return str(VT[INPUT.token.val])
         elif isinstance(INPUT,StringNode):
             try:
@@ -127,9 +132,8 @@ class ArithmeticNode(BinOpNode):
                 float(INPUT.token.val)
             except ValueError:
                 raise Error(INPUT.token,"Unable to use Arithmetic operations on Yarn")
-            return str(INPUT.token.val)
-        else:
-            return str(INPUT.token.val)
+
+        return str(INPUT.token.val)
 
 
 #GIMMEH VAR
