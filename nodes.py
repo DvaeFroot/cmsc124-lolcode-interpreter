@@ -99,40 +99,43 @@ class ArithmeticNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
         if not isinstance(EXPR1, ArithmeticNode):
+            expr1 = EXPR1.token.val if not isinstance(EXPR1, VariableNode) else VT[EXPR1.token.val]
             if not isinstance(EXPR2, ArithmeticNode):
+                expr2 = EXPR2.token.val if not isinstance(EXPR2, VariableNode) else VT[EXPR2.token.val]
                 if OP_TOKEN.type in (TT_SUMMATION):
-                    ST[0]["value"] = eval(EXPR1.token.val + "+" + EXPR2.token.val)
+                    ST[0]["value"] = eval(expr1 + "+" + expr2)
                 elif OP_TOKEN.type in (TT_SUB):
-                    ST[0]["value"] = eval(EXPR1.token.val + "-" + EXPR2.token.val)
+                    ST[0]["value"] = eval(expr1 + "-" + expr2)
                 elif OP_TOKEN.type in (TT_MUL_OP):
-                    ST[0]["value"] = eval(EXPR1.token.val + "*" + EXPR2.token.val)
+                    ST[0]["value"] = eval(expr1 + "*" + expr2)
                 elif OP_TOKEN.type in (TT_DIV_OP):
-                    ST[0]["value"] = eval(EXPR1.token.val + "/" + EXPR2.token.val)
+                    ST[0]["value"] = eval(expr1 + "/" + expr2)
                 elif OP_TOKEN.type in (TT_MOD):
-                    ST[0]["value"] = eval(EXPR1.token.val + "%" + EXPR2.token.val)
+                    ST[0]["value"] = eval(expr1 + "%" + expr2)
             else:
                 if OP_TOKEN.type in (TT_SUMMATION):
-                    ST[0]["value"] = eval(EXPR1.token.val + "+" + str(ST[0]["value"]))
+                    ST[0]["value"] = eval(expr1 + "+" + str(ST[0]["value"]))
                 elif OP_TOKEN.type in (TT_SUB):
-                    ST[0]["value"] = eval(EXPR1.token.val + "-" + str(ST[0]["value"]))
+                    ST[0]["value"] = eval(expr1 + "-" + str(ST[0]["value"]))
                 elif OP_TOKEN.type in (TT_MUL_OP):
-                    ST[0]["value"] = eval(EXPR1.token.val + "*" + str(ST[0]["value"]))
+                    ST[0]["value"] = eval(expr1 + "*" + str(ST[0]["value"]))
                 elif OP_TOKEN.type in (TT_DIV_OP):
-                    ST[0]["value"] = eval(EXPR1.token.val + "/" + str(ST[0]["value"]))
+                    ST[0]["value"] = eval(expr1 + "/" + str(ST[0]["value"]))
                 elif OP_TOKEN.type in (TT_MOD):
-                    ST[0]["value"] = eval(EXPR1.token.val + "%" + str(ST[0]["value"]))
+                    ST[0]["value"] = eval(expr1 + "%" + str(ST[0]["value"]))
         else:
             if not isinstance(EXPR2, ArithmeticNode):
+                expr2 = EXPR2.token.val if not isinstance(EXPR2, VariableNode) else VT[EXPR2.token.val]
                 if OP_TOKEN.type in (TT_SUMMATION):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "+" + EXPR2.token.val)
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "+" + expr2)
                 elif OP_TOKEN.type in (TT_SUB):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "-" + EXPR2.token.val)
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "-" + expr2)
                 elif OP_TOKEN.type in (TT_MUL_OP):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "*" + EXPR2.token.val)
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "*" + expr2)
                 elif OP_TOKEN.type in (TT_DIV_OP):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "/" + EXPR2.token.val)
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "/" + expr2)
                 elif OP_TOKEN.type in (TT_MOD):
-                    ST[0]["value"] = eval(str(ST[0]["value"]) + "%" + EXPR2.token.val)
+                    ST[0]["value"] = eval(str(ST[0]["value"]) + "%" + expr2)
             else:
                 if OP_TOKEN.type in (TT_SUMMATION):
                     ST[0]["value"] = eval(str(EXPR1.value) + "+" + str(EXPR2.value))
@@ -166,9 +169,14 @@ class GimmehNode(UnaryOpNode):
 class VisibleNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
-        txt_console.configure(state=NORMAL)
-        txt_console.insert(INSERT,str(right.token.val)+'\n')
-        txt_console.configure(state=DISABLED)
+        if not isinstance(right, VariableNode):
+            txt_console.configure(state=NORMAL)
+            txt_console.insert(INSERT,str(right.token.val)+'\n')
+            txt_console.configure(state=DISABLED)
+        else:
+            txt_console.configure(state=NORMAL)
+            txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
+            txt_console.configure(state=DISABLED)
 
 
 #I HAS A Variable

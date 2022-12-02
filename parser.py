@@ -104,6 +104,7 @@ class Parser:
         elif self.current_tok.type in (TT_BOOLEAN):
             return TroofNode(self.current_tok)
         elif self.current_tok.type in (TT_IDENTIFIER):
+            print("Hello")
             return VariableNode(self.current_tok)
         elif self.current_tok.type in (GP_COMPARISON):
             return self.comparison()
