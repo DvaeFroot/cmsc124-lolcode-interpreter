@@ -61,6 +61,10 @@ def getTokens():
         tbl_lex.insert("",'end',iid=index,
 		values=(token.val,token.type))
 
+    # clear contents of symbol table
+    for x in tbl_sym.get_children():
+        tbl_sym.delete(x)
+    
     # parse the tokens
     res = Parser(txt_console, tbl_sym, tokens)
 
