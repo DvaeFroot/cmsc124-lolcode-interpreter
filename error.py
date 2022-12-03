@@ -18,3 +18,7 @@ class ErrorSyntax(Error):
 
     def __str__(self) -> str:
         return f'SyntaxError at {self.token}: {self.cause}'
+
+class LexerError(Exception):
+    def __init__(self, pos):
+        self.pos = pos

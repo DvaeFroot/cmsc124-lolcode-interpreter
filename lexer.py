@@ -1,7 +1,7 @@
 #Forked from https://gist.github.com/eliben/5797351
 import re
 from token_types import *
-
+from error import *
 
 class Token(object):
     def __init__(self, type, val, pos):
@@ -11,11 +11,6 @@ class Token(object):
 
     def __str__(self):
         return '%s: %s' % (self.type, self.val)
-
-
-class LexerError(Exception):
-    def __init__(self, pos):
-        self.pos = pos
 
 
 class Lexer(object):
