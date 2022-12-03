@@ -160,7 +160,7 @@ class Lexer(object):
                 #Update the position
                 self.pos = m.end()
 
-                newline = re.compile(r"ErrorSemantic(")
+                newline = re.compile(r"\n")
                 m = newline.search(self.buf, self.pos)
 
                 if m:
