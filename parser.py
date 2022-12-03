@@ -6,9 +6,11 @@ class Parser:
     def __init__(self,txt_console,tbl_sym,  tokens) -> None:
         self.tokens = tokens
         self.token_idx = -1
-        self.advance()
         self.txt_console = txt_console
         self.tbl_sym = tbl_sym
+        self.insideString = False
+        
+        self.advance()
 
 
     def advance(self):
@@ -17,6 +19,9 @@ class Parser:
             self.current_tok = self.tokens[self.token_idx]
         if self.current_tok.type in (TT_COMMENT_STRT, TT_COMMENT_MULTI_STRT, TT_COMMENT_MULTI_END):
             self.advance()
+        if not self.insideString and self.current_tok.type in (TT_NEWLINE):
+            self.token_idx += 1
+            self.current_tok = self.tokens[self.token_idx]
         return self.current_tok
 
 
@@ -42,6 +47,7 @@ class Parser:
 
     def print(self):
         if self.current_tok.type in (TT_OUTPUT):
+            self.insideString = True
             left = self.current_tok
 
             right = []
@@ -55,7 +61,7 @@ class Parser:
                     break
                 
                 right.append(exproutput)
-
+            self.insideString = False
             res = VisibleNode(left, right, self.txt_console)
             return res
 
@@ -404,8 +410,8 @@ class Parser:
         while(self.token_idx+1 < len(self.tokens)):
             if self.tokens[self.token_idx+1].type not in (TT_CODE_END):
                 if self.token_idx+1 < len(self.tokens):
-                    yield self.statement()
                     self.advance()
+                    yield self.statement()
             else:
                 break
 
@@ -417,12 +423,11 @@ class Parser:
                 raise ErrorSyntax(self.current_tok, f"Expected HAI at {self.current_tok.pos}")
 
             start_node = self.current_tok
-            self.advance()
 
             body_node = list(self.body())
 
             #End of code
-            end_node = self.advance()
+            end_node = self.current_tok
 
             if self.current_tok.type not in (TT_CODE_END):
                 raise ErrorSyntax(self.current_tok, f"Expected KTHBYE at pos {self.current_tok.pos}")

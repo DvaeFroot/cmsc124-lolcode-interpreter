@@ -95,7 +95,7 @@ class Lexer(object):
             (r'\bA\b',                                    TT_A),
             # (r'\"',                                       TT_STR_DELIMITER),
 
-            #  {r'\n',                                       TT_NEWLINE},
+            {r'\n',                                       TT_NEWLINE},
 
             #identifier
             (r'\b[a-zA-Z]\w*\b',                          TT_IDENTIFIER),
@@ -117,7 +117,7 @@ class Lexer(object):
 
         #For white space checking
         self.skip_whitespace = skip_whitespace
-        self.regex_whitespace = re.compile('[^\s,]')
+        self.regex_whitespace = re.compile('[^, \t]')
         self.regex_newline = re.compile('[\n]')
 
 
@@ -212,6 +212,11 @@ class Lexer(object):
                 self.pos = m.end()
                 
                 tokens.append(tok)
-                    
-        [print(x) for x in tokens]       
+        
+        # remove new lines in end of tokens list
+        for x in range(len(tokens)-1,0,-1):
+            if (tokens[x].type in (TT_NEWLINE)):
+                tokens.pop()
+            else:
+                break
         return tokens
