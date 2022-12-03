@@ -152,15 +152,15 @@ class GimmehNode(UnaryOpNode):
 class VisibleNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
-        if not isinstance(right, VariableNode):
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(right.token.val)+'\n')
-            txt_console.configure(state=DISABLED)
-        else:
+        if isinstance(right, VariableNode):
             if right.token.val not in VT:
                 raise Error(right.token,"Variable not Initialized")
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
+            txt_console.configure(state=DISABLED)
+        else:
+            txt_console.configure(state=NORMAL)
+            txt_console.insert(INSERT,str(right.token.val)+'\n')
             txt_console.configure(state=DISABLED)
 
 
@@ -175,16 +175,16 @@ class AssignmentShlongNode(UnaryOpNode):
 class AssignmentLongNode(BinOpNode):
     def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
         super().__init__(IHASA, VAR, ITZ, EXPR)
-        if not isinstance(EXPR, ArithmeticNode):
+        if isinstance(EXPR, ArithmeticNode):
+            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
+            VT[VAR.token.val] = ST[0]["value"]
+        else:
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
             ST[0]["value"] = EXPR.token.val
             if VAR.token.type not in TT_STRING:
                 if VAR.token.val.isdigit():
                     VT[VAR.token.val] = eval(EXPR.token.val)
             VT[VAR.token.val] = EXPR.token.val
-        else:
-            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
-            VT[VAR.token.val] = ST[0]["value"]
 
 
 #VAR R EXPR
