@@ -135,9 +135,6 @@ class Lexer(object):
             if m == None:
                 #No match means end of file
                 break
-
-            #Get the current line of the parsed token
-            self.line += len(self.regex_newline.findall(self.buf,self.pos,m.start()))
             
             #Get new starting position for regex searching
             self.pos = m.start()
@@ -152,6 +149,10 @@ class Lexer(object):
             
             #Get the type of the token using the groupname
             tok_type = self.group_type[groupname]
+            
+            #increment the current line number if newline is seen
+            if tok_type in (TT_NEWLINE):
+                self.line += 1
                 
             if str(m.group(groupname)) == "BTW":
                 #Get the current token using the groupname. The actual token is in m.group(groupname). 
