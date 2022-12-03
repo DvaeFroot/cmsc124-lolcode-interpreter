@@ -12,3 +12,9 @@ class Error(Exception):
 class ErrorSyntax(Error):
     def __init__(self,token,cause) -> None:
         super.__init__(token,cause)
+    
+    def __repr__(self) -> str:
+        return f'SyntaxError at {self.token}: {self.cause}'
+
+    def __str__(self) -> str:
+        return f'SyntaxError at {self.token}: {self.cause}'
