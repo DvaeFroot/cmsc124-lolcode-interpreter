@@ -194,6 +194,16 @@ class AssignmentLongNode(BinOpNode):
 class AssignmentShortNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
+        if isinstance(right, ArithmeticNode):
+            ST.append({"type": "variable", "token": left.token.val, "value": ST[0]["value"]})
+            VT[left.token.val] = ST[0]["value"]
+        else:
+            ST.append({"type": "variable", "token": left.token.val, "value": right.token.val})
+            ST[0]["value"] = right.token.val
+            if left.token.type not in TT_STRING:
+                if left.token.val.isdigit():
+                    VT[left.token.val] = eval(right.token.val)
+            VT[left.token.val] = right.token.val
 
 
 #OPERATION EXPR AN EXPR
