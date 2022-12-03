@@ -35,7 +35,7 @@ class ErrorSemantic(Error):
         super().__init__(token,cause)
     
     def __repr__(self) -> str:
-        return f'SemanticError at {self.token}: {self.cause}'
+        return f'SemanticError at {self.token} in line {self.token.line}: {self.cause}'
 
     def __str__(self) -> str:
-        return f'SemanticError at {self.token}: {self.cause}'
+        return f'SemanticError at {self.token} in line {self.token.line}: {self.cause}'
