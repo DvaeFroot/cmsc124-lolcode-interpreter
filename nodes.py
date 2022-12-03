@@ -140,6 +140,8 @@ class ArithmeticNode(BinOpNode):
 class GimmehNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
+        if right.token.val not in VT:
+            raise Error(right.token,"Variable not Initialized")
         answer = simpledialog.askstring("Input", f"Value for: {right.val}")
         ST[0]["value"] = answer
         VT["IT"] = ST[0]["value"]
