@@ -1,9 +1,7 @@
-#  from main import printToConsole
-from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION, TT_IDENTIFIER
+from token_types import *
 from error import *
 from tkinter import *
 from tkinter import simpledialog
-#  import main
 
 ST = [{"type": "IT", "value": None}]
 VT = {"IT": None}
@@ -119,19 +117,19 @@ class ArithmeticNode(BinOpNode):
             return str(INPUT.value)
         elif isinstance(INPUT, VariableNode):
             if INPUT.token.val not in VT:
-                raise Error(INPUT.token,"Variable not Initialized")
+                raise ErrorSemantic(INPUT.token,"Variable not Initialized")
             try:
                 int(VT[INPUT.token.val])
                 float(VT[INPUT.token.val])
             except ValueError:
-                raise Error(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
+                raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
             return str(VT[INPUT.token.val])
         elif isinstance(INPUT,StringNode):
             try:
                 int(INPUT.token.val)
                 float(INPUT.token.val)
             except ValueError:
-                raise Error(INPUT.token,"Unable to use Arithmetic operations on Yarn")
+                raise ErrorSemantic(INPUT.token,"Unable to use Arithmetic operations on Yarn")
 
         return str(INPUT.token.val)
 
@@ -140,6 +138,8 @@ class ArithmeticNode(BinOpNode):
 class GimmehNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
+        if right.token.val not in VT:
+            raise ErrorSemantic(right.token,"Variable not Initialized")
         answer = simpledialog.askstring("Input", f"Value for: {right.val}")
         ST[0]["value"] = answer
         VT["IT"] = ST[0]["value"]
@@ -150,15 +150,15 @@ class GimmehNode(UnaryOpNode):
 class VisibleNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
-        if not isinstance(right, VariableNode):
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(right.token.val)+'\n')
-            txt_console.configure(state=DISABLED)
-        else:
+        if isinstance(right, VariableNode):
             if right.token.val not in VT:
-                raise Error(right.token,"Variable not Initialized")
+                raise ErrorSemantic(right.token,"Variable not Initialized")
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
+            txt_console.configure(state=DISABLED)
+        else:
+            txt_console.configure(state=NORMAL)
+            txt_console.insert(INSERT,str(right.token.val)+'\n')
             txt_console.configure(state=DISABLED)
 
 
@@ -173,16 +173,16 @@ class AssignmentShlongNode(UnaryOpNode):
 class AssignmentLongNode(BinOpNode):
     def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
         super().__init__(IHASA, VAR, ITZ, EXPR)
-        if not isinstance(EXPR, ArithmeticNode):
+        if isinstance(EXPR, ArithmeticNode):
+            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
+            VT[VAR.token.val] = ST[0]["value"]
+        else:
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
             ST[0]["value"] = EXPR.token.val
             if VAR.token.type not in TT_STRING:
                 if VAR.token.val.isdigit():
                     VT[VAR.token.val] = eval(EXPR.token.val)
             VT[VAR.token.val] = EXPR.token.val
-        else:
-            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
-            VT[VAR.token.val] = ST[0]["value"]
 
 
 #VAR R EXPR
