@@ -118,7 +118,7 @@ class Lexer(object):
         self.skip_whitespace = skip_whitespace
         self.regex_whitespace = re.compile('[^\s,]')
         self.regex_newline = re.compile('[\n]')
-
+        self.str = False
 
     def input(self, buf):
         self.buf = buf
@@ -131,7 +131,7 @@ class Lexer(object):
             return None
 
         #This one can just be omitted. It's only used if we try to skip whitespaces
-        if self.skip_whitespace:
+        if self.skip_whitespace and not(self.str):
             #Get the first space from starting position
             m = self.regex_whitespace.search(self.buf, self.pos)
 
@@ -192,16 +192,17 @@ class Lexer(object):
 
                 return tok
 
-            #Get the first space from starting position
-            m = self.regex_whitespace.search(self.buf, self.pos)
+            if not(self.str):
+                #Get the first space from starting position
+                m = self.regex_whitespace.search(self.buf, self.pos)
 
-            if m == None:
-                #No match means end of file
-                tok = Token(TT_EOF, )
-                return None
+                if m == None:
+                    #No match means end of file
+                    tok = Token(TT_EOF, )
+                    return None
 
-            #Get new starting position for regex searching
-            self.pos = m.start()
+                #Get new starting position for regex searching
+                self.pos = m.start()
 
         #Do regex match. This is the only codeblock needed
         m = self.regex.match(self.buf, self.pos)
@@ -218,7 +219,9 @@ class Lexer(object):
             #The Token class is just a struct to store information about the current token.
             tok = Token(tok_type, m.group(groupname), self.pos, self.line)
             #Update the position
-            self.pos = m.end()
+            self.pos = m.span()[1]
+            if tok_type == TT_STR_DELIMITER:
+                self.str = not(self.str)
             return tok
 
         # if we're here, no rule matched
