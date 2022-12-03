@@ -44,8 +44,20 @@ class Parser:
         if self.current_tok.type in (TT_OUTPUT):
             left = self.current_tok
 
-            self.advance()
-            right = self.expr()
+            right = []
+            while 1:
+                self.advance()
+                temptok = self.current_tok
+                print("new token:",temptok,temptok.type)
+                exproutput = self.expr(raiseError=False)
+                print(exproutput)
+                if exproutput == None:
+                    print(self.current_tok)
+                    self.token_idx -= 1
+                    self.current_tok = temptok
+                    break
+                
+                right.append(exproutput)
 
             res = VisibleNode(left, right, self.txt_console)
             return res
@@ -79,7 +91,7 @@ class Parser:
             return res
 
 
-    def expr(self):
+    def expr(self,raiseError=True):
         if self.current_tok.type in (GP_ARITHMETIC):
             op_token = self.current_tok
 
@@ -109,8 +121,10 @@ class Parser:
         elif self.current_tok.type in (GP_COMPARISON):
             return self.comparison()
 
-        raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
-
+        if raiseError:
+            raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
+        else:
+            return None
 
     def variableLong(self):
         if self.current_tok.type in (TT_VAR_DEC):

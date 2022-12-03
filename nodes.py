@@ -150,16 +150,20 @@ class GimmehNode(UnaryOpNode):
 class VisibleNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
-        if isinstance(right, VariableNode):
-            if right.token.val not in VT:
-                raise ErrorSemantic(right.token,"Variable not Initialized")
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
-            txt_console.configure(state=DISABLED)
-        else:
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(right.token.val)+'\n')
-            txt_console.configure(state=DISABLED)
+        for value in right:
+            if isinstance(value, VariableNode):
+                if value.token.val not in VT:
+                    raise ErrorSemantic(value.token,"Variable not Initialized")
+                txt_console.configure(state=NORMAL)
+                txt_console.insert(INSERT,str(VT[value.token.val]))
+                txt_console.configure(state=DISABLED)
+            else:
+                txt_console.configure(state=NORMAL)
+                txt_console.insert(INSERT,str(value.token.val))
+                txt_console.configure(state=DISABLED)
+        txt_console.configure(state=NORMAL)
+        txt_console.insert(INSERT,'\n')
+        txt_console.configure(state=DISABLED)
 
 
 #I HAS A Variable
