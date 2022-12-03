@@ -22,3 +22,9 @@ class ErrorSyntax(Error):
 class LexerError(Exception):
     def __init__(self, pos):
         self.pos = pos
+    
+    def __repr__(self) -> str:
+        return f'LexerError at {self.pos}'
+
+    def __str__(self) -> str:
+        return f'LexerError at {self.pos}'

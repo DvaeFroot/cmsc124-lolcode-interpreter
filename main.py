@@ -47,7 +47,14 @@ def getTokens():
         tbl_lex.delete(x)
 
     # put tokens in a list
-    tokens = list(lx.tokens())
+    try:
+        tokens = list(lx.tokens())
+    except LexerError as e:
+        txt_console.configure(state=NORMAL)
+        txt_console.insert(INSERT,str(e))
+        txt_console.configure(state=DISABLED)
+        return
+        
 
     # insert the generated tokin in the lexemes treeview
     for index,token in enumerate(tokens):

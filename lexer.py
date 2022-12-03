@@ -1,7 +1,7 @@
 #Forked from https://gist.github.com/eliben/5797351
 import re
 from token_types import *
-from error import *
+from error import LexerError
 
 class Token(object):
     def __init__(self, type, val, pos):
@@ -222,8 +222,11 @@ class Lexer(object):
 
     def tokens(self):
         #generator to get all tokens
-        while 1:
-            tok = self.token()
-            if tok is None:
-                break
-            yield tok
+        try:
+            while 1:
+                tok = self.token()
+                if tok is None:
+                    break
+                yield tok
+        except LexerError:
+            raise LexerError(self.pos)
