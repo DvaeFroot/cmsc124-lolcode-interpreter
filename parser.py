@@ -60,7 +60,7 @@ class Parser:
             if right.type not in (TT_IDENTIFIER):
                 raise Error(self.current_tok, f"Expected IDENTIFIER at pos {self.current_tok.pos}")
 
-            res = GimmehNode(left, right, self.txt_console)
+            res = GimmehNode(left, VariableNode(right), self.txt_console)
             return res
         raise Error(self.current_tok, f"Expected GIMMEH at pos {self.current_tok.pos}")
 
