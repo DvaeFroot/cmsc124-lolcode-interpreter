@@ -4,10 +4,11 @@ from token_types import *
 from error import LexerError
 
 class Token(object):
-    def __init__(self, type, val, pos):
+    def __init__(self, type, val, pos, line):
         self.type = type
         self.val = val
         self.pos = pos
+        self.line = line
 
     def __str__(self):
         return '%s: %s' % (self.type, self.val)
@@ -116,6 +117,7 @@ class Lexer(object):
         #For white space checking
         self.skip_whitespace = skip_whitespace
         self.regex_whitespace = re.compile('[^\s,]')
+        self.regex_newline = re.compile('[\n]')
 
 
     def input(self, buf):
@@ -137,6 +139,9 @@ class Lexer(object):
                 #No match means end of file
                 return None
 
+            #Get the current line of the parsed token
+            self.line += len(self.regex_newline.findall(self.buf,self.pos,m.start()))
+            
             #Get new starting position for regex searching
             self.pos = m.start()
 
@@ -151,11 +156,11 @@ class Lexer(object):
                 tok_type = self.group_type[groupname]
                 #Get the current token using the groupname. The actual token is in m.group(groupname). 
                 #The Token class is just a struct to store information about the current token.
-                tok = Token(tok_type, m.group(groupname), self.pos)
+                tok = Token(tok_type, m.group(groupname), self.pos, self.line)
                 #Update the position
                 self.pos = m.end()
 
-                newline = re.compile(r"\n")
+                newline = re.compile(r"ErrorSemantic(")
                 m = newline.search(self.buf, self.pos)
 
                 if m:
@@ -171,7 +176,7 @@ class Lexer(object):
                 tok_type = self.group_type[groupname]
                 #Get the current token using the groupname. The actual token is in m.group(groupname). 
                 #The Token class is just a struct to store information about the current token.
-                tok = Token(tok_type, m.group(groupname), self.pos)
+                tok = Token(tok_type, m.group(groupname), self.pos, self.line)
                 # print(tok)
                 #Update the position
                 self.pos = m.end()
@@ -211,14 +216,14 @@ class Lexer(object):
                 return
             #Get the current token using the groupname. The actual token is in m.group(groupname). 
             #The Token class is just a struct to store information about the current token.
-            tok = Token(tok_type, m.group(groupname), self.pos)
+            tok = Token(tok_type, m.group(groupname), self.pos, self.line)
             #Update the position
             self.pos = m.end()
             return tok
 
         # if we're here, no rule matched
         # We can replace this one or outright remove it
-        raise LexerError(self.pos)
+        raise LexerError(self.pos, self.line)
 
     def tokens(self):
         #generator to get all tokens
@@ -229,4 +234,4 @@ class Lexer(object):
                     break
                 yield tok
         except LexerError:
-            raise LexerError(self.pos)
+            raise LexerError(self.pos, self.line)
