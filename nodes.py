@@ -140,10 +140,10 @@ class GimmehNode(UnaryOpNode):
         super().__init__(left, right)
         if right.token.val not in VT:
             raise ErrorSemantic(right.token,"Variable not Initialized")
-        answer = simpledialog.askstring("Input", f"Value for: {right.val}")
+        answer = simpledialog.askstring("Input", f"Value for: {right.token.val}")
         ST[0]["value"] = answer
         VT["IT"] = ST[0]["value"]
-        VT[right.val] = answer
+        VT[right.token.val] = answer
 
 
 #VISIBLE
@@ -167,6 +167,7 @@ class AssignmentShlongNode(UnaryOpNode):
     def __init__(self, IHASA, VAR):
         super().__init__(IHASA, VAR)
         ST.append({"type": "variable", "token": VAR.token.val, "value": None})
+        VT[str(VAR.token.val)] = None
 
 
 #I HAS A VAR ITZ EPXR
