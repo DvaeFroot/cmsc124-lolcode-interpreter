@@ -21,7 +21,7 @@ class LexerError(Exception):
 
 class ErrorSyntax(Error):
     def __init__(self,token,cause) -> None:
-        super.__init__(token,cause)
+        super().__init__(token,cause)
     
     def __repr__(self) -> str:
         return f'SyntaxError at {self.token}: {self.cause}'
@@ -31,7 +31,7 @@ class ErrorSyntax(Error):
 
 class ErrorSemantic(Error):
     def __init__(self,token,cause) -> None:
-        super.__init__(token,cause)
+        super().__init__(token,cause)
     
     def __repr__(self) -> str:
         return f'SemanticError at {self.token}: {self.cause}'
