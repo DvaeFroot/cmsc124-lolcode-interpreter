@@ -9,6 +9,6 @@ class Error(Exception):
     def __str__(self) -> str:
         return f'Error at {self.token}: {self.cause}'
 
-class SyntaxError(Error):
+class ErrorSyntax(Error):
     def __init__(self,token,cause) -> None:
         super.__init__(token,cause)
