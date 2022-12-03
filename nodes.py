@@ -1,9 +1,7 @@
-#  from main import printToConsole
-from token_types import TT_DIV_OP, TT_MOD, TT_MUL_OP, TT_STRING, TT_SUB, TT_SUMMATION, TT_IDENTIFIER
+from token_types import *
 from error import *
 from tkinter import *
 from tkinter import simpledialog
-#  import main
 
 ST = [{"type": "IT", "value": None}]
 VT = {"IT": None}
