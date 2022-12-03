@@ -48,11 +48,8 @@ class Parser:
             while 1:
                 self.advance()
                 temptok = self.current_tok
-                print("new token:",temptok,temptok.type)
                 exproutput = self.expr(raiseError=False)
-                print(exproutput)
                 if exproutput == None:
-                    print(self.current_tok)
                     self.token_idx -= 1
                     self.current_tok = temptok
                     break
