@@ -117,19 +117,19 @@ class ArithmeticNode(BinOpNode):
             return str(INPUT.value)
         elif isinstance(INPUT, VariableNode):
             if INPUT.token.val not in VT:
-                raise Error(INPUT.token,"Variable not Initialized")
+                raise ErrorSemantic(INPUT.token,"Variable not Initialized")
             try:
                 int(VT[INPUT.token.val])
                 float(VT[INPUT.token.val])
             except ValueError:
-                raise Error(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
+                raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
             return str(VT[INPUT.token.val])
         elif isinstance(INPUT,StringNode):
             try:
                 int(INPUT.token.val)
                 float(INPUT.token.val)
             except ValueError:
-                raise Error(INPUT.token,"Unable to use Arithmetic operations on Yarn")
+                raise ErrorSemantic(INPUT.token,"Unable to use Arithmetic operations on Yarn")
 
         return str(INPUT.token.val)
 
@@ -139,7 +139,7 @@ class GimmehNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
         if right.token.val not in VT:
-            raise Error(right.token,"Variable not Initialized")
+            raise ErrorSemantic(right.token,"Variable not Initialized")
         answer = simpledialog.askstring("Input", f"Value for: {right.val}")
         ST[0]["value"] = answer
         VT["IT"] = ST[0]["value"]
@@ -152,7 +152,7 @@ class VisibleNode(UnaryOpNode):
         super().__init__(left, right)
         if isinstance(right, VariableNode):
             if right.token.val not in VT:
-                raise Error(right.token,"Variable not Initialized")
+                raise ErrorSemantic(right.token,"Variable not Initialized")
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
             txt_console.configure(state=DISABLED)
