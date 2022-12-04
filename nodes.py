@@ -108,6 +108,10 @@ class ArithmeticNode(BinOpNode):
             ST[0]["value"] = eval(left + "/" + right)
         elif OP_TOKEN.type in (TT_MOD):
             ST[0]["value"] = eval(left + "%" + right)
+        elif OP_TOKEN.type in (TT_MAX):
+            ST[0]["value"] = max((eval(left),eval(right)))
+        elif OP_TOKEN.type in (TT_MIN):
+            ST[0]["value"] = min((eval(left),eval(right)))
 
         self.value=ST[0]["value"]
         VT["IT"] = ST[0]["value"]
@@ -156,40 +160,57 @@ class VisibleNode(UnaryOpNode):
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
             txt_console.configure(state=DISABLED)
+        elif isinstance(right,BooleanNode):
+            txt_console.configure(state=NORMAL)
+            txt_console.insert(INSERT,str(right.value)+'\n')
+            txt_console.configure(state=DISABLED)
         else:
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(right.token.val)+'\n')
             txt_console.configure(state=DISABLED)
 
 
-#I HAS A Variable
-class AssignmentShlongNode(UnaryOpNode):
-    def __init__(self, IHASA, VAR):
-        super().__init__(IHASA, VAR)
-        ST.append({"type": "variable", "token": VAR.token.val, "value": None})
-        VT[str(VAR.token.val)] = None
-
-
-#I HAS A VAR ITZ EPXR
-class AssignmentLongNode(BinOpNode):
-    def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
-        super().__init__(IHASA, VAR, ITZ, EXPR)
-        if isinstance(EXPR, ArithmeticNode):
+class AssignmentNode():
+    def assign(self,VAR,EXPR):
+        if EXPR is None:
+            ST.append({"type": "variable", "token": VAR.token.val, "value": None})
+            VT[str(VAR.token.val)] = None
+        
+        elif isinstance(EXPR, ArithmeticNode):
             ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
-            VT[VAR.token.val] = ST[0]["value"]
+            VT[str(VAR.token.val)] = ST[0]["value"]
+        
+        elif isinstance(EXPR, BooleanNode):
+            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
+            VT[str(VAR.token.val)] = ST[0]["value"]
+        
         else:
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
             ST[0]["value"] = EXPR.token.val
             if VAR.token.type not in TT_STRING:
                 if VAR.token.val.isdigit():
                     VT[VAR.token.val] = eval(EXPR.token.val)
-            VT[VAR.token.val] = EXPR.token.val
+            VT[str(VAR.token.val)] = EXPR.token.val
+
+#I HAS A Variable
+class AssignmentShlongNode(UnaryOpNode,AssignmentNode):
+    def __init__(self, IHASA, VAR):
+        super().__init__(IHASA, VAR)
+        self.assign(VAR,None)
+
+
+#I HAS A VAR ITZ EPXR
+class AssignmentLongNode(BinOpNode,AssignmentNode):
+    def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
+        super().__init__(IHASA, VAR, ITZ, EXPR)
+        self.assign(VAR,EXPR)
 
 
 #VAR R EXPR
-class AssignmentShortNode(DoubleOpNode):
+class AssignmentShortNode(DoubleOpNode,AssignmentNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
+        self.assign(left,right)
 
 
 #OPERATION EXPR AN EXPR
@@ -197,16 +218,57 @@ class ComparisonNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
+class BooleanNode():
+    def check(self, INPUT):
+        if isinstance(INPUT,TroofNode):
+            return str(INPUT.token.val)
+        elif isinstance(INPUT, VariableNode):
+            if INPUT.token.val not in VT:
+                raise ErrorSemantic(INPUT.token,"Variable not Initialized")
+            
+            if VT[INPUT.token.val] not in ("WIN","FAIL"):
+                raise ErrorSemantic(INPUT.token,"Variable contain Yarn. Unable to use Boolean operations on Yarn")
+            
+            return str(VT[INPUT.token.val])
+        elif isinstance(INPUT,StringNode):
+            if VT[INPUT.token.val] not in ("WIN","FAIL"):
+                raise ErrorSemantic(INPUT.token,"Unable to use Boolean operations on Yarn")
+
+        return str(INPUT.token.val)
+
 #
-class BooleanLongNode(BinOpNode):
+class BooleanLongNode(BinOpNode,BooleanNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
+        left = self.check(EXPR1)
+        right = self.check(EXPR2)
+        output = None
+
+        if OP_TOKEN.type in (TT_AND):
+            output = left and right
+        elif OP_TOKEN.type in (TT_OR_OP):
+            output = left or right
+        elif OP_TOKEN.type in (TT_XOR):
+            output = not (left or right)
+        
+        ST[0]["value"] = "WIN" if output else "FAIL"
+        self.value = ST[0]["value"]
+        VT["IT"] = ST[0]["value"]
 
 
 #OPERATION EXPR
-class BooleanShortNode(UnaryOpNode):
+class BooleanShortNode(UnaryOpNode,BooleanNode):
     def __init__(self, left, right):
         super().__init__(left, right)
+        val = self.check(right)
+        output = None
+
+        if left.type in (TT_NOT):
+            output = not val
+        
+        ST[0]["value"] = "WIN" if output else "FAIL"
+        self.value = ST[0]["value"]
+        VT["IT"] = ST[0]["value"]
 
 
 #MAEK EXPR AN TYPE
@@ -272,6 +334,7 @@ class StringNode(BasicNode):
 class TroofNode(BasicNode):
     def __init__(self, token):
         super().__init__(token)
+        self.value = True if self.token.val == "WIN" else False
 
 
 class LoopNodeShort:
