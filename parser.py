@@ -393,8 +393,8 @@ class Parser:
         while(self.token_idx+1 < len(self.tokens)):
             if self.tokens[self.token_idx+1].type not in (TT_CODE_END):
                 if self.token_idx+1 < len(self.tokens):
-                    yield self.statement()
                     self.advance()
+                    yield self.statement()
             else:
                 break
 
@@ -406,7 +406,6 @@ class Parser:
                 raise ErrorSyntax(self.current_tok, f"Expected HAI at {self.current_tok.pos}")
 
             start_node = self.current_tok
-            self.advance()
 
             body_node = list(self.body())
 
