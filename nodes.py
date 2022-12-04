@@ -170,44 +170,43 @@ class VisibleNode(UnaryOpNode):
         txt_console.configure(state=DISABLED)
 
 
-#I HAS A Variable
-class AssignmentShlongNode(UnaryOpNode):
-    def __init__(self, IHASA, VAR):
-        super().__init__(IHASA, VAR)
-        ST.append({"type": "variable", "token": VAR.token.val, "value": None})
-        VT[str(VAR.token.val)] = None
-
-
-#I HAS A VAR ITZ EPXR
-class AssignmentLongNode(BinOpNode):
-    def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
-        super().__init__(IHASA, VAR, ITZ, EXPR)
-        if isinstance(EXPR, ArithmeticNode):
+class AssignmentNode():
+    def assign(self,VAR,EXPR):
+        if EXPR is None:
+            ST.append({"type": "variable", "token": VAR.token.val, "value": None})
+            VT[str(VAR.token.val)] = None
+        
+        elif isinstance(EXPR, ArithmeticNode):
             ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
-            VT[VAR.token.val] = ST[0]["value"]
+            VT[str(VAR.token.val)] = ST[0]["value"]
+        
         else:
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
             ST[0]["value"] = EXPR.token.val
             if VAR.token.type not in TT_STRING:
                 if VAR.token.val.isdigit():
                     VT[VAR.token.val] = eval(EXPR.token.val)
-            VT[VAR.token.val] = EXPR.token.val
+            VT[str(VAR.token.val)] = EXPR.token.val
+
+#I HAS A Variable
+class AssignmentShlongNode(UnaryOpNode,AssignmentNode):
+    def __init__(self, IHASA, VAR):
+        super().__init__(IHASA, VAR)
+        self.assign(VAR,None)
+
+
+#I HAS A VAR ITZ EPXR
+class AssignmentLongNode(BinOpNode,AssignmentNode):
+    def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
+        super().__init__(IHASA, VAR, ITZ, EXPR)
+        self.assign(VAR,EXPR)
 
 
 #VAR R EXPR
-class AssignmentShortNode(DoubleOpNode):
+class AssignmentShortNode(DoubleOpNode,AssignmentNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
-        if isinstance(right, ArithmeticNode):
-            ST.append({"type": "variable", "token": left.token.val, "value": ST[0]["value"]})
-            VT[left.token.val] = ST[0]["value"]
-        else:
-            ST.append({"type": "variable", "token": left.token.val, "value": right.token.val})
-            ST[0]["value"] = right.token.val
-            if left.token.type not in TT_STRING:
-                if left.token.val.isdigit():
-                    VT[left.token.val] = eval(right.token.val)
-            VT[left.token.val] = right.token.val
+        self.assign(left,right)
 
 
 #OPERATION EXPR AN EXPR
