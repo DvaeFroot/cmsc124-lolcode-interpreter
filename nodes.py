@@ -214,6 +214,37 @@ class ComparisonNode(BinOpNode):
 class BooleanLongNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
+        left = self.check(EXPR1)
+        right = self.check(EXPR2)
+        output = None
+
+        if OP_TOKEN.type in (TT_AND):
+            output = left and right
+        elif OP_TOKEN.type in (TT_OR_OP):
+            output = left or right
+        elif OP_TOKEN.type in (TT_XOR):
+            output = eval(left + "*" + right)
+        
+        ST[0]["value"] = "WIN" if output else "FAIL"
+        self.value = ST[0]["value"]
+        VT["IT"] = ST[0]["value"]
+    
+    def check(self, INPUT):
+        if isinstance(INPUT,TroofNode):
+            return str(INPUT.token.val)
+        elif isinstance(INPUT, VariableNode):
+            if INPUT.token.val not in VT:
+                raise ErrorSemantic(INPUT.token,"Variable not Initialized")
+            
+            if VT[INPUT.token.val] not in ("WIN","FAIL"):
+                raise ErrorSemantic(INPUT.token,"Variable contain Yarn. Unable to use Boolean operations on Yarn")
+            
+            return str(VT[INPUT.token.val])
+        elif isinstance(INPUT,StringNode):
+            if VT[INPUT.token.val] not in ("WIN","FAIL"):
+                raise ErrorSemantic(INPUT.token,"Unable to use Boolean operations on Yarn")
+
+        return str(INPUT.token.val)
 
 
 #OPERATION EXPR
@@ -285,6 +316,7 @@ class StringNode(BasicNode):
 class TroofNode(BasicNode):
     def __init__(self, token):
         super().__init__(token)
+        self.value = True if self.token.val == "WIN" else False
 
 
 class LoopNodeShort:

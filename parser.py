@@ -105,6 +105,8 @@ class Parser:
             return VariableNode(self.current_tok)
         elif self.current_tok.type in (GP_COMPARISON):
             return self.comparison()
+        elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
+            return self.boolean()
 
         raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
 
