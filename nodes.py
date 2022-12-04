@@ -160,6 +160,10 @@ class VisibleNode(UnaryOpNode):
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
             txt_console.configure(state=DISABLED)
+        elif isinstance(right,BooleanLongNode):
+            txt_console.configure(state=NORMAL)
+            txt_console.insert(INSERT,str(right.value)+'\n')
+            txt_console.configure(state=DISABLED)
         else:
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(right.token.val)+'\n')
@@ -223,7 +227,7 @@ class BooleanLongNode(BinOpNode):
         elif OP_TOKEN.type in (TT_OR_OP):
             output = left or right
         elif OP_TOKEN.type in (TT_XOR):
-            output = eval(left + "*" + right)
+            output = not (left or right)
         
         ST[0]["value"] = "WIN" if output else "FAIL"
         self.value = ST[0]["value"]
