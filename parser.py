@@ -25,18 +25,16 @@ class Parser:
 
 
     def literal(self):
-        if self.current_tok.type in (TT_FLOAT, TT_INTEGER):
-            tok = self.current_tok
-            if tok.type in (TT_FLOAT):
-                return NumbarNode(tok)
-            elif tok.type in (TT_INTEGER):
-                return NumbrNode(tok)
+        if self.current_tok.type in (TT_FLOAT):
+            return NumbarNode(self.current_tok)
+        elif self.current_tok.type in (TT_INTEGER):
+            return NumbrNode(self.current_tok)
         elif self.current_tok.type in (TT_STR_DELIMITER):
             return self.string()
         elif self.current_tok.type in (TT_BOOLEAN):
             return TroofNode(self.current_tok)
 
-        return ErrorSyntax(self.current_tok, "")
+        return ErrorSyntax(self.current_tok, "Not a literal")
 
 
     def print(self):
