@@ -160,7 +160,7 @@ class VisibleNode(UnaryOpNode):
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
             txt_console.configure(state=DISABLED)
-        elif isinstance(right,BooleanLongNode):
+        elif isinstance(right,BooleanNode):
             txt_console.configure(state=NORMAL)
             txt_console.insert(INSERT,str(right.value)+'\n')
             txt_console.configure(state=DISABLED)
@@ -214,25 +214,7 @@ class ComparisonNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
-#
-class BooleanLongNode(BinOpNode):
-    def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
-        super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        left = self.check(EXPR1)
-        right = self.check(EXPR2)
-        output = None
-
-        if OP_TOKEN.type in (TT_AND):
-            output = left and right
-        elif OP_TOKEN.type in (TT_OR_OP):
-            output = left or right
-        elif OP_TOKEN.type in (TT_XOR):
-            output = not (left or right)
-        
-        ST[0]["value"] = "WIN" if output else "FAIL"
-        self.value = ST[0]["value"]
-        VT["IT"] = ST[0]["value"]
-    
+class BooleanNode():
     def check(self, INPUT):
         if isinstance(INPUT,TroofNode):
             return str(INPUT.token.val)
@@ -250,11 +232,39 @@ class BooleanLongNode(BinOpNode):
 
         return str(INPUT.token.val)
 
+#
+class BooleanLongNode(BinOpNode,BooleanNode):
+    def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
+        super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
+        left = self.check(EXPR1)
+        right = self.check(EXPR2)
+        output = None
+
+        if OP_TOKEN.type in (TT_AND):
+            output = left and right
+        elif OP_TOKEN.type in (TT_OR_OP):
+            output = left or right
+        elif OP_TOKEN.type in (TT_XOR):
+            output = not (left or right)
+        
+        ST[0]["value"] = "WIN" if output else "FAIL"
+        self.value = ST[0]["value"]
+        VT["IT"] = ST[0]["value"]
+
 
 #OPERATION EXPR
-class BooleanShortNode(UnaryOpNode):
+class BooleanShortNode(UnaryOpNode,BooleanNode):
     def __init__(self, left, right):
         super().__init__(left, right)
+        val = self.check(right)
+        output = None
+
+        if left.type in (TT_NOT):
+            output = not val
+        
+        ST[0]["value"] = "WIN" if output else "FAIL"
+        self.value = ST[0]["value"]
+        VT["IT"] = ST[0]["value"]
 
 
 #MAEK EXPR AN TYPE
