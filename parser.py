@@ -6,7 +6,6 @@ class Parser:
     def __init__(self,txt_console,tbl_sym,  tokens) -> None:
         self.tokens = tokens
         self.token_idx = -1
-        self.advance()
         self.txt_console = txt_console
         self.tbl_sym = tbl_sym
 
@@ -401,17 +400,17 @@ class Parser:
     def code(self):
         try:
             #Start of code
-            if self.current_tok.type not in (TT_CODE_STRT):
+            start_node = self.advance()
+            
+            if start_node.type not in (TT_CODE_STRT):
                 raise ErrorSyntax(self.current_tok, f"Expected HAI at {self.current_tok.pos}")
-
-            start_node = self.current_tok
 
             body_node = list(self.body())
 
             #End of code
             end_node = self.advance()
 
-            if self.current_tok.type not in (TT_CODE_END):
+            if end_node.type not in (TT_CODE_END):
                 raise ErrorSyntax(self.current_tok, f"Expected KTHBYE at pos {self.current_tok.pos}")
 
             res = Program(start_node, body_node, end_node, self.tbl_sym)
