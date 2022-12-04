@@ -209,23 +209,22 @@ class Parser:
 
     def switchcase(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type not in (TT_CONTROL_END):
-                if self.token_idx < len(self.tokens):
-                    omg = self.current_tok
-                    if omg.type not in (TT_BREAK):
-                        self.advance()
-                        value = self.literal()
-                        self.advance()
-                        casebody = list(self.casebody())
-                        yield SwitchCaseNode(omg, value, casebody)
-                    elif omg.type in (TT_BREAK):
-                        self.advance()
-                        casebody = list(self.casebody())
-                        yield DefaultCaseNode(omg, casebody)
-                        break
-            else:
-                 break
-
+            if self.tokens[self.token_idx].type in (TT_CONTROL_END):
+                break
+            
+            omg = self.current_tok
+            if omg.type in (TT_BREAK):
+                self.advance()
+                casebody = list(self.casebody())
+                yield DefaultCaseNode(omg, casebody)
+                break
+            
+            self.advance()
+            value = self.literal()
+            self.advance()
+            casebody = list(self.casebody())
+            yield SwitchCaseNode(omg, value, casebody)
+            
 
     def switch(self):
         if self.current_tok.type in (TT_SWITCH):
