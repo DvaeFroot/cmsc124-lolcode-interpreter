@@ -151,7 +151,7 @@ class Lexer(object):
             tok_type = self.group_type[groupname]
             
             #increment the current line number if newline is seen
-            if tok_type in (TT_NEWLINE):
+            if str(m.group(groupname)) == "\n":
                 self.line += 1
                 
             if str(m.group(groupname)) == "BTW":
