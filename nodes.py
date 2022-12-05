@@ -108,6 +108,10 @@ class ArithmeticNode(BinOpNode):
             ST[0]["value"] = eval(left + "/" + right)
         elif OP_TOKEN.type in (TT_MOD):
             ST[0]["value"] = eval(left + "%" + right)
+        elif OP_TOKEN.type in (TT_MAX):
+            ST[0]["value"] = max((eval(left),eval(right)))
+        elif OP_TOKEN.type in (TT_MIN):
+            ST[0]["value"] = min((eval(left),eval(right)))
 
         self.value=ST[0]["value"]
         VT["IT"] = ST[0]["value"]
