@@ -117,9 +117,10 @@ class Lexer(object):
 
         #For white space checking
         self.skip_whitespace = skip_whitespace
-        self.regex_whitespace = re.compile('[^ \t]')
+        # self.regex_whitespace = re.compile('[^\s,]')
+        self.regex_whitespace = re.compile('[^ \t\v]')
         self.regex_newline = re.compile('[\n]')
-
+        self.str = False
 
     def input(self, buf):
         self.buf = buf

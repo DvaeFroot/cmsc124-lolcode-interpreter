@@ -9,8 +9,6 @@ class Parser:
         self.txt_console = txt_console
         self.tbl_sym = tbl_sym
         self.insideString = False
-        
-        self.advance()
 
 
     def advance(self):
@@ -31,18 +29,16 @@ class Parser:
 
 
     def literal(self):
-        if self.current_tok.type in (TT_FLOAT, TT_INTEGER):
-            tok = self.current_tok
-            if tok.type in (TT_FLOAT):
-                return NumbarNode(tok)
-            elif tok.type in (TT_INTEGER):
-                return NumbrNode(tok)
+        if self.current_tok.type in (TT_FLOAT):
+            return NumbarNode(self.current_tok)
+        elif self.current_tok.type in (TT_INTEGER):
+            return NumbrNode(self.current_tok)
         elif self.current_tok.type in (TT_STR_DELIMITER):
             return self.string()
         elif self.current_tok.type in (TT_BOOLEAN):
             return TroofNode(self.current_tok)
 
-        return ErrorSyntax(self.current_tok, "")
+        return ErrorSyntax(self.current_tok, "Not a literal")
 
 
     def print(self):
@@ -123,6 +119,8 @@ class Parser:
             return VariableNode(self.current_tok)
         elif self.current_tok.type in (GP_COMPARISON):
             return self.comparison()
+        elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
+            return self.boolean()
 
         if raiseError:
             raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
@@ -218,36 +216,34 @@ class Parser:
 
     def casebody(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type not in (TT_BREAK, TT_CASE,TT_CONTROL_END):
-                if self.token_idx < len(self.tokens):
-                    if self.current_tok.type in (TT_CASEBREAK):
-                        yield CaseBreakNode(self.current_tok)
-                    else:
-                        yield self.statement()
-                    self.advance()
-            else:
+            if self.tokens[self.token_idx].type in (TT_BREAK, TT_CASE,TT_CONTROL_END):
                  break
+            
+            if self.current_tok.type in (TT_CASEBREAK):
+                yield CaseBreakNode(self.current_tok)
+            else:
+                yield self.statement()
+            self.advance()
 
 
     def switchcase(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type not in (TT_CONTROL_END):
-                if self.token_idx < len(self.tokens):
-                    omg = self.current_tok
-                    if omg.type not in (TT_BREAK):
-                        self.advance()
-                        value = self.literal()
-                        self.advance()
-                        casebody = list(self.casebody())
-                        yield SwitchCaseNode(omg, value, casebody)
-                    elif omg.type in (TT_BREAK):
-                        self.advance()
-                        casebody = list(self.casebody())
-                        yield DefaultCaseNode(omg, casebody)
-                        break
-            else:
-                 break
-
+            if self.tokens[self.token_idx].type in (TT_CONTROL_END):
+                break
+            
+            omg = self.current_tok
+            if omg.type in (TT_BREAK):
+                self.advance()
+                casebody = list(self.casebody())
+                yield DefaultCaseNode(omg, casebody)
+                break
+            
+            self.advance()
+            value = self.literal()
+            self.advance()
+            casebody = list(self.casebody())
+            yield SwitchCaseNode(omg, value, casebody)
+            
 
     def switch(self):
         if self.current_tok.type in (TT_SWITCH):
@@ -279,13 +275,11 @@ class Parser:
 
     def loopbody(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type not in (TT_LOOP_END):
-                if self.token_idx < len(self.tokens):
-                    yield self.statement()
-                    self.advance()
-            else:
-                 break
-
+            if self.tokens[self.token_idx].type in (TT_LOOP_END):
+                break
+            
+            yield self.statement()
+            self.advance()
 
     def loop(self):
         if self.current_tok.type in (TT_LOOP_STRT):
@@ -334,12 +328,11 @@ class Parser:
 
     def ifbody(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type not in (TT_ELIF, TT_ELSE, TT_CONTROL_END):
-                if self.token_idx < len(self.tokens):
-                    yield self.statement()
-                    self.advance()
-            else:
-                 break
+            if self.tokens[self.token_idx].type in (TT_ELIF, TT_ELSE, TT_CONTROL_END):
+                break
+            
+            yield self.statement()
+            self.advance()
 
 
     def elsecase(self):
@@ -417,22 +410,25 @@ class Parser:
                     yield self.statement()
             else:
                 break
+            
+            self.advance()
+            yield self.statement()
 
 
     def code(self):
         try:
             #Start of code
-            if self.current_tok.type not in (TT_CODE_STRT):
+            start_node = self.advance()
+            
+            if start_node.type not in (TT_CODE_STRT):
                 raise ErrorSyntax(self.current_tok, f"Expected HAI at {self.current_tok.pos}")
-
-            start_node = self.current_tok
 
             body_node = list(self.body())
 
             #End of code
             end_node = self.current_tok
 
-            if self.current_tok.type not in (TT_CODE_END):
+            if end_node.type not in (TT_CODE_END):
                 raise ErrorSyntax(self.current_tok, f"Expected KTHBYE at pos {self.current_tok.pos}")
 
             res = Program(start_node, body_node, end_node, self.tbl_sym)
