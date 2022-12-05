@@ -127,7 +127,10 @@ class Parser:
         if raiseError:
             raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
         else:
-            return None
+            if self.current_tok.type in (TT_NEWLINE):
+                return None
+            
+            raise ErrorSyntax(self.current_tok, f"Expected Delimiter at pos {self.current_tok.pos}")
 
     def variableLong(self):
         if self.current_tok.type in (TT_VAR_DEC):
