@@ -404,11 +404,7 @@ class Parser:
 
     def body(self):
         while(self.token_idx+1 < len(self.tokens)):
-            if self.tokens[self.token_idx+1].type not in (TT_CODE_END):
-                if self.token_idx+1 < len(self.tokens):
-                    self.advance()
-                    yield self.statement()
-            else:
+            if self.tokens[self.token_idx+1].type in (TT_CODE_END):
                 break
             
             self.advance()
