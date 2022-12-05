@@ -18,7 +18,7 @@ class Lexer(object):
     def __init__(self, skip_whitespace=True):
         rules = [
             # literal
-            (r'(?<=\")[^\"]*(?=\")',                      TT_STRING),
+            (r'(?<=\")[^\"\r\n]*(?=\")',                      TT_STRING),
             (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE\b',    TT_TYPE),
             (r'\bWIN|FAIL\b',                             TT_BOOLEAN),
             (r'\b-?\d+.\d+\b',                            TT_FLOAT),
@@ -94,7 +94,7 @@ class Lexer(object):
             (r'\bA\b',                                    TT_A),
             (r'\"',                                       TT_STR_DELIMITER),
 
-            #  {r'\n',                                       TT_NEWLINE},
+            {r'\n',                                       TT_NEWLINE},
 
             #identifier
             (r'\b[a-zA-Z]\w*\b',                          TT_IDENTIFIER),
@@ -116,7 +116,8 @@ class Lexer(object):
 
         #For white space checking
         self.skip_whitespace = skip_whitespace
-        self.regex_whitespace = re.compile('[^\s,]')
+        # self.regex_whitespace = re.compile('[^\s,]')
+        self.regex_whitespace = re.compile('[^ \t\v]')
         self.regex_newline = re.compile('[\n]')
         self.str = False
 
@@ -212,9 +213,7 @@ class Lexer(object):
             #Get the type of the token using the groupname
             tok_type = self.group_type[groupname]
             if tok_type in (TT_NEWLINE):
-                print(self.line)
                 self.line +=1
-                return
             #Get the current token using the groupname. The actual token is in m.group(groupname). 
             #The Token class is just a struct to store information about the current token.
             tok = Token(tok_type, m.group(groupname), self.pos, self.line)
