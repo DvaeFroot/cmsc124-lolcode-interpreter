@@ -6,6 +6,11 @@ from tkinter import simpledialog
 ST = [{"type": "IT", "value": None}]
 VT = {"IT": None}
 
+def resetSymbolTable():
+    ST = [{"type": "IT", "value": None}]
+    VT = {"IT": None}
+
+
 class BasicNode:
     def __init__(self,token):
         self.token = token

@@ -412,6 +412,7 @@ class Parser:
 
     def code(self):
         try:
+            resetSymbolTable()
             #Start of code
             start_node = self.advance()
             
