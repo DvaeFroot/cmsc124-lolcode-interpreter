@@ -202,6 +202,10 @@ class AssignmentNode():
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.value})
             VT[str(VAR.token.val)] = ST[0]["value"]
         
+        elif isinstance(EXPR, VariableNode):
+            ST.append({"type": "variable", "token": VAR.token.val, "value": VT[str(EXPR.token.val)]})
+            VT[str(VAR.token.val)] = VT[str(EXPR.token.val)]
+        
         else:
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
             ST[0]["value"] = EXPR.token.val
