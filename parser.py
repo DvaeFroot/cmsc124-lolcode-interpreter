@@ -18,8 +18,7 @@ class Parser:
         if self.current_tok.type in (TT_COMMENT_STRT, TT_COMMENT_MULTI_STRT, TT_COMMENT_MULTI_END):
             self.advance()
         if not self.insideString and self.current_tok.type in (TT_NEWLINE):
-            self.token_idx += 1
-            self.current_tok = self.tokens[self.token_idx]
+            self.advance()
         return self.current_tok
 
 
