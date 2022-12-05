@@ -56,26 +56,35 @@ class Program(DoubleOpNode):
             tbl_sym.insert("",'end',iid=index,
             values=(key,VT[key]))
 
+class LiteralNode:
+    pass
 
-class NoobNode(BasicNode):
+# NULL
+class NoobNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
 
-
-class NumbrNode(BasicNode):
+# INTEGERS
+class NumbrNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
 
-
-class NumbarNode(BasicNode):
+# FLOATS
+class NumbarNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
 
-
-class YarnNode(BasicNode):
-    def __init__(self, token):
+#"STRINGBODY"
+class YarnNode(BasicNode,LiteralNode):
+    def __init__(self, token) -> None:
         super().__init__(token)
 
+
+#TRUE OR FALSE
+class TroofNode(BasicNode,LiteralNode):
+    def __init__(self, token):
+        super().__init__(token)
+        self.value = True if self.token.val == "WIN" else False
 
 class OperatorNode(BasicNode):
     def __init__(self, token):
@@ -128,7 +137,7 @@ class ArithmeticNode(BinOpNode):
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
             return str(VT[INPUT.token.val])
-        elif isinstance(INPUT,StringNode):
+        elif isinstance(INPUT,YarnNode):
             try:
                 int(INPUT.token.val)
                 float(INPUT.token.val)
@@ -234,7 +243,7 @@ class BooleanNode():
                 raise ErrorSemantic(INPUT.token,"Variable contain Yarn. Unable to use Boolean operations on Yarn")
             
             return str(VT[INPUT.token.val])
-        elif isinstance(INPUT,StringNode):
+        elif isinstance(INPUT,YarnNode):
             if VT[INPUT.token.val] not in ("WIN","FAIL"):
                 raise ErrorSemantic(INPUT.token,"Unable to use Boolean operations on Yarn")
 
@@ -331,18 +340,6 @@ class ElseIfNode(DoubleOpNode):
 class ElseNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
-
-#"STRINGBODY"
-class StringNode(BasicNode):
-    def __init__(self, token) -> None:
-        super().__init__(token)
-
-
-#TRUE OR FALSE
-class TroofNode(BasicNode):
-    def __init__(self, token):
-        super().__init__(token)
-        self.value = True if self.token.val == "WIN" else False
 
 
 class LoopNodeShort:

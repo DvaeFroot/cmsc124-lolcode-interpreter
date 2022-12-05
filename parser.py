@@ -267,7 +267,7 @@ class Parser:
             qt2 = self.advance()
             if qt2.type not in (TT_STR_DELIMITER):
                 raise ErrorSyntax(self.current_tok, f"Expected \" at pos {self.current_tok.pos}")
-            res = StringNode(string)
+            res = YarnNode(string)
             return res
         return ErrorSyntax(self.current_tok, f"Expected \" at pos {self.current_tok.pos}")
 
