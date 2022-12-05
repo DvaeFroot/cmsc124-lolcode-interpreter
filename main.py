@@ -56,8 +56,10 @@ def getTokens():
         return
         
 
-    # insert the generated tokin in the lexemes treeview
+    # insert the generated token in the lexemes treeview
     for index,token in enumerate(tokens):
+        if token.type in (TT_NEWLINE):
+            continue
         tbl_lex.insert("",'end',iid=index,
 		values=(token.val,token.type))
 
