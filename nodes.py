@@ -6,6 +6,11 @@ from tkinter import simpledialog
 ST = [{"type": "IT", "value": None}]
 VT = {"IT": None}
 
+def resetSymbolTable():
+    ST = [{"type": "IT", "value": None}]
+    VT = {"IT": None}
+
+
 class BasicNode:
     def __init__(self,token):
         self.token = token
@@ -56,26 +61,35 @@ class Program(DoubleOpNode):
             tbl_sym.insert("",'end',iid=index,
             values=(key,VT[key]))
 
+class LiteralNode:
+    pass
 
-class NoobNode(BasicNode):
+# NULL
+class NoobNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
 
-
-class NumbrNode(BasicNode):
+# INTEGERS
+class NumbrNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
 
-
-class NumbarNode(BasicNode):
+# FLOATS
+class NumbarNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
 
-
-class YarnNode(BasicNode):
-    def __init__(self, token):
+#"STRINGBODY"
+class YarnNode(BasicNode,LiteralNode):
+    def __init__(self, token) -> None:
         super().__init__(token)
 
+
+#TRUE OR FALSE
+class TroofNode(BasicNode,LiteralNode):
+    def __init__(self, token):
+        super().__init__(token)
+        self.value = True if self.token.val == "WIN" else False
 
 class OperatorNode(BasicNode):
     def __init__(self, token):
@@ -128,7 +142,7 @@ class ArithmeticNode(BinOpNode):
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
             return str(VT[INPUT.token.val])
-        elif isinstance(INPUT,StringNode):
+        elif isinstance(INPUT,YarnNode):
             try:
                 int(INPUT.token.val)
                 float(INPUT.token.val)
@@ -154,20 +168,24 @@ class GimmehNode(UnaryOpNode):
 class VisibleNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
-        if isinstance(right, VariableNode):
-            if right.token.val not in VT:
-                raise ErrorSemantic(right.token,"Variable not Initialized")
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
-            txt_console.configure(state=DISABLED)
-        elif isinstance(right,BooleanNode):
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(right.value)+'\n')
-            txt_console.configure(state=DISABLED)
-        else:
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(right.token.val)+'\n')
-            txt_console.configure(state=DISABLED)
+        for value in right:
+            if isinstance(value, VariableNode):
+                if value.token.val not in VT:
+                    raise ErrorSemantic(value.token,"Variable not Initialized")
+                txt_console.configure(state=NORMAL)
+                txt_console.insert(INSERT,str(VT[value.token.val]))
+                txt_console.configure(state=DISABLED)
+            elif isinstance(value,BooleanNode):
+                txt_console.configure(state=NORMAL)
+                txt_console.insert(INSERT,str(value.value))
+                txt_console.configure(state=DISABLED)
+            else:
+                txt_console.configure(state=NORMAL)
+                txt_console.insert(INSERT,str(value.token.val))
+                txt_console.configure(state=DISABLED)
+        txt_console.configure(state=NORMAL)
+        txt_console.insert(INSERT,'\n')
+        txt_console.configure(state=DISABLED)
 
 
 class AssignmentNode():
@@ -181,8 +199,12 @@ class AssignmentNode():
             VT[str(VAR.token.val)] = ST[0]["value"]
         
         elif isinstance(EXPR, BooleanNode):
-            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
+            ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.value})
             VT[str(VAR.token.val)] = ST[0]["value"]
+        
+        elif isinstance(EXPR, VariableNode):
+            ST.append({"type": "variable", "token": VAR.token.val, "value": VT[str(EXPR.token.val)]})
+            VT[str(VAR.token.val)] = VT[str(EXPR.token.val)]
         
         else:
             ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
@@ -230,7 +252,7 @@ class BooleanNode():
                 raise ErrorSemantic(INPUT.token,"Variable contain Yarn. Unable to use Boolean operations on Yarn")
             
             return str(VT[INPUT.token.val])
-        elif isinstance(INPUT,StringNode):
+        elif isinstance(INPUT,YarnNode):
             if VT[INPUT.token.val] not in ("WIN","FAIL"):
                 raise ErrorSemantic(INPUT.token,"Unable to use Boolean operations on Yarn")
 
@@ -240,12 +262,16 @@ class BooleanNode():
 class BooleanLongNode(BinOpNode,BooleanNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        left = self.check(EXPR1)
-        right = self.check(EXPR2)
+        leftval = self.check(EXPR1)
+        rightval = self.check(EXPR2)
+        left = True if leftval == "WIN" else False
+        right = True if rightval == "WIN" else False
+        
         output = None
 
         if OP_TOKEN.type in (TT_AND):
             output = left and right
+            print(output)
         elif OP_TOKEN.type in (TT_OR_OP):
             output = left or right
         elif OP_TOKEN.type in (TT_XOR):
@@ -323,18 +349,6 @@ class ElseIfNode(DoubleOpNode):
 class ElseNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
-
-#"STRINGBODY"
-class StringNode(BasicNode):
-    def __init__(self, token) -> None:
-        super().__init__(token)
-
-
-#TRUE OR FALSE
-class TroofNode(BasicNode):
-    def __init__(self, token):
-        super().__init__(token)
-        self.value = True if self.token.val == "WIN" else False
 
 
 class LoopNodeShort:

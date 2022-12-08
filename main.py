@@ -17,7 +17,7 @@ def open_file():
     txt_edit.delete(1.0, tk.END)
     with open(filepath, "r") as input_file:
         text = input_file.read()
-        txt_edit.insert(tk.END, text)
+        txt_edit.insert(tk.INSERT, text)
     window.title(f"LOLCODE INTERPRETER - {filepath}")
 
 def save_file():
@@ -41,7 +41,7 @@ def getTokens():
 
     """Insert tokens in the Lexemes Treeview"""
     lx = Lexer()
-    lx.input(txt_edit.get("1.0",END))
+    lx.input(txt_edit.get(1.0,END))
     # clear previous items in the lexemes treeview
     for x in tbl_lex.get_children():
         tbl_lex.delete(x)
@@ -56,8 +56,10 @@ def getTokens():
         return
         
 
-    # insert the generated tokin in the lexemes treeview
+    # insert the generated token in the lexemes treeview
     for index,token in enumerate(tokens):
+        if token.type in (TT_NEWLINE):
+            continue
         tbl_lex.insert("",'end',iid=index,
 		values=(token.val,token.type))
 

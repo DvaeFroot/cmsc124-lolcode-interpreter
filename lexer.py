@@ -18,7 +18,8 @@ class Lexer(object):
     def __init__(self, skip_whitespace=True):
         rules = [
             # literal
-            (r'(?<=\")[^\"]*(?=\")',                      TT_STRING),
+            # (r'(?<=\")[^\"]*(?=\")',                      TT_STRING),
+            (r'\"[^\"]*\"',                      TT_STRING),
             (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE\b',    TT_TYPE),
             (r'\bWIN|FAIL\b',                             TT_BOOLEAN),
             (r'\b-?\d+.\d+\b',                            TT_FLOAT),
@@ -92,9 +93,9 @@ class Lexer(object):
             (r'\bAN\b',                                   TT_ARG_SEP),
             (r'\bYR\b',                                   TT_YR),
             (r'\bA\b',                                    TT_A),
-            (r'\"',                                       TT_STR_DELIMITER),
+            # (r'\"',                                       TT_STR_DELIMITER),
 
-            #  {r'\n',                                       TT_NEWLINE},
+            {r'\n|,',                                       TT_NEWLINE},
 
             #identifier
             (r'\b[a-zA-Z]\w*\b',                          TT_IDENTIFIER),
@@ -116,7 +117,8 @@ class Lexer(object):
 
         #For white space checking
         self.skip_whitespace = skip_whitespace
-        self.regex_whitespace = re.compile('[^\s,]')
+        # self.regex_whitespace = re.compile('[^\s,]')
+        self.regex_whitespace = re.compile('[^ \t\v]')
         self.regex_newline = re.compile('[\n]')
         self.str = False
 
@@ -125,116 +127,98 @@ class Lexer(object):
         self.pos = 0
         self.line = 1
 
-
-    def token(self):
-        if self.pos >= len(self.buf):
-            return None
-
-        #This one can just be omitted. It's only used if we try to skip whitespaces
-        if self.skip_whitespace and not(self.str):
-            #Get the first space from starting position
+    
+    def tokens(self):
+        tokens = []
+        while self.pos < len(self.buf):
+            # check for whitespaces
             m = self.regex_whitespace.search(self.buf, self.pos)
-
             if m == None:
                 #No match means end of file
-                return None
-
-            #Get the current line of the parsed token
-            self.line += len(self.regex_newline.findall(self.buf,self.pos,m.start()))
+                break
             
             #Get new starting position for regex searching
             self.pos = m.start()
-
-        #Do regex match. check for comments and skip them.
-        m = self.regex.match(self.buf, self.pos)
-        if m:
-            groupname = m.lastgroup
-            if str(m.group(groupname)) == "BTW":
-                #Get the group that was matched
-                groupname = m.lastgroup
-                #Get the type of the token using the groupname
-                tok_type = self.group_type[groupname]
-                #Get the current token using the groupname. The actual token is in m.group(groupname). 
-                #The Token class is just a struct to store information about the current token.
-                tok = Token(tok_type, m.group(groupname), self.pos, self.line)
-                #Update the position
-                self.pos = m.end()
-
-                newline = re.compile(r"\n")
-                m = newline.search(self.buf, self.pos)
-
-                if m:
-                    #Get new starting position for regex searching
-                    self.pos = m.start()
-                else:
-                    self.pos = len(self.buf)
-                return tok
-            elif str(m.group(groupname)) == "OBTW":
-                #Get the group that was matched
-                groupname = m.lastgroup
-                #Get the type of the token using the groupname
-                tok_type = self.group_type[groupname]
-                #Get the current token using the groupname. The actual token is in m.group(groupname). 
-                #The Token class is just a struct to store information about the current token.
-                tok = Token(tok_type, m.group(groupname), self.pos, self.line)
-                # print(tok)
-                #Update the position
-                self.pos = m.end()
-
-                newline = re.compile(r"TLDR")
-                m = newline.search(self.buf, self.pos)
-
-                if m:
-                    #Get new starting position for regex searching
-                    self.pos = m.start()
-                else:
-                    self.pos = len(self.buf)
-
-                return tok
-
-            if not(self.str):
-                #Get the first space from starting position
-                m = self.regex_whitespace.search(self.buf, self.pos)
-
-                if m == None:
-                    #No match means end of file
-                    tok = Token(TT_EOF, )
-                    return None
-
-                #Get new starting position for regex searching
-                self.pos = m.start()
-
-        #Do regex match. This is the only codeblock needed
-        m = self.regex.match(self.buf, self.pos)
-        if m:
+            
+            #Do regex match. check for comments and skip them.
+            m = self.regex.match(self.buf, self.pos)
+            if m == None:
+                raise LexerError(self.pos,self.line)
+            
             #Get the group that was matched
             groupname = m.lastgroup
+            
             #Get the type of the token using the groupname
             tok_type = self.group_type[groupname]
-            if tok_type in (TT_NEWLINE):
-                print(self.line)
-                self.line +=1
-                return
-            #Get the current token using the groupname. The actual token is in m.group(groupname). 
-            #The Token class is just a struct to store information about the current token.
-            tok = Token(tok_type, m.group(groupname), self.pos, self.line)
-            #Update the position
-            self.pos = m.span()[1]
-            if tok_type == TT_STR_DELIMITER:
-                self.str = not(self.str)
-            return tok
+            
+            #increment the current line number if newline is seen
+            if str(m.group(groupname)) == "\n":
+                self.line += 1
+                
+            if str(m.group(groupname)) == "BTW":
+                #Get the current token using the groupname. The actual token is in m.group(groupname). 
+                #The Token class is just a struct to store information about the current token.
+                tok = Token(tok_type, m.group(groupname), self.pos, self.line)
+                
+                #Update the position
+                self.pos = m.end()
+            
+                newline = re.compile(r"\n")
+                endtok = newline.search(self.buf, self.pos)
 
-        # if we're here, no rule matched
-        # We can replace this one or outright remove it
-        raise LexerError(self.pos, self.line)
+                if endtok:
+                    #Get new starting position for regex searching
+                    self.pos = endtok.start()
+                else:
+                    self.pos = len(self.buf)
+                
+                tokens.append(tok)
+            elif str(m.group(groupname)) == "OBTW":
+                #Get the current token using the groupname. The actual token is in m.group(groupname). 
+                #The Token class is just a struct to store information about the current token.
+                tok = Token(tok_type, m.group(groupname), self.pos, self.line)
+                
+                #Update the position
+                self.pos = m.end()
+                
+                newline = re.compile(r"TLDR")
+                endtok = newline.search(self.buf, self.pos)
 
-    def tokens(self):
-        #generator to get all tokens
-        try:
-            while 1:
-                tok = self.token()
-                if tok is None:
-                    break
-                yield tok
-        except LexerError:
-            raise LexerError(self.pos, self.line)
+                if endtok:
+                    #Get new starting position for regex searching
+                    self.pos = endtok.start()
+                else:
+                    self.pos = len(self.buf)
+
+                tokens.append(tok)
+            elif tok_type in (TT_STRING):
+                #Get the current token using the groupname. The actual token is in m.group(groupname). 
+                #The Token class is just a struct to store information about the current token.
+                
+                #Update the position
+                
+                delim1 = Token(TT_STR_DELIMITER, "\"", self.pos-1, self.line)
+                tok = Token(tok_type, "", self.pos, self.line)
+                if len(m.group(groupname)) > 2:
+                    tok = Token(tok_type, m.group(groupname)[1:-1], self.pos, self.line)
+                self.pos = m.end()
+                delim2 = Token(TT_STR_DELIMITER, "\"", self.pos, self.line)
+                tokens.append(delim1)
+                tokens.append(tok)
+                tokens.append(delim2)
+            else:
+                #Get the current token using the groupname. The actual token is in m.group(groupname). 
+                #The Token class is just a struct to store information about the current token.
+                tok = Token(tok_type, m.group(groupname), self.pos, self.line)
+                #Update the position
+                self.pos = m.end()
+                
+                tokens.append(tok)
+        
+        # remove new lines in end of tokens list
+        for x in range(len(tokens)-1,0,-1):
+            if (tokens[x].type in (TT_NEWLINE)):
+                tokens.pop()
+            else:
+                break
+        return tokens
