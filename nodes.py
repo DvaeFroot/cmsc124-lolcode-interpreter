@@ -7,6 +7,8 @@ ST = [{"type": "IT", "value": None}]
 VT = {"IT": None}
 
 def resetSymbolTable():
+    global ST
+    global VT
     ST = [{"type": "IT", "value": None}]
     VT = {"IT": None}
 
