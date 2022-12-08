@@ -95,7 +95,7 @@ class Lexer(object):
             (r'\bA\b',                                    TT_A),
             # (r'\"',                                       TT_STR_DELIMITER),
 
-            {r'\n|,',                                       TT_NEWLINE},
+            (r'\n|,',                                       TT_NEWLINE),
 
             #identifier
             (r'\b[a-zA-Z]\w*\b',                          TT_IDENTIFIER),
@@ -222,3 +222,17 @@ class Lexer(object):
             else:
                 break
         return tokens
+
+if __name__ == "__main__":
+    lx = Lexer()
+    lx.input("""
+             HAI
+I HAS A rope ITZ SUM OF SUM OF 1 AN 3 AN SUM OF 1 AN SUM OF 1 AN 1
+VISIBLE "HELLO!"
+VISIBLE "THIS PROGRAM WORKS LOL!"
+VISIBLE rope
+KTHXBYE
+             """)
+    for x in lx.tokens():
+        pass
+    
