@@ -283,6 +283,23 @@ class BooleanNode():
 
         return str(INPUT.token.val)
 
+class BooleanInfNode(UnaryOpNode, BooleanNode):
+    def __init__(self, op_token, left, right):
+        super().__init__(left,right)
+        output = self.check(left)
+        print(output)
+        if op_token.type in (TT_AND_INF):
+            for value in right:
+                output = output and self.check(value)
+        elif op_token.type in (TT_OR_INF):
+            for value in right:
+                output = output or self.check(value)
+        
+        self.value = output
+        ST[0]["value"] = self.value
+        VT["IT"] = ST[0]["value"]
+        
+
 #
 class BooleanLongNode(BinOpNode,BooleanNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
