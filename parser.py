@@ -125,7 +125,7 @@ class Parser:
 
 
     def expr(self,raiseError=True):
-        if self.current_tok.type in (GP_ARITHMETIC):
+        if self.current_tok.type in GP_ARITHMETIC:
             op_token = self.current_tok
 
             self.advance()
@@ -156,6 +156,9 @@ class Parser:
             return self.boolean()
         elif self.current_tok.type in (TT_CONCAT):
             return self.concatenation()
+        elif self.current_tok.type in (TT_TYPECAST_2):
+            return self.typecast()
+        
 
         if raiseError:
             raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
