@@ -152,7 +152,7 @@ class Parser:
             return VariableNode(self.current_tok)
         elif self.current_tok.type in (GP_COMPARISON):
             return self.comparison()
-        elif self.current_tok.type in (*GP_BOOLEAN_LONG, *GP_BOOLEAN_SHORT,*GP_BOOLEAN_INF):
+        elif self.current_tok.type in (*GP_BOOLEAN_LONG, GP_BOOLEAN_SHORT, *GP_BOOLEAN_INF):
             return self.boolean()
         elif self.current_tok.type in (TT_CONCAT):
             return self.concatenation()
@@ -230,7 +230,7 @@ class Parser:
 
 
     def boolean(self):
-        if self.current_tok.type in (GP_BOOLEAN_INF):
+        if self.current_tok.type in GP_BOOLEAN_INF:
             op_token = self.current_tok
 
             self.advance()
@@ -254,11 +254,13 @@ class Parser:
                 if self.tokens[self.token_idx+1].type in (TT_MKAY):
                     self.advance()
                     break
+                elif self.tokens[self.token_idx+1].type in (TT_NEWLINE):
+                    break
                 
             res = BooleanInfNode(op_token, left, right)
             return res
 
-        elif self.current_tok.type in (GP_BOOLEAN_LONG):
+        elif self.current_tok.type in GP_BOOLEAN_LONG:
             op_token = self.current_tok
             self.advance()
             expr1 = self.expr()
@@ -269,7 +271,7 @@ class Parser:
             expr2 = self.expr()
             res = BooleanLongNode(op_token, expr1, an, expr2)
             return res
-        elif self.current_tok.type in (GP_BOOLEAN_SHORT):
+        elif self.current_tok.type in (TT_NOT):
             op_token = self.current_tok
             self.advance()
             expr = self.expr()
