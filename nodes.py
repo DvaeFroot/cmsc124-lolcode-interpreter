@@ -218,7 +218,7 @@ class VisibleNode(UnaryOpNode):
                 txt_console.configure(state=NORMAL)
                 txt_console.insert(INSERT,str(VT[value.token.val]))
                 txt_console.configure(state=DISABLED)
-            elif isinstance(value,BooleanNode) or isinstance(value,SmooshNode):
+            elif isinstance(value,(BooleanNode, SmooshNode, ArithmeticNode, ComparisonNode)):
                 txt_console.configure(state=NORMAL)
                 txt_console.insert(INSERT,str(value.value))
                 txt_console.configure(state=DISABLED)
