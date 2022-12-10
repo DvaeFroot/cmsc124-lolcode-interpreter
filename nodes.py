@@ -101,21 +101,19 @@ class Program(DoubleOpNode):
             statement.run()
 
         printST()
-        # print(VT)
-        # clear previous items in the lexemes treeview
-        for x in self.tbl_sym.get_children():
-            self.tbl_sym.delete(x)
-        # for index,key in enumerate(VT):
-        #     tbl_sym.insert("",'end',iid=index,
-        #     values=(key,VT[key]))
-
-        for index,key in enumerate(SYMBOL_TABLE):
-            if SYMBOL_TABLE[key]["type"] == YARN:
-                self.tbl_sym.insert("",'end',iid=index,
-                values=(key,"\""+str(SYMBOL_TABLE[key]["value"])+"\""))
-            else:
-                self.tbl_sym.insert("",'end',iid=index,
-                values=(key,SYMBOL_TABLE[key]["value"]))
+        
+        if self.tbl_sym is not None:
+            # clear previous items in the lexemes treeview
+            for x in self.tbl_sym.get_children():
+                self.tbl_sym.delete(x)
+            
+            for index,key in enumerate(SYMBOL_TABLE):
+                if SYMBOL_TABLE[key]["type"] == YARN:
+                    self.tbl_sym.insert("",'end',iid=index,
+                    values=(key,"\""+str(SYMBOL_TABLE[key]["value"])+"\""))
+                else:
+                    self.tbl_sym.insert("",'end',iid=index,
+                    values=(key,SYMBOL_TABLE[key]["value"]))
 
 
 class LiteralNode:
@@ -295,28 +293,29 @@ class VisibleNode(UnaryOpNode):
         self.suppress = suppress
 
     def run(self):
+        output = []
         for value in self.right:
             value.run()
             if isinstance(value, VariableNode):
                 if value.token.val not in SYMBOL_TABLE:
                     raise ErrorSemantic(value.token,"Variable not Initialized")
-                self.txt_console.configure(state=NORMAL)
-                self.txt_console.insert(INSERT,str(SYMBOL_TABLE[value.token.val]["value"]))
-                self.txt_console.configure(state=DISABLED)
+                output.append(str(SYMBOL_TABLE[value.token.val]["value"]))
             elif isinstance(value,(BooleanNode, SmooshNode, ArithmeticNode, ComparisonNode)):
-                self.txt_console.configure(state=NORMAL)
-                self.txt_console.insert(INSERT,str(value.value))
-                self.txt_console.configure(state=DISABLED)
+                output.append(str(value.value))
             else:
-                self.txt_console.configure(state=NORMAL)
-                self.txt_console.insert(INSERT,str(value.token.val))
-                self.txt_console.configure(state=DISABLED)
+                output.append(str(value.token.val))
         
         if not self.suppress:
+            output.append('\n')
+        
+        if self.txt_console is None: 
+            # CLI
+            print("".join(output))
+        else:
+            # GUI
             self.txt_console.configure(state=NORMAL)
-            self.txt_console.insert(INSERT,'\n')
+            self.txt_console.insert(INSERT,"".join(output))
             self.txt_console.configure(state=DISABLED)
-
 
 class AssignmentNode():
     def assign(self,VAR,EXPR):
