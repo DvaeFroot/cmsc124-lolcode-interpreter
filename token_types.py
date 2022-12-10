@@ -80,6 +80,7 @@ TT_STR_DELIMITER =      'String Delimiter'
 TT_IDENTIFIER =         'Identifier'
 TT_EOF =                'EOF'
 TT_NEWLINE =            'New Line'
+TT_SUPPRESS_NEWLINE =   'Visible Suppress Next Line'
 
 #GROUPS
 GP_LITERAL =            (TT_STRING, TT_FLOAT, TT_INTEGER, TT_TYPE, TT_BOOLEAN)
