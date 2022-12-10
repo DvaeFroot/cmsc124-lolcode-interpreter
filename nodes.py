@@ -175,7 +175,7 @@ class ArithmeticNode(BinOpNode):
         left = self.check(self.EXPR1)
         right = self.check(self.EXPR2)
         
-        isNumbar = self.isNumbar(str(left)) or self.isNumbar(str(right))
+        isNumbar = self.isNumbar(left) or self.isNumbar(right)
 
         if self.OP_TOKEN.type in (TT_SUMMATION):
             self.value = eval(left + "+" + right)
@@ -205,7 +205,7 @@ class ArithmeticNode(BinOpNode):
     
     def check(self, INPUT):
         if isinstance(INPUT,ArithmeticNode):
-            return INPUT.value
+            return str(INPUT.value)
         elif isinstance(INPUT, VariableNode):
             if INPUT.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(INPUT.token,"Variable not Initialized")
@@ -214,14 +214,14 @@ class ArithmeticNode(BinOpNode):
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
             
-            return SYMBOL_TABLE[INPUT.token.val]["value"]
+            return str(SYMBOL_TABLE[INPUT.token.val]["value"])
         elif isinstance(INPUT,YarnNode):
             try:
                 float(INPUT.token.val)
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Unable to use Arithmetic operations on Yarn")
 
-        return INPUT.token.val
+        return str(INPUT.token.val)
 
 
 #GIMMEH VAR
