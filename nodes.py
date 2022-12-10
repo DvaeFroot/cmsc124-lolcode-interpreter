@@ -201,11 +201,13 @@ class GimmehNode(UnaryOpNode):
         if right.token.val not in VT:
             raise ErrorSemantic(right.token,"Variable not Initialized")
         answer = simpledialog.askstring("Input", f"Value for: {right.token.val}")
+        
         ST[0]["value"] = answer
         VT["IT"] = ST[0]["value"]
         VT[right.token.val] = answer
         
-        SYMBOL_TABLE[IT] = {"type": NUMBAR, "value": answer}
+        SYMBOL_TABLE[IT] = {"type": YARN, "value": answer}
+        SYMBOL_TABLE[right.token.val]["type"] = YARN
         SYMBOL_TABLE[right.token.val]["value"] = answer
         
 
@@ -263,7 +265,7 @@ class AssignmentNode():
         if EXPR is None:
             ST.append({"type": "variable", "token": VAR.token.val, "value": None})
             VT[str(VAR.token.val)] = None
-            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NOOB, "value": None}
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": None, "value": None}
         
         elif isinstance(EXPR, ArithmeticNode):
             ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
@@ -583,5 +585,5 @@ def printST():
         print(key,value)
 
 SYMBOL_TABLE = {
-    IT: {"type": NOOB, "value":None}
+    IT: None
 }
