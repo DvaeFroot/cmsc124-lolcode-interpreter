@@ -420,6 +420,21 @@ class BooleanShortNode(UnaryOpNode,BooleanNode):
 
 
 class TypecastNode:
+    def run(self,expr,token):
+        value = self.getValue(expr)
+        originalType = self.getType(expr)
+        newType = token.val
+        
+        self.value = self.getCastedValue(expr,value,originalType,newType)
+        
+        ST[0]["value"] = self.value
+        VT["IT"] = ST[0]["value"]
+        
+        SYMBOL_TABLE[IT] = {"type": newType, "value": self.value}
+        
+        if isinstance(expr,VariableNode):
+            SYMBOL_TABLE[str(expr.token.val)] = {"type": newType, "value": self.value}
+    
     def getType(self,expr):
         if isinstance(expr,VariableNode):
             if expr.token.val not in SYMBOL_TABLE:
@@ -440,7 +455,7 @@ class TypecastNode:
         elif isinstance(expr,SmooshNode):
             return expr.val
     
-    def cast(self,expr, value, originalType, newType):
+    def getCastedValue(self,expr, value, originalType, newType):
         res = None
         if originalType == NUMBR:
             if newType == "NUMBR":
@@ -479,42 +494,14 @@ class TypecastNode:
 class TypecastLongNode(BinOpNode,TypecastNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        expr = self.EXPR1
-        
-        value = self.getValue(expr)
-        originalType = self.getType(expr)
-        newType = self.EXPR2.val
-        
-        self.value = self.cast(expr,value,originalType,newType)
-        
-        ST[0]["value"] = self.value
-        VT["IT"] = ST[0]["value"]
-        
-        SYMBOL_TABLE[IT] = {"type": newType, "value": self.value}
-        
-        if isinstance(expr,VariableNode):
-            SYMBOL_TABLE[str(expr.token.val)] = {"type": newType, "value": self.value}
+        self.run(EXPR1,EXPR2)
 
 
 #MAEK EXPR possible
 class TypecastShortNode(DoubleOpNode,TypecastNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
-        expr = self.middle
-        
-        value = self.getValue(expr)
-        originalType = self.getType(expr)
-        newType = self.right.val
-        
-        self.value = self.cast(expr,value,originalType,newType)
-        
-        ST[0]["value"] = self.value
-        VT["IT"] = ST[0]["value"]
-        
-        SYMBOL_TABLE[IT] = {"type": newType, "value": self.value}
-        
-        if isinstance(expr,VariableNode):
-            SYMBOL_TABLE[str(expr.token.val)] = {"type": newType, "value": self.value}
+        self.run(middle,right)
 
 
 #OPERATION EXPR
