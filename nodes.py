@@ -185,7 +185,7 @@ class GimmehNode(UnaryOpNode):
 
 #SMOOSH
 class SmooshNode():
-    def __init__(self, op_token, left, right):
+    def __init__(self, left, right):
         valueList = []
         valueList.append(self.check(left))
 
