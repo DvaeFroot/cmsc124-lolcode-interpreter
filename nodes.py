@@ -202,11 +202,11 @@ class ArithmeticNode(BinOpNode):
             if INPUT.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(INPUT.token,"Variable not Initialized")
             try:
-                int(VT[INPUT.token.val])
-                float(VT[INPUT.token.val])
+                int(SYMBOL_TABLE[INPUT.token.val]["value"])
+                float(SYMBOL_TABLE[INPUT.token.val]["value"])
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
-            return str(VT[INPUT.token.val])
+            return str(SYMBOL_TABLE[INPUT.token.val]["value"])
         elif isinstance(INPUT,YarnNode):
             try:
                 int(INPUT.token.val)
