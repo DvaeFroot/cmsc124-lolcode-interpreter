@@ -154,7 +154,7 @@ class Parser:
             return VariableNode(self.current_tok)
         elif self.current_tok.type in (GP_COMPARISON):
             return self.comparison()
-        elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
+        elif self.current_tok.type in (*GP_BOOLEAN_LONG, *GP_BOOLEAN_SHORT,*GP_BOOLEAN_INF):
             return self.boolean()
         elif self.current_tok.type in (TT_CONCAT):
             return self.concatenation()
@@ -232,7 +232,35 @@ class Parser:
 
 
     def boolean(self):
-        if self.current_tok.type in (GP_BOOLEAN_LONG):
+        if self.current_tok.type in (GP_BOOLEAN_INF):
+            op_token = self.current_tok
+
+            self.advance()
+            left = self.expr()
+
+            right = []
+            while 1:
+                an = self.advance()
+                if an.type not in (TT_ARG_SEP):
+                    raise ErrorSyntax(self.current_tok, f"Expected AN at pos {self.current_tok.pos}")
+                self.advance()
+                temptok = self.current_tok
+                exproutput = self.expr(raiseError=False)
+                if exproutput == None:
+                    self.token_idx -= 1
+                    self.current_tok = temptok
+                    break
+                
+                right.append(exproutput)
+
+                if self.tokens[self.token_idx+1].type in (TT_MKAY):
+                    self.advance()
+                    break
+                
+            res = BooleanInfNode(op_token, left, right)
+            return res
+
+        elif self.current_tok.type in (GP_BOOLEAN_LONG):
             op_token = self.current_tok
             self.advance()
             expr1 = self.expr()
@@ -423,7 +451,7 @@ class Parser:
             res = self.variableShort()
         elif self.current_tok.type in (GP_COMPARISON):
             res = self.comparison()
-        elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
+        elif self.current_tok.type in (*GP_BOOLEAN_LONG, *GP_BOOLEAN_SHORT):
             res = self.boolean()
         elif self.current_tok.type in (TT_TYPECAST_2):
             res = self.typecast()
