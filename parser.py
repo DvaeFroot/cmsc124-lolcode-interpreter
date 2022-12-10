@@ -171,7 +171,7 @@ class Parser:
             return self.concatenation()
         elif self.current_tok.type in (TT_TYPECAST_2):
             return self.typecast()
-        
+
 
         if raiseError:
             raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
@@ -215,6 +215,16 @@ class Parser:
             expr = self.expr()
 
             res = AssignmentShortNode(variable, r, expr)
+            return res
+
+    def variable(self):
+        if self.current_tok.type in (TT_IDENTIFIER):
+
+            variable = self.current_tok
+            if variable.type not in (TT_IDENTIFIER):
+                raise ErrorSyntax(self.current_tok, f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+
+            res = VariableNode(self.current_tok)
             return res
 
 
@@ -261,7 +271,7 @@ class Parser:
                     self.token_idx -= 1
                     self.current_tok = temptok
                     break
-                
+
                 right.append(exproutput)
 
                 if self.tokens[self.token_idx+1].type in (TT_MKAY):
@@ -269,7 +279,7 @@ class Parser:
                     break
                 elif self.tokens[self.token_idx+1].type in (TT_NEWLINE):
                     break
-                
+
             res = BooleanInfNode(op_token, left, right)
             return res
 
@@ -296,7 +306,7 @@ class Parser:
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_BREAK, TT_CASE,TT_CONTROL_END):
                  break
-            
+
             if self.current_tok.type in (TT_CASEBREAK):
                 yield CaseBreakNode(self.current_tok)
             else:
@@ -308,20 +318,20 @@ class Parser:
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_CONTROL_END):
                 break
-            
+
             omg = self.current_tok
             if omg.type in (TT_BREAK):
                 self.advance()
                 casebody = list(self.casebody())
                 yield DefaultCaseNode(omg, casebody)
                 break
-            
+
             self.advance()
             value = self.literal()
             self.advance()
             casebody = list(self.casebody())
             yield SwitchCaseNode(omg, value, casebody)
-            
+
 
     def switch(self):
         if self.current_tok.type in (TT_SWITCH):
@@ -461,7 +471,10 @@ class Parser:
         elif self.current_tok.type in (TT_VAR_DEC):
             res = self.variableLong()
         elif self.current_tok.type in (TT_IDENTIFIER):
-            res = self.variableShort()
+            if self.tokens[self.token_idx+1].type in (TT_VAR_VAL_ASSIGN):
+                res = self.variableShort()
+            else:
+                res = self.variable()
         elif self.current_tok.type in (GP_COMPARISON):
             res = self.comparison()
         elif self.current_tok.type in (*GP_BOOLEAN_LONG, *GP_BOOLEAN_SHORT):
