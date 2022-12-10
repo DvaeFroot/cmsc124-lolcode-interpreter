@@ -327,6 +327,12 @@ class AssignmentNode():
             
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.token.val}
         
+        elif isinstance(EXPR, TypecastNode):
+            # ST.append({"type": "variable", "token": VAR.token.val, "value": VT[str(EXPR.token.val)]})
+            # VT[str(VAR.token.val)] = VT[str(EXPR.token.val)]
+            
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.value}
+        
         else:
             # ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
             # ST[0]["value"] = EXPR.token.val
@@ -491,6 +497,13 @@ class BooleanShortNode(UnaryOpNode,BooleanNode):
 
 class TypecastNode:
     def run(self,expr,token):
+        expr.run()
+        """ FIX ME PROPERLY """
+        try:
+            token.run()
+        except:
+            pass
+        
         value = self.getValue(expr)
         originalType = self.getType(expr)
         newType = token.val
