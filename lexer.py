@@ -177,6 +177,8 @@ class Lexer(object):
                 
                 newline = re.compile(r"TLDR")
                 endtok = newline.search(self.buf, self.pos)
+                
+                self.line += len(re.compile(r"\n").findall(self.buf,self.pos,endtok.start()))
 
                 if endtok:
                     #Get new starting position for regex searching
