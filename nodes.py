@@ -243,6 +243,10 @@ class GimmehNode(UnaryOpNode):
         SYMBOL_TABLE[self.right.token.val]["type"] = YARN
         SYMBOL_TABLE[self.right.token.val]["value"] = answer
         
+        self.txt_console.configure(state=NORMAL)
+        self.txt_console.insert(INSERT,str(answer)+'\n')
+        self.txt_console.configure(state=DISABLED)
+        
 
 #SMOOSH
 class SmooshNode():
