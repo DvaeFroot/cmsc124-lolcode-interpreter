@@ -22,7 +22,7 @@ class Parser:
             self.advance()
         return self.current_tok
     
-    def seek(self):
+    def seekToken(self):
         try:
             return self.tokens[self.token_idx+1]
         except Exception:
@@ -100,7 +100,7 @@ class Parser:
                 
                 right.append(exproutput)
 
-                if self.tokens[self.token_idx+1].type in (TT_NEWLINE):
+                if self.seekToken().type in (TT_NEWLINE):
                     break
                 
             self.insideSmoosh = False
@@ -186,7 +186,7 @@ class Parser:
             if variable.type not in (TT_IDENTIFIER):
                 raise ErrorSyntax(self.current_tok, f"Expected IDENTIFIER at pos {self.current_tok.pos}")
             variable = VariableNode(self.current_tok)
-            itz = self.tokens[self.token_idx+1]
+            itz = self.seekToken()
             if itz.type not in (TT_VAR_ASSIGN):
                 res = AssignmentShlongNode(ihasa_token, variable)
                 return res
@@ -264,10 +264,10 @@ class Parser:
                 
                 right.append(exproutput)
 
-                if self.tokens[self.token_idx+1].type in (TT_MKAY):
+                if self.seekToken().type in (TT_MKAY):
                     self.advance()
                     break
-                elif self.tokens[self.token_idx+1].type in (TT_NEWLINE):
+                elif self.seekToken().type in (TT_NEWLINE):
                     break
                 
             res = BooleanInfNode(op_token, left, right)
@@ -484,7 +484,7 @@ class Parser:
 
     def body(self):
         while(self.token_idx+1 < len(self.tokens)):
-            if self.tokens[self.token_idx+1].type in (TT_CODE_END):
+            if self.seekToken().type in (TT_CODE_END):
                 break
             
             self.advance()
