@@ -9,6 +9,7 @@ class Parser:
         self.txt_console = txt_console
         self.tbl_sym = tbl_sym
         self.insideString = False
+        self.insideSmoosh = False
 
 
     def advance(self):
@@ -17,7 +18,7 @@ class Parser:
             self.current_tok = self.tokens[self.token_idx]
         if self.current_tok.type in (TT_COMMENT_STRT, TT_COMMENT_MULTI_STRT, TT_COMMENT_MULTI_END):
             self.advance()
-        if not self.insideString and self.current_tok.type in (TT_NEWLINE):
+        if not self.insideString and not self.insideSmoosh and self.current_tok.type in (TT_NEWLINE):
             self.advance()
         return self.current_tok
 
@@ -62,6 +63,41 @@ class Parser:
 
         raise ErrorSyntax(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")
 
+    def concatenation(self):
+        if self.current_tok.type in (TT_CONCAT):
+            print("inside concat")
+            self.insideSmoosh = True
+            
+            op_token = self.current_tok
+
+            self.advance()
+            left = self.expr()
+
+            right = []
+            while 1:
+                an = self.advance()
+                if an.type not in (TT_ARG_SEP):
+                    raise ErrorSyntax(self.current_tok, f"Expected AN at pos {self.current_tok.pos}")
+                self.advance()
+                temptok = self.current_tok
+                exproutput = self.expr(raiseError=False)
+                if exproutput == None:
+                    self.token_idx -= 1
+                    self.current_tok = temptok
+                    break
+                
+                right.append(exproutput)
+
+                if self.tokens[self.token_idx+1].type in (TT_NEWLINE):
+                    break
+                
+            self.insideSmoosh = False
+            res = SmooshNode(op_token, left, right)
+            return res
+
+        raise ErrorSyntax(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")
+
+        pass
 
     def get_input(self):
         if self.current_tok.type in (TT_READ):
@@ -120,6 +156,8 @@ class Parser:
             return self.comparison()
         elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
             return self.boolean()
+        elif self.current_tok.type in (TT_CONCAT):
+            return self.concatenation()
 
         if raiseError:
             raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
@@ -397,6 +435,8 @@ class Parser:
             res = self.loop()
         elif self.current_tok.type in (TT_IF):
             res = self.ifelse()
+        elif self.current_tok.type in (TT_CONCAT):
+            res = self.concatenation()
 
         return StatementNode("",res)
 

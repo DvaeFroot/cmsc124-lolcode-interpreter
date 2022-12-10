@@ -165,6 +165,29 @@ class GimmehNode(UnaryOpNode):
         VT["IT"] = ST[0]["value"]
         VT[right.token.val] = answer
 
+#SMOOSH
+class SmooshNode():
+    def __init__(self, op_token, left, right):
+        valueList = []
+        valueList.append(self.check(left))
+
+        for value in right:
+            valueList.append(self.check(value))
+        
+        self.value = ''.join(valueList)
+        print("value",self.value)
+        ST[0]["value"] = self.value
+        VT["IT"] = self.value
+    
+    def check(self,value):
+        if isinstance(value, VariableNode):
+            if value.token.val not in VT:
+                raise ErrorSemantic(value.token,"Variable not Initialized")
+            return str(VT[value.token.val])
+        elif isinstance(value,BooleanNode):
+            return str(value.value)
+        else:
+            return str(value.token.val)
 
 #VISIBLE
 class VisibleNode(UnaryOpNode):
@@ -177,7 +200,7 @@ class VisibleNode(UnaryOpNode):
                 txt_console.configure(state=NORMAL)
                 txt_console.insert(INSERT,str(VT[value.token.val]))
                 txt_console.configure(state=DISABLED)
-            elif isinstance(value,BooleanNode):
+            elif isinstance(value,BooleanNode) or isinstance(value,SmooshNode):
                 txt_console.configure(state=NORMAL)
                 txt_console.insert(INSERT,str(value.value))
                 txt_console.configure(state=DISABLED)
