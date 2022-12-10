@@ -398,7 +398,7 @@ class Parser:
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_ELIF, TT_ELSE, TT_CONTROL_END):
                 break
-            
+
             yield self.statement()
             self.advance()
 
@@ -434,7 +434,7 @@ class Parser:
             oic = self.current_tok
             if oic.type not in (TT_CONTROL_END):
                 raise ErrorSyntax(self.current_tok,f"Expected OIC at pos {self.current_tok.pos}")
-            res = IfNode(op_token, expr)
+            res = IfElseNode(op_token, expr, oic)
             return res
         else:
             raise ErrorSyntax(self.current_tok,f"Expected IF at pos {self.current_tok.pos}")
