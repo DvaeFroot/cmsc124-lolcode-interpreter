@@ -72,8 +72,8 @@ class DoubleOpNode:
 class Program(DoubleOpNode):
     def __init__(self, start_node, body_node,end_node, tbl_sym) -> None:
         super().__init__(start_node, body_node, end_node)
-        printST()
-        print(VT)
+        # printST()
+        # print(VT)
         # clear previous items in the lexemes treeview
         for x in tbl_sym.get_children():
             tbl_sym.delete(x)
@@ -93,17 +93,19 @@ class NoobNode(BasicNode,LiteralNode):
 class NumbrNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
+        self.value: int = int(token.val)
 
 # FLOATS
 class NumbarNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
-
+        self.value: float = float(token.val)
+        
 #"STRINGBODY"
 class YarnNode(BasicNode,LiteralNode):
     def __init__(self, token) -> None:
         super().__init__(token)
-
+        self.value: str = str(token.val)
 
 #TRUE OR FALSE
 class TroofNode(BasicNode,LiteralNode):
@@ -193,7 +195,6 @@ class SmooshNode():
             valueList.append(self.check(value))
         
         self.value = ''.join(valueList)
-        print("value",self.value)
         ST[0]["value"] = self.value
         VT["IT"] = self.value
     
@@ -324,7 +325,6 @@ class BooleanInfNode(UnaryOpNode, BooleanNode):
     def __init__(self, op_token, left, right):
         super().__init__(left,right)
         output = self.tobool(left)
-        print(output)
         if op_token.type in (TT_AND_INF):
             for value in right:
                 output = output and self.tobool(value)
@@ -350,7 +350,6 @@ class BooleanLongNode(BinOpNode,BooleanNode):
 
         if OP_TOKEN.type in (TT_AND):
             output = left and right
-            print(output)
         elif OP_TOKEN.type in (TT_OR_OP):
             output = left or right
         elif OP_TOKEN.type in (TT_XOR):
