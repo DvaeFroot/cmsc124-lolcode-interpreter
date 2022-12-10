@@ -506,5 +506,5 @@ def printST():
         print(key,value)
 
 SYMBOL_TABLE = {
-    
+    IT: {"type": NOOB, "value":None}
 }
