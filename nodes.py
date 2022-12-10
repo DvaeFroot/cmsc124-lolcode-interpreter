@@ -12,6 +12,24 @@ def resetSymbolTable():
     ST = [{"type": "IT", "value": None}]
     VT = {"IT": None}
 
+def toBool(value):
+    return True if value == "WIN" else False
+    
+def toTroof(value):
+    return "WIN" if value else "FAIL"
+
+def toValue(inputValue):
+    if isinstance(inputValue,ArithmeticNode):
+        return str(inputValue.value)
+    elif isinstance(inputValue, VariableNode):
+        if inputValue.token.val not in VT:
+            raise ErrorSemantic(inputValue.token,"Variable not Initialized")
+        
+        return str(VT[inputValue.token.val])
+    elif isinstance(inputValue,TroofNode):
+        return inputValue.token.val
+
+    return inputValue.token.val
 
 class BasicNode:
     def __init__(self,token):
@@ -200,7 +218,7 @@ class VisibleNode(UnaryOpNode):
                 txt_console.configure(state=NORMAL)
                 txt_console.insert(INSERT,str(VT[value.token.val]))
                 txt_console.configure(state=DISABLED)
-            elif isinstance(value,BooleanNode) or isinstance(value,SmooshNode):
+            elif isinstance(value,(BooleanNode, SmooshNode, ArithmeticNode, ComparisonNode)):
                 txt_console.configure(state=NORMAL)
                 txt_console.insert(INSERT,str(value.value))
                 txt_console.configure(state=DISABLED)
@@ -264,6 +282,18 @@ class AssignmentShortNode(DoubleOpNode,AssignmentNode):
 class ComparisonNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
+        left = toValue(EXPR1)
+        right = toValue(EXPR2)
+        output = None
+        
+        if OP_TOKEN.type in (TT_EQU_OP):
+            output = left == right
+        elif OP_TOKEN.type in (TT_NEQU):
+            output = left != right
+
+        self.value = toTroof(output)
+        ST[0]["value"] = self.value
+        VT["IT"] = ST[0]["value"]
 
 class BooleanNode():
     def tobool(self,INPUT):
