@@ -174,6 +174,8 @@ class ArithmeticNode(BinOpNode):
         
         left = self.check(self.EXPR1)
         right = self.check(self.EXPR2)
+        
+        isNumbar = self.isNumbar(str(left)) or self.isNumbar(str(right))
 
         if self.OP_TOKEN.type in (TT_SUMMATION):
             self.value = eval(left + "+" + right)
@@ -182,7 +184,10 @@ class ArithmeticNode(BinOpNode):
         elif self.OP_TOKEN.type in (TT_MUL_OP):
             self.value = eval(left + "*" + right)
         elif self.OP_TOKEN.type in (TT_DIV_OP):
-            self.value = eval(left + "/" + right)
+            if isNumbar:
+                self.value = eval(left + "/" + right)
+            else:
+                self.value = eval(left + "//" + right)
         elif self.OP_TOKEN.type in (TT_MOD):
             self.value = eval(left + "%" + right)
         elif self.OP_TOKEN.type in (TT_MAX):
@@ -190,31 +195,33 @@ class ArithmeticNode(BinOpNode):
         elif self.OP_TOKEN.type in (TT_MIN):
             self.value = min((eval(left),eval(right)))
 
-        # self.value=ST[0]["value"]
-        # VT["IT"] = ST[0]["value"]
-        
-        SYMBOL_TABLE[IT] = {"type": NUMBAR, "value": self.value}
+        if isNumbar:
+            SYMBOL_TABLE[IT] = {"type": NUMBAR, "value": self.value}
+        else:
+            SYMBOL_TABLE[IT] = {"type": NUMBR, "value": self.value}
+    
+    def isNumbar(self, value:str):
+        return True if "." in value else False
     
     def check(self, INPUT):
         if isinstance(INPUT,ArithmeticNode):
-            return str(INPUT.value)
+            return INPUT.value
         elif isinstance(INPUT, VariableNode):
             if INPUT.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(INPUT.token,"Variable not Initialized")
             try:
-                int(SYMBOL_TABLE[INPUT.token.val]["value"])
                 float(SYMBOL_TABLE[INPUT.token.val]["value"])
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
-            return str(SYMBOL_TABLE[INPUT.token.val]["value"])
+            
+            return SYMBOL_TABLE[INPUT.token.val]["value"]
         elif isinstance(INPUT,YarnNode):
             try:
-                int(INPUT.token.val)
                 float(INPUT.token.val)
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Unable to use Arithmetic operations on Yarn")
 
-        return str(INPUT.token.val)
+        return INPUT.token.val
 
 
 #GIMMEH VAR
