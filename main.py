@@ -68,7 +68,7 @@ def getTokens():
         tbl_sym.delete(x)
     
     # parse the tokens
-    res = Parser(txt_console, tbl_sym, tokens)
+    res = Parser(tokens, txt_console, tbl_sym)
 
     # put into console the output of the parser
     parse = res.parse()

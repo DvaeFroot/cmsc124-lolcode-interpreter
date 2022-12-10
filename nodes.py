@@ -10,15 +10,8 @@ NUMBR = "NUMBR"
 YARN = "YARN"
 TROOF = "TROOF"
 
-# ST = [{"type": "IT", "value": None}]
-# VT = {"IT": None}
 
 def resetSymbolTable():
-    # global ST
-    # global VT
-    # ST = [{"type": "IT", "value": None}]
-    # VT = {"IT": None}
-
     global SYMBOL_TABLE
     SYMBOL_TABLE = {}
 
@@ -101,21 +94,19 @@ class Program(DoubleOpNode):
             statement.run()
 
         printST()
-        # print(VT)
-        # clear previous items in the lexemes treeview
-        for x in self.tbl_sym.get_children():
-            self.tbl_sym.delete(x)
-        # for index,key in enumerate(VT):
-        #     tbl_sym.insert("",'end',iid=index,
-        #     values=(key,VT[key]))
-
-        for index,key in enumerate(SYMBOL_TABLE):
-            if SYMBOL_TABLE[key]["type"] == YARN:
-                self.tbl_sym.insert("",'end',iid=index,
-                values=(key,"\""+str(SYMBOL_TABLE[key]["value"])+"\""))
-            else:
-                self.tbl_sym.insert("",'end',iid=index,
-                values=(key,SYMBOL_TABLE[key]["value"]))
+        
+        if self.tbl_sym is not None:
+            # clear previous items in the lexemes treeview
+            for x in self.tbl_sym.get_children():
+                self.tbl_sym.delete(x)
+            
+            for index,key in enumerate(SYMBOL_TABLE):
+                if SYMBOL_TABLE[key]["type"] == YARN:
+                    self.tbl_sym.insert("",'end',iid=index,
+                    values=(key,"\""+str(SYMBOL_TABLE[key]["value"])+"\""))
+                else:
+                    self.tbl_sym.insert("",'end',iid=index,
+                    values=(key,SYMBOL_TABLE[key]["value"]))
 
 
 class LiteralNode:
@@ -228,6 +219,8 @@ class ArithmeticNode(BinOpNode):
                 float(SYMBOL_TABLE[INPUT.token.val]["value"])
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
+            except TypeError:
+                raise ErrorSemantic(INPUT.token,"Variable contains Nothing. Unable to use Arithmetic operations on Nothing")
             
             return str(SYMBOL_TABLE[INPUT.token.val]["value"])
         elif isinstance(INPUT,YarnNode):
@@ -249,10 +242,6 @@ class GimmehNode(UnaryOpNode):
         if self.right.token.val not in SYMBOL_TABLE:
             raise ErrorSemantic(self.right.token,"Variable not Initialized")
         answer = simpledialog.askstring("Input", f"Value for: {self.right.token.val}")
-
-        # ST[0]["value"] = answer
-        # VT["IT"] = ST[0]["value"]
-        # VT[self.right.token.val] = answer
 
         SYMBOL_TABLE[IT] = {"type": YARN, "value": answer}
         SYMBOL_TABLE[self.right.token.val]["type"] = YARN
@@ -278,8 +267,6 @@ class SmooshNode(UnaryOpNode):
             valueList.append(self.check(value))
 
         self.value = ''.join(valueList)
-        # ST[0]["value"] = self.value
-        # VT["IT"] = self.value
 
         SYMBOL_TABLE[IT] = {"type": YARN, "value": self.value}
 
@@ -287,7 +274,7 @@ class SmooshNode(UnaryOpNode):
         if isinstance(value, VariableNode):
             if value.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(value.token,"Variable not Initialized")
-            return str(VT[value.token.val])
+            return str(SYMBOL_TABLE[value.token.val]["value"])
         elif isinstance(value,BooleanNode):
             return str(value.value)
         else:
@@ -301,63 +288,51 @@ class VisibleNode(UnaryOpNode):
         self.suppress = suppress
 
     def run(self):
+        output = []
         for value in self.right:
             value.run()
             if isinstance(value, VariableNode):
                 if value.token.val not in SYMBOL_TABLE:
                     raise ErrorSemantic(value.token,"Variable not Initialized")
-                self.txt_console.configure(state=NORMAL)
-                self.txt_console.insert(INSERT,str(SYMBOL_TABLE[value.token.val]["value"]))
-                self.txt_console.configure(state=DISABLED)
+                output.append(str(SYMBOL_TABLE[value.token.val]["value"]))
             elif isinstance(value,(BooleanNode, SmooshNode, ArithmeticNode, ComparisonNode)):
-                self.txt_console.configure(state=NORMAL)
-                self.txt_console.insert(INSERT,str(value.value))
-                self.txt_console.configure(state=DISABLED)
+                output.append(str(value.value))
             else:
-                self.txt_console.configure(state=NORMAL)
-                self.txt_console.insert(INSERT,str(value.token.val))
-                self.txt_console.configure(state=DISABLED)
+                output.append(str(value.token.val))
         
         if not self.suppress:
+            output.append('\n')
+        
+        if self.txt_console is None: 
+            # CLI
+            print("".join(output))
+        else:
+            # GUI
             self.txt_console.configure(state=NORMAL)
-            self.txt_console.insert(INSERT,'\n')
+            self.txt_console.insert(INSERT,"".join(output))
             self.txt_console.configure(state=DISABLED)
-
 
 class AssignmentNode():
     def assign(self,VAR,EXPR):
         if EXPR == None:
-            # ST.append({"type": "variable", "token": VAR.token.val, "value": None})
-            # VT[str(VAR.token.val)] = None
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": None, "value": None}
+            
         elif isinstance(EXPR, ArithmeticNode):
-            # ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
-            # VT[str(VAR.token.val)] = ST[0]["value"]
-
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": SYMBOL_TABLE[IT]["value"]}
 
         elif isinstance(EXPR, BooleanNode):
-            # ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.value})
-            # VT[str(VAR.token.val)] = ST[0]["value"]
-
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": SYMBOL_TABLE[IT]["value"]}
 
         elif isinstance(EXPR, VariableNode):
-            # ST.append({"type": "variable", "token": VAR.token.val, "value": VT[str(EXPR.token.val)]})
-            # VT[str(VAR.token.val)] = VT[str(EXPR.token.val)]
-
-            SYMBOL_TABLE[str(VAR.token.val)] = {"type": SYMBOL_TABLE[IT]["type"], "value": SYMBOL_TABLE[IT]["value"]}
+            if EXPR.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(EXPR.token,"Variable not Initialized")
+            
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": SYMBOL_TABLE[EXPR.token.val]["type"], "value": SYMBOL_TABLE[EXPR.token.val]["value"]}
 
         elif isinstance(EXPR, TroofNode):
-            # ST.append({"type": "variable", "token": VAR.token.val, "value": VT[str(EXPR.token.val)]})
-            # VT[str(VAR.token.val)] = VT[str(EXPR.token.val)]
-
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.token.val}
 
         elif isinstance(EXPR, TypecastNode):
-            # ST.append({"type": "variable", "token": VAR.token.val, "value": VT[str(EXPR.token.val)]})
-            # VT[str(VAR.token.val)] = VT[str(EXPR.token.val)]
-
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.value}
 
         elif EXPR.token.type in TT_INTEGER:
@@ -366,14 +341,10 @@ class AssignmentNode():
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBR, "value": EXPR.value}
 
         else:
-            # ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
-            # ST[0]["value"] = EXPR.token.val
             if VAR.token.type not in TT_STRING:
                 if VAR.token.val.isdigit():
-                    # VT[VAR.token.val] = eval(EXPR.token.val)
                     SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": eval(EXPR.token.val)}
 
-            # VT[str(VAR.token.val)] = EXPR.token.val
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": YARN, "value": EXPR.token.val}
 
 #I HAS A Variable
@@ -424,9 +395,6 @@ class ComparisonNode(BinOpNode):
             output = left != right
 
         self.value = toTroof(output)
-        # ST[0]["value"] = self.value
-        # VT["IT"] = ST[0]["value"]
-
         SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
 
 class BooleanNode():
@@ -473,9 +441,6 @@ class BooleanInfNode(UnaryOpNode, BooleanNode):
                 output = output or self.tobool(value)
 
         self.value = self.totroof(output)
-        # ST[0]["value"] = self.value
-        # VT["IT"] = ST[0]["value"]
-
         SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
 
 
@@ -503,9 +468,6 @@ class BooleanLongNode(BinOpNode,BooleanNode):
             output = not (left or right)
 
         self.value = "WIN" if output else "FAIL"
-        # self.value = ST[0]["value"]
-        # VT["IT"] = ST[0]["value"]
-
         SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
 
 
@@ -521,9 +483,6 @@ class BooleanShortNode(UnaryOpNode,BooleanNode):
         output = not val
 
         self.value = "WIN" if output else "FAIL"
-        # self.value = ST[0]["value"]
-        # VT["IT"] = ST[0]["value"]
-
         SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
 
 
@@ -541,10 +500,6 @@ class TypecastNode:
         newType = token.val
 
         self.value = self.getCastedValue(expr,value,originalType,newType)
-
-        # ST[0]["value"] = self.value
-        # VT["IT"] = ST[0]["value"]
-
         SYMBOL_TABLE[IT] = {"type": newType, "value": self.value}
 
         if isinstance(expr,VariableNode):
