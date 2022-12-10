@@ -65,7 +65,6 @@ class Parser:
 
     def concatenation(self):
         if self.current_tok.type in (TT_CONCAT):
-            print("inside concat")
             self.insideSmoosh = True
             
             op_token = self.current_tok
@@ -92,7 +91,7 @@ class Parser:
                     break
                 
             self.insideSmoosh = False
-            res = SmooshNode(op_token, left, right)
+            res = SmooshNode(left, right)
             return res
 
         raise ErrorSyntax(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")
