@@ -21,6 +21,12 @@ class Parser:
         if not self.insideString and not self.insideSmoosh and self.current_tok.type in (TT_NEWLINE):
             self.advance()
         return self.current_tok
+    
+    def seek(self):
+        try:
+            return self.tokens[self.token_idx+1]
+        except Exception:
+            pass
 
 
     def parse(self):
@@ -47,18 +53,25 @@ class Parser:
             left = self.current_tok
 
             right = []
+            suppress = False
             while 1:
                 self.advance()
                 temptok = self.current_tok
                 exproutput = self.expr(raiseError=False)
                 if exproutput == None:
+                    if self.current_tok.type in (TT_SUPPRESS_NEWLINE):
+                        self.advance()
+                        temptok = self.current_tok
+                        suppress = True
+                    if self.current_tok.type not in (TT_NEWLINE):
+                        raise ErrorSyntax(self.current_tok, f"Expected Delimiter at pos {self.current_tok.pos}")
                     self.token_idx -= 1
                     self.current_tok = temptok
                     break
                 
                 right.append(exproutput)
             self.insideString = False
-            res = VisibleNode(left, right, self.txt_console)
+            res = VisibleNode(left, right, self.txt_console, suppress)
             return res
 
         raise ErrorSyntax(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")
@@ -163,10 +176,7 @@ class Parser:
         if raiseError:
             raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
         else:
-            if self.current_tok.type in (TT_NEWLINE):
-                return None
-            
-            raise ErrorSyntax(self.current_tok, f"Expected Delimiter at pos {self.current_tok.pos}")
+            return None
 
     def variableLong(self):
         if self.current_tok.type in (TT_VAR_DEC):

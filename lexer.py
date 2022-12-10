@@ -93,6 +93,7 @@ class Lexer(object):
             (r'\bAN\b',                                   TT_ARG_SEP),
             (r'\bYR\b',                                   TT_YR),
             (r'\bA\b',                                    TT_A),
+            (r'\!',                                       TT_SUPPRESS_NEWLINE),
             # (r'\"',                                       TT_STR_DELIMITER),
 
             (r'\n|,',                                       TT_NEWLINE),
