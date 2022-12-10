@@ -337,8 +337,8 @@ print("\n Operations: Comparison \n")
 doTest("Comparison",
        """
          HAI
-         BOTH SAEM x AN y
-         DIFFRINT x AN y
+         BOTH SAEM "1" AN 1
+         DIFFRINT "a" AN 3
          KTHXBYE
         """)
 
@@ -350,45 +350,45 @@ doTest("Relational Comparison",
          DIFFRINT x AN SMALLR OF x AN y BTW x > y
          DIFFRINT x AN BIGGR OF x AN y BTW x < y
          KTHXBYE
-        """)
+        """, shouldFail=True)
 
 print("\n IF THEN \n")
 
-doTest("if statement minimum",
-       """
-         HAI
-        O RLY?
-        YA RLY
-               VISIBLE "TEST"
-        OIC
-         KTHXBYE
-        """)
+# doTest("if statement minimum",
+#        """
+#          HAI
+#         O RLY?
+#         YA RLY
+#                VISIBLE "TEST"
+#         OIC
+#          KTHXBYE
+#         """)
 
-doTest("if statement with else",
-       """
-         HAI
-        O RLY?
-        YA RLY
-        VISIBLE "TEST"
-        NO WAI
-        VISIBLE "TEST"
-        OIC
-         KTHXBYE
-        """)
+# doTest("if statement with else",
+#        """
+#          HAI
+#         O RLY?
+#         YA RLY
+#         VISIBLE "TEST"
+#         NO WAI
+#         VISIBLE "TEST"
+#         OIC
+#          KTHXBYE
+#         """)
 
-doTest("if statement with else and mebber",
-       """
-         HAI
-        O RLY?
-        YA RLY
-               VISIBLE "TEST"
-        MEBBE "1"
-               VISIBLE "TEST"
-        NO WAI BTW else
-               VISIBLE "TEST"
-        OIC
-         KTHXBYE
-        """)
+# doTest("if statement with else and mebber",
+#        """
+#          HAI
+#         O RLY?
+#         YA RLY
+#                VISIBLE "TEST"
+#         MEBBE "1"
+#                VISIBLE "TEST"
+#         NO WAI BTW else
+#                VISIBLE "TEST"
+#         OIC
+#          KTHXBYE
+#         """)
 
 print("\n SWITCH \n")
 
@@ -420,7 +420,7 @@ doTest("Switch OMG and OMGWTF",
                  VISIBLE "IJKL"
          OIC
          KTHXBYE
-        """, printOutput=False)
+        """)
 
 doTest("Switch 1 omg",
        """
@@ -430,4 +430,4 @@ doTest("Switch 1 omg",
              VISIBLE "OMG"
          OIC
          KTHXBYE
-        """, printOutput=False)
+        """)

@@ -213,6 +213,8 @@ class ArithmeticNode(BinOpNode):
                 float(SYMBOL_TABLE[INPUT.token.val]["value"])
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
+            except TypeError:
+                raise ErrorSemantic(INPUT.token,"Variable contains Nothing. Unable to use Arithmetic operations on Nothing")
             
             return str(SYMBOL_TABLE[INPUT.token.val]["value"])
         elif isinstance(INPUT,YarnNode):
@@ -316,7 +318,10 @@ class AssignmentNode():
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": SYMBOL_TABLE[IT]["value"]}
 
         elif isinstance(EXPR, VariableNode):
-            SYMBOL_TABLE[str(VAR.token.val)] = {"type": SYMBOL_TABLE[IT]["type"], "value": SYMBOL_TABLE[IT]["value"]}
+            if EXPR.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(EXPR.token,"Variable not Initialized")
+            
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": SYMBOL_TABLE[EXPR.token.val]["type"], "value": SYMBOL_TABLE[EXPR.token.val]["value"]}
 
         elif isinstance(EXPR, TroofNode):
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.token.val}
