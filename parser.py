@@ -3,7 +3,7 @@ from nodes import *
 from error import *
 
 class Parser:
-    def __init__(self,txt_console,tbl_sym,  tokens) -> None:
+    def __init__(self, tokens,  txt_console=None, tbl_sym=None) -> None:
         self.tokens = tokens
         self.token_idx = -1
         self.txt_console = txt_console
