@@ -423,10 +423,10 @@ class Parser:
                     omg = self.current_tok
                     if omg.type in (TT_ELIF):
                         self.advance()
-                        value = self.literal()
+                        expr = self.statement()
                         self.advance()
                         ifbody = list(self.ifbody())
-                        yield ElseIfNode(omg, value, ifbody)
+                        yield ElseIfNode(omg, expr, ifbody)
                     elif omg.type in (TT_ELSE):
                         self.advance()
                         elsebody = list(self.ifbody())
