@@ -18,8 +18,7 @@ class Lexer(object):
     def __init__(self, skip_whitespace=True):
         rules = [
             # literal
-            # (r'(?<=\")[^\"]*(?=\")',                      TT_STRING),
-            (r'\"[^\"]*\"',                      TT_STRING),
+            (r'\"[^\"]*\"',                               TT_STRING),
             (r'\bTROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE\b',    TT_TYPE),
             (r'\bWIN|FAIL\b',                             TT_BOOLEAN),
             (r'\b-?\d+.\d+\b',                            TT_FLOAT),
@@ -86,7 +85,7 @@ class Lexer(object):
             (r'\bR\b',                                    TT_VAR_VAL_ASSIGN),
 
             #OTHERS
-            (r'\bOBTW\b',                        TT_COMMENT_MULTI_STRT),
+            (r'\bOBTW\b',                                 TT_COMMENT_MULTI_STRT),
             (r'\bTLDR\b',                                 TT_COMMENT_MULTI_END),
             (r'\bBTW\b',                                  TT_COMMENT_STRT),
             (r'\bMKAY\b',                                 TT_MKAY),
@@ -94,9 +93,7 @@ class Lexer(object):
             (r'\bYR\b',                                   TT_YR),
             (r'\bA\b',                                    TT_A),
             (r'\!',                                       TT_SUPPRESS_NEWLINE),
-            # (r'\"',                                       TT_STR_DELIMITER),
-
-            (r'\n|,',                                       TT_NEWLINE),
+            (r'\n|,',                                     TT_NEWLINE),
 
             #identifier
             (r'\b[a-zA-Z]\w*\b',                          TT_IDENTIFIER),
@@ -117,11 +114,7 @@ class Lexer(object):
         self.regex = re.compile('|'.join(regex_parts))
 
         #For white space checking
-        self.skip_whitespace = skip_whitespace
-        # self.regex_whitespace = re.compile('[^\s,]')
-        self.regex_whitespace = re.compile('[^ \t\v]')
-        self.regex_newline = re.compile('[\n]')
-        self.str = False
+        self.regex_whitespace = re.compile('[\S\r\n]')
 
     def input(self, buf):
         self.buf = buf
