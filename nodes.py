@@ -266,6 +266,12 @@ class ComparisonNode(BinOpNode):
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
 class BooleanNode():
+    def tobool(self,INPUT):
+        return True if self.check(INPUT) == "WIN" else FALSE
+    
+    def totroof(self,INPUT):
+        return "WIN" if INPUT else "FAIL"
+
     def check(self, INPUT):
         if isinstance(INPUT,TroofNode):
             return str(INPUT.token.val)
@@ -281,21 +287,22 @@ class BooleanNode():
             if VT[INPUT.token.val] not in ("WIN","FAIL"):
                 raise ErrorSemantic(INPUT.token,"Unable to use Boolean operations on Yarn")
 
-        return str(INPUT.token.val)
+        raise ErrorSemantic(INPUT.token,"Invalid value for boolean operations")
+        # return str(INPUT.token.val)
 
 class BooleanInfNode(UnaryOpNode, BooleanNode):
     def __init__(self, op_token, left, right):
         super().__init__(left,right)
-        output = self.check(left)
+        output = self.tobool(left)
         print(output)
         if op_token.type in (TT_AND_INF):
             for value in right:
-                output = output and self.check(value)
+                output = output and self.tobool(value)
         elif op_token.type in (TT_OR_INF):
             for value in right:
-                output = output or self.check(value)
+                output = output or self.tobool(value)
         
-        self.value = output
+        self.value = self.totroof(output)
         ST[0]["value"] = self.value
         VT["IT"] = ST[0]["value"]
         
