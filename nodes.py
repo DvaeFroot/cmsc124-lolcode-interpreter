@@ -243,6 +243,10 @@ class GimmehNode(UnaryOpNode):
         SYMBOL_TABLE[self.right.token.val]["type"] = YARN
         SYMBOL_TABLE[self.right.token.val]["value"] = answer
         
+        self.txt_console.configure(state=NORMAL)
+        self.txt_console.insert(INSERT,str(answer)+'\n')
+        self.txt_console.configure(state=DISABLED)
+        
 
 #SMOOSH
 class SmooshNode():
@@ -278,9 +282,10 @@ class SmooshNode():
 
 #VISIBLE
 class VisibleNode(UnaryOpNode):
-    def __init__(self, left, right, txt_console):
+    def __init__(self, left, right, txt_console, suppress):
         super().__init__(left, right)
         self.txt_console = txt_console
+        self.suppress = suppress
     
     def run(self):
         for value in self.right:
@@ -299,9 +304,11 @@ class VisibleNode(UnaryOpNode):
                 self.txt_console.configure(state=NORMAL)
                 self.txt_console.insert(INSERT,str(value.token.val))
                 self.txt_console.configure(state=DISABLED)
-        self.txt_console.configure(state=NORMAL)
-        self.txt_console.insert(INSERT,'\n')
-        self.txt_console.configure(state=DISABLED)
+        
+        if not self.suppress:
+            self.txt_console.configure(state=NORMAL)
+            self.txt_console.insert(INSERT,'\n')
+            self.txt_console.configure(state=DISABLED)
 
 
 class AssignmentNode():
