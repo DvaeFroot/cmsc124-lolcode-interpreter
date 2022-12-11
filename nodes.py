@@ -137,6 +137,7 @@ class YarnNode(BasicNode,LiteralNode):
     def __init__(self, token) -> None:
         super().__init__(token)
         self.value: str = str(token.val)
+        SYMBOL_TABLE[IT] = {"type": YARN, "value": self.value}
 
 #TRUE OR FALSE
 class TroofNode(BasicNode,LiteralNode):
@@ -152,6 +153,11 @@ class OperatorNode(BasicNode):
 class VariableNode(BasicNode):
     def __init__(self, token):
         super().__init__(token)
+
+    def run(self):
+        print(self.token)
+        SYMBOL_TABLE[IT] = {"type": SYMBOL_TABLE[self.token.val]['type'], "value": SYMBOL_TABLE[self.token.val]['value']}
+
 
 
 class StatementNode(UnaryOpNode):
@@ -328,6 +334,11 @@ class AssignmentNode():
 
         elif isinstance(EXPR, TypecastNode):
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.value}
+
+        elif EXPR.token.type in TT_INTEGER:
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": EXPR.value}
+        elif EXPR.token.type in TT_FLOAT:
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBR, "value": EXPR.value}
 
         else:
             if VAR.token.type not in TT_STRING:
@@ -572,11 +583,23 @@ class SwitchNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
+    def run(self):
+        for statement in self.right:
+            if statement.run():
+                break;
+
 
 #OMG VALUE STATEMENT
 class SwitchCaseNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
+
+    def run(self):
+        if SYMBOL_TABLE[IT]['value'] == self.middle.value:
+            for statement in self.right:
+                statement.run()
+            return True
+        return False
 
 
 #OMGWTF
@@ -584,6 +607,10 @@ class DefaultCaseNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
+    def run(self):
+        for statement in self.right:
+            statement.run()
+        return True
 
 #
 class CaseBreakNode(BasicNode):
@@ -604,6 +631,7 @@ class IfElseNode(DoubleOpNode):
 class IfNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
+
 
     def run(self):
         if SYMBOL_TABLE[IT]['value'] == "WIN":
