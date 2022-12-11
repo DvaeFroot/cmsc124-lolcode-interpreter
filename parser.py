@@ -393,32 +393,23 @@ class Parser:
             if var.type not in (TT_IDENTIFIER):
                 raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos {self.current_tok.pos}")
             cond = self.advance()
-            if cond.type in (TT_WHILE, TT_UNTIL):
-                self.advance()
-                cond_expr = self.expr()
-                self.advance()
-
-                codeblock = list(self.loopbody())
-                del_end = self.current_tok
-
-                if del_end.type not in (TT_LOOP_END):
-                    raise ErrorSyntax(self.current_tok,f"Expected IM OUTTA YR at pos {self.current_tok}")
-                label_end = self.advance()
-                if label_end.type not in (TT_IDENTIFIER):
-                    raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos{self.current_tok}")
-
-                res = LoopNodeLong(del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end)
-                return res
+            if cond.type not in (TT_WHILE, TT_UNTIL):
+                raise ErrorSyntax(self.current_tok,f"Expected WILE|TIL at pos {self.current_tok.pos}")
+            
+            self.advance()
+            cond_expr = self.expr()
+            self.advance()
 
             codeblock = list(self.loopbody())
             del_end = self.current_tok
+
             if del_end.type not in (TT_LOOP_END):
-                raise ErrorSyntax(self.current_tok,f"Expected IM OUTTA YR at pos {self.current_tok.pos}")
+                raise ErrorSyntax(self.current_tok,f"Expected IM OUTTA YR at pos {self.current_tok}")
             label_end = self.advance()
             if label_end.type not in (TT_IDENTIFIER):
-                raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+                raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos{self.current_tok}")
 
-            res = LoopNodeShort(del_start, label_start, operation, yr, var, codeblock, del_end, label_end)
+            res = LoopNodeLong(del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end)
             return res
 
 
