@@ -462,6 +462,17 @@ class BooleanNode():
             if SYMBOL_TABLE[INPUT.token.val]["value"] not in ("WIN","FAIL"):
                 raise ErrorSemantic(INPUT.token,"Unable to use Boolean operations on Yarn")
 
+        elif isinstance(INPUT, NumbrNode) or isinstance(INPUT, NumbarNode):
+            if INPUT.token.val == "0":
+                return "FAIL"
+            else:
+                return "WIN"
+
+        elif isinstance(INPUT, BooleanShortNode) or isinstance(INPUT, BooleanLongNode):
+            INPUT.run()
+            return SYMBOL_TABLE[IT]['value']
+
+
         raise ErrorSemantic(INPUT.token,"Invalid value for boolean operations")
 
 
