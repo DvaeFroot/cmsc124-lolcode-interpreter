@@ -320,7 +320,7 @@ class VisibleNode(UnaryOpNode):
         if not self.suppress:
             output.append('\n')
         
-        if self.txt_console is None: 
+        if self.txt_console is None:
             # CLI
             print("".join(output))
         else:
@@ -614,24 +614,28 @@ class SwitchNode(UnaryOpNode):
         super().__init__(left, right)
 
     def run(self):
+        gtfo = False
+        is_run = False
         for statement in self.right:
-            print(statement)
-            if statement.run():
-                break;
+            is_run, gtfo = statement.run(is_run, gtfo)
+            if not gtfo:
+                continue
+            if is_run:
+                break
 
 
 #OMG VALUE STATEMENT
 class SwitchCaseNode(DoubleOpNode):
-    def __init__(self, left, middle, right) -> None:
+    def __init__(self, left, middle, right, gtfo = None) -> None:
         super().__init__(left, middle, right)
+        self.gtfo = gtfo
 
-    def run(self):
-        print(SYMBOL_TABLE)
-        if SYMBOL_TABLE[IT]['value'] == self.middle.value:
+    def run(self, is_run, gtfo):
+        if SYMBOL_TABLE[IT]['value'] == self.middle.value or (is_run and not gtfo):
             for statement in self.right:
                 statement.run()
-            return True
-        return False
+            return True, True if self.gtfo != None else False
+        return False, False
 
 
 #OMGWTF
