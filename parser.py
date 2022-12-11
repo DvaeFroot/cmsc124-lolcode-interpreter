@@ -76,6 +76,7 @@ class Parser:
 
         raise ErrorSyntax(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")
 
+
     def concatenation(self):
         if self.current_tok.type in (TT_CONCAT):
             self.insideSmoosh = True
@@ -303,7 +304,7 @@ class Parser:
 
     def casebody(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type in (TT_BREAK, TT_CASE,TT_CONTROL_END):
+            if self.tokens[self.token_idx].type in (TT_BREAK, TT_CONTROL_END):
                  break
 
             if self.current_tok.type in (TT_CASEBREAK):

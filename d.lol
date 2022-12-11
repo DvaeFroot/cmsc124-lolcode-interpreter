@@ -3,7 +3,6 @@ I HAS A NAME ITZ "A"
 NAME, WTF?
    OMG "A"
       VISIBLE "ABCD"
-      GTFO
    OMG "E"
       VISIBLE "EFGH"
       GTFO

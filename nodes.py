@@ -3,13 +3,14 @@ from error import *
 from tkinter import *
 from tkinter import simpledialog
 
+IS_OPERATING = False
+
 IT = "IT"
 NOOB = "NOOB"
 NUMBAR = "NUMBAR"
 NUMBR = "NUMBR"
 YARN = "YARN"
 TROOF = "TROOF"
-
 
 def resetSymbolTable():
     global SYMBOL_TABLE
@@ -98,7 +99,7 @@ class Program(DoubleOpNode):
         for statement in self.middle:
             statement.run()
 
-        printST()
+        #  printST()
         
         if self.tbl_sym is not None:
             # clear previous items in the lexemes treeview
@@ -165,8 +166,8 @@ class VariableNode(BasicNode):
 
     def run(self):
         #  print(self.token)
-        #  SYMBOL_TABLE[IT] = {"type": SYMBOL_TABLE[self.token.val]['type'], "value": SYMBOL_TABLE[self.token.val]['value']}
-        pass
+        if not IS_OPERATING:
+            SYMBOL_TABLE[IT] = {"type": SYMBOL_TABLE[self.token.val]['type'], "value": SYMBOL_TABLE[self.token.val]['value']}
 
 
 class StatementNode(UnaryOpNode):
@@ -302,6 +303,8 @@ class VisibleNode(UnaryOpNode):
         self.suppress = suppress
 
     def run(self):
+        global IS_OPERATING
+        IS_OPERATING = True
         output = []
         for value in self.right:
             value.run()
@@ -325,6 +328,8 @@ class VisibleNode(UnaryOpNode):
             self.txt_console.configure(state=NORMAL)
             self.txt_console.insert(INSERT,"".join(output))
             self.txt_console.configure(state=DISABLED)
+
+        IS_OPERATING = False
 
 
 class AssignmentNode():
@@ -606,6 +611,7 @@ class SwitchNode(UnaryOpNode):
 
     def run(self):
         for statement in self.right:
+            print(statement)
             if statement.run():
                 break;
 
@@ -616,6 +622,7 @@ class SwitchCaseNode(DoubleOpNode):
         super().__init__(left, middle, right)
 
     def run(self):
+        print(SYMBOL_TABLE)
         if SYMBOL_TABLE[IT]['value'] == self.middle.value:
             for statement in self.right:
                 statement.run()

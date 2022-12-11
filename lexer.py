@@ -63,14 +63,14 @@ class Lexer(object):
             #CONTROL
             (r'\bO\sRLY\?',                               TT_IF),
             (r'\bYA\sRLY\b',                              TT_TRUTH),
+            (r'\bOMG\b',                                  TT_CASE),
             (r'\bOMGWTF\b',                               TT_BREAK),
+            (r'\bGTFO\b',                                 TT_CASEBREAK),
             (r'\bMEBBE\b',                                TT_ELIF),
             (r'\bWTF\?',                                  TT_SWITCH),
-            (r'\bGTFO\b',                                 TT_CASEBREAK),
             (r'\bWILE\b',                                 TT_WHILE),
-            (r'\bOIC\b',                                  TT_CONTROL_END),
-            (r'\bOMG\b',                                  TT_CASE),
             (r'\bTIL\b',                                  TT_UNTIL),
+            (r'\bOIC\b',                                  TT_CONTROL_END),
 
             (r'\bI\sIZ\b',                                TT_FUNCALL),
             (r'\bFOUND\b',                                TT_RETURN),
