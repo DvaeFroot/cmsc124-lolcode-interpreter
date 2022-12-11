@@ -21,7 +21,8 @@ class Parser:
         if not self.insideString and not self.insideSmoosh and self.current_tok.type in (TT_NEWLINE):
             self.advance()
         return self.current_tok
-    
+
+
     def seek(self):
         try:
             return self.tokens[self.token_idx+1]
