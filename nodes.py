@@ -167,6 +167,8 @@ class VariableNode(BasicNode):
     def run(self):
         #  print(self.token)
         if not IS_OPERATING:
+            if self.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(self.token,"Variable not Initialized")
             SYMBOL_TABLE[IT] = {"type": SYMBOL_TABLE[self.token.val]['type'], "value": SYMBOL_TABLE[self.token.val]['value']}
 
 
