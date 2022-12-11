@@ -193,7 +193,10 @@ class ArithmeticNode(BinOpNode):
             if isNumbar:
                 self.value = eval(left + "/" + right)
             else:
-                self.value = eval(left + "//" + right)
+                if not int(left) < int(right):
+                    self.value = eval(left + "//" + right)
+                else:
+                    self.value = float(left)/float(right)
         elif self.OP_TOKEN.type in (TT_MOD):
             self.value = eval(left + "%" + right)
         elif self.OP_TOKEN.type in (TT_MAX):
