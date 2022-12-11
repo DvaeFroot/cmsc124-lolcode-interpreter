@@ -505,7 +505,7 @@ class Parser:
 
     def body(self):
         while(self.token_idx+1 < len(self.tokens)):
-            if self.seekToken().type in (TT_CODE_END):
+            if self.seekToken().type in (TT_CODE_END) or self.current_tok.type in (TT_CODE_END):
                 break
             
             self.advance()
