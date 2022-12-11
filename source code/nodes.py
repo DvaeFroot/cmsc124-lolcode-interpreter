@@ -26,7 +26,7 @@ def toTroof(value):
 
 
 def toValue(inputValue):
-    if isinstance(inputValue,ArithmeticNode):
+    if isinstance(inputValue,(ArithmeticNode,ComparisonNode,BooleanNode)):
         return inputValue.value
     elif isinstance(inputValue, VariableNode):
         if inputValue.token.val not in SYMBOL_TABLE:
@@ -428,9 +428,9 @@ class ComparisonNode(BinOpNode):
         output = None
 
         if self.OP_TOKEN.type in (TT_EQU_OP):
-            output = left == right
+            output = eval(str(left) + "==" + str(right))
         elif self.OP_TOKEN.type in (TT_NEQU):
-            output = left != right
+            output = eval(str(left) + "!=" + str(right))
 
         self.value = toTroof(output)
         SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
@@ -441,7 +441,8 @@ class BooleanNode():
         if isinstance(INPUT, ComparisonNode):
             INPUT.run()
             return True if SYMBOL_TABLE[IT]['value'] == "WIN" else False
-
+        if isinstance(INPUT,NumbrNode):
+            return False if INPUT.value == 0 else True
         return True if self.check(INPUT) == "WIN" else False
 
     def totroof(self,INPUT):
