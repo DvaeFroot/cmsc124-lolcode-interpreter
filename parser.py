@@ -3,12 +3,14 @@ from nodes import *
 from error import *
 
 class Parser:
-    def __init__(self,txt_console,tbl_sym,  tokens) -> None:
+    def __init__(self, tokens,  txt_console=None, tbl_sym=None) -> None:
         self.tokens = tokens
         self.token_idx = -1
         self.txt_console = txt_console
         self.tbl_sym = tbl_sym
-
+        self.insideString = False
+        self.insideSmoosh = False
+        self.loop_token_idx = {}
 
     def advance(self):
         self.token_idx += 1
@@ -16,7 +18,15 @@ class Parser:
             self.current_tok = self.tokens[self.token_idx]
         if self.current_tok.type in (TT_COMMENT_STRT, TT_COMMENT_MULTI_STRT, TT_COMMENT_MULTI_END):
             self.advance()
+        if not self.insideString and not self.insideSmoosh and self.current_tok.type in (TT_NEWLINE):
+            self.advance()
         return self.current_tok
+    
+    def seekToken(self):
+        try:
+            return self.tokens[self.token_idx+1]
+        except Exception:
+            pass
 
 
     def parse(self):
@@ -39,16 +49,68 @@ class Parser:
 
     def print(self):
         if self.current_tok.type in (TT_OUTPUT):
+            self.insideString = True
             left = self.current_tok
 
-            self.advance()
-            right = self.expr()
-
-            res = VisibleNode(left, right, self.txt_console)
+            right = []
+            suppress = False
+            while 1:
+                self.advance()
+                temptok = self.current_tok
+                exproutput = self.expr(raiseError=False)
+                if exproutput == None:
+                    if self.current_tok.type in (TT_SUPPRESS_NEWLINE):
+                        self.advance()
+                        temptok = self.current_tok
+                        suppress = True
+                    if self.current_tok.type not in (TT_NEWLINE):
+                        raise ErrorSyntax(self.current_tok, f"Expected Delimiter at pos {self.current_tok.pos}")
+                    self.token_idx -= 1
+                    self.current_tok = temptok
+                    break
+                
+                right.append(exproutput)
+            self.insideString = False
+            res = VisibleNode(left, right, self.txt_console, suppress)
             return res
 
         raise ErrorSyntax(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")
 
+
+    def concatenation(self):
+        if self.current_tok.type in (TT_CONCAT):
+            self.insideSmoosh = True
+            
+            op_token = self.current_tok
+
+            self.advance()
+            left = self.expr()
+
+            right = []
+            while 1:
+                an = self.advance()
+                if an.type not in (TT_ARG_SEP):
+                    raise ErrorSyntax(self.current_tok, f"Expected AN at pos {self.current_tok.pos}")
+                self.advance()
+                temptok = self.current_tok
+                exproutput = self.expr(raiseError=False)
+                if exproutput == None:
+                    self.token_idx -= 1
+                    self.current_tok = temptok
+                    break
+                
+                right.append(exproutput)
+
+                if self.seekToken().type in (TT_NEWLINE):
+                    break
+                
+            self.insideSmoosh = False
+            res = SmooshNode(left, right)
+            return res
+
+        raise ErrorSyntax(self.current_tok, f"Expected VISIBLE at pos {self.current_tok.pos}")
+
+        pass
 
     def get_input(self):
         if self.current_tok.type in (TT_READ):
@@ -76,8 +138,8 @@ class Parser:
             return res
 
 
-    def expr(self):
-        if self.current_tok.type in (GP_ARITHMETIC):
+    def expr(self,raiseError=True):
+        if self.current_tok.type in GP_ARITHMETIC:
             op_token = self.current_tok
 
             self.advance()
@@ -101,15 +163,21 @@ class Parser:
         elif self.current_tok.type in (TT_BOOLEAN):
             return TroofNode(self.current_tok)
         elif self.current_tok.type in (TT_IDENTIFIER):
-            print("Hello")
             return VariableNode(self.current_tok)
         elif self.current_tok.type in (GP_COMPARISON):
             return self.comparison()
-        elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
+        elif self.current_tok.type in (*GP_BOOLEAN_LONG, GP_BOOLEAN_SHORT, *GP_BOOLEAN_INF):
             return self.boolean()
+        elif self.current_tok.type in (TT_CONCAT):
+            return self.concatenation()
+        elif self.current_tok.type in (TT_TYPECAST_2):
+            return self.typecast()
 
-        raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
 
+        if raiseError:
+            raise ErrorSyntax(self.current_tok, f"Expected SUM OF or DIFF OF or OR PRODUKT OF or QUOSHUNT OF or NERFIN or UPPIN or BIGGR or SMALLR or Float or Integer or \" or Boolean or BOTH SAEM or NOT BOTH SAEM at pos {self.current_tok.pos}")
+        else:
+            return None
 
     def variableLong(self):
         if self.current_tok.type in (TT_VAR_DEC):
@@ -119,7 +187,7 @@ class Parser:
             if variable.type not in (TT_IDENTIFIER):
                 raise ErrorSyntax(self.current_tok, f"Expected IDENTIFIER at pos {self.current_tok.pos}")
             variable = VariableNode(self.current_tok)
-            itz = self.tokens[self.token_idx+1]
+            itz = self.seekToken()
             if itz.type not in (TT_VAR_ASSIGN):
                 res = AssignmentShlongNode(ihasa_token, variable)
                 return res
@@ -150,6 +218,16 @@ class Parser:
             res = AssignmentShortNode(variable, r, expr)
             return res
 
+    def variable(self):
+        if self.current_tok.type in (TT_IDENTIFIER):
+
+            variable = self.current_tok
+            if variable.type not in (TT_IDENTIFIER):
+                raise ErrorSyntax(self.current_tok, f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+
+            res = VariableNode(self.current_tok)
+            return res
+
 
     def typecast(self):
         if self.current_tok.type in (TT_TYPECAST_2):
@@ -176,7 +254,36 @@ class Parser:
 
 
     def boolean(self):
-        if self.current_tok.type in (GP_BOOLEAN_LONG):
+        if self.current_tok.type in GP_BOOLEAN_INF:
+            op_token = self.current_tok
+
+            self.advance()
+            left = self.expr()
+
+            right = []
+            while 1:
+                an = self.advance()
+                if an.type not in (TT_ARG_SEP):
+                    raise ErrorSyntax(self.current_tok, f"Expected AN at pos {self.current_tok.pos}")
+                self.advance()
+                temptok = self.current_tok
+                exproutput = self.expr(raiseError=False)
+                if exproutput == None:
+                    self.token_idx -= 1
+                    self.current_tok = temptok
+                    break
+
+                right.append(exproutput)
+
+                if self.seekToken().type in (TT_MKAY):
+                    self.advance()
+                    break
+                elif self.seekToken().type in (TT_NEWLINE):
+                    break
+
+            res = BooleanInfNode(op_token, left, right)
+            return res
+        elif self.current_tok.type in GP_BOOLEAN_LONG:
             op_token = self.current_tok
             self.advance()
             expr1 = self.expr()
@@ -187,7 +294,7 @@ class Parser:
             expr2 = self.expr()
             res = BooleanLongNode(op_token, expr1, an, expr2)
             return res
-        elif self.current_tok.type in (GP_BOOLEAN_SHORT):
+        elif self.current_tok.type in (TT_NOT):
             op_token = self.current_tok
             self.advance()
             expr = self.expr()
@@ -197,9 +304,9 @@ class Parser:
 
     def casebody(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type in (TT_BREAK, TT_CASE,TT_CONTROL_END):
-                 break
-            
+            if self.tokens[self.token_idx].type in (TT_BREAK, TT_CONTROL_END, TT_CASE):
+                break
+
             if self.current_tok.type in (TT_CASEBREAK):
                 yield CaseBreakNode(self.current_tok)
             else:
@@ -211,20 +318,20 @@ class Parser:
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_CONTROL_END):
                 break
-            
+
             omg = self.current_tok
             if omg.type in (TT_BREAK):
                 self.advance()
                 casebody = list(self.casebody())
                 yield DefaultCaseNode(omg, casebody)
                 break
-            
+
             self.advance()
             value = self.literal()
             self.advance()
             casebody = list(self.casebody())
             yield SwitchCaseNode(omg, value, casebody)
-            
+
 
     def switch(self):
         if self.current_tok.type in (TT_SWITCH):
@@ -249,18 +356,44 @@ class Parser:
             qt2 = self.advance()
             if qt2.type not in (TT_STR_DELIMITER):
                 raise ErrorSyntax(self.current_tok, f"Expected \" at pos {self.current_tok.pos}")
-            res = StringNode(string)
+            res = YarnNode(string)
             return res
         return ErrorSyntax(self.current_tok, f"Expected \" at pos {self.current_tok.pos}")
 
 
-    def loopbody(self):
+# helper function for storing start and end token index of loops; to be stored in dictionary "self.loop_token_idx"
+# input:
+#  - label: String; start_label of loops
+# output:
+#  - self.loop_token_idx[label]: array; (starting index, ending index)
+    def loopbody(self, label):
+        self.loop_token_idx[label.val] = []
+        self.loop_token_idx[label.val].append(self.token_idx-1) #start index of loop
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_LOOP_END):
-                break
-            
-            yield self.statement()
+                if self.tokens[self.token_idx+1].type not in (TT_IDENTIFIER):
+                    raise ErrorSyntax(self.tokens[self.token_idx+1],f"Expected IDENTIFIER at pos{self.tokens[self.token_idx+1]}")
+                if label.val == self.tokens[self.token_idx+1].val:
+                    self.loop_token_idx[label.val].append(self.token_idx) #end index of loop
+                    break
+                else:
+                    pass # IM OUTTA YR encountered but wrong label
+                # if self.tokens[self.token_idx + 1].type in (TT_LOOP_END):
+            # yield self.statement()
             self.advance()
+        return self.loop_token_idx[label.val]
+
+
+# execution of loop codeblock
+    def executeLoop(self, start, end):
+        # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~entered loop")
+        self.token_idx = start
+        while(self.token_idx+1 < end):
+            # print(f'{self.token_idx} : {self.tokens[self.token_idx]}')
+            if self.tokens[self.token_idx+1].type in (TT_CODE_END):
+                break
+            self.advance()
+            self.statement()
 
     def loop(self):
         if self.current_tok.type in (TT_LOOP_STRT):
@@ -268,50 +401,66 @@ class Parser:
             label_start = self.advance()
             if label_start.type not in (TT_IDENTIFIER):
                 raise ErrorSyntax(self.current_tok, f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+            if label_start.val in self.loop_token_idx:
+                raise ErrorSyntax(self.current_tok,"Loop IDENTIFIER same as outer loop")
+            
             operation = self.advance()
             if operation.type not in (TT_INC, TT_DEC):
                 raise ErrorSyntax(self.current_tok,f"Expected UPPIN OR NERFIN at pos {self.current_tok.pos}")
+
             yr = self.advance()
             if yr.type not in (TT_YR):
                 raise ErrorSyntax(self.current_tok,f"Expected YR at pos {self.current_tok.pos}")
+
             var = self.advance()
             if var.type not in (TT_IDENTIFIER):
                 raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+
             cond = self.advance()
             if cond.type in (TT_WHILE, TT_UNTIL):
                 self.advance()
                 cond_expr = self.expr()
+
                 self.advance()
 
-                codeblock = list(self.loopbody())
+                codeblock = self.loopbody(label_start)
+                
                 del_end = self.current_tok
 
                 if del_end.type not in (TT_LOOP_END):
                     raise ErrorSyntax(self.current_tok,f"Expected IM OUTTA YR at pos {self.current_tok}")
+
                 label_end = self.advance()
                 if label_end.type not in (TT_IDENTIFIER):
                     raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos{self.current_tok}")
+                if label_start.val != label_end.val:
+                    raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER \"{label_start.val}\" at pos{self.current_tok}")
 
-                res = LoopNodeLong(del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end)
-                return res
+                loopNode = LoopNodeLong(del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end)
+                while(loopNode.execute()):
+                    self.executeLoop(loopNode.codeblock[0], loopNode.codeblock[1])
+                    loopNode.next()
 
-            codeblock = list(self.loopbody())
-            del_end = self.current_tok
-            if del_end.type not in (TT_LOOP_END):
-                raise ErrorSyntax(self.current_tok,f"Expected IM OUTTA YR at pos {self.current_tok.pos}")
-            label_end = self.advance()
-            if label_end.type not in (TT_IDENTIFIER):
-                raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+                self.loop_token_idx.popitem()
+                self.advance()
 
-            res = LoopNodeShort(del_start, label_start, operation, yr, var, codeblock, del_end, label_end)
-            return res
+            # codeblock = list(self.loopbody())
+            # del_end = self.current_tok
+            # if del_end.type not in (TT_LOOP_END):
+            #     raise ErrorSyntax(self.current_tok,f"Expected IM OUTTA YR at pos {self.current_tok.pos}")
+            # label_end = self.advance()
+            # if label_end.type not in (TT_IDENTIFIER):
+            #     raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+
+            # res = LoopNodeShort(del_start, label_start, operation, yr, var, codeblock, del_end, label_end)
+            # return res
 
 
     def ifbody(self):
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_ELIF, TT_ELSE, TT_CONTROL_END):
                 break
-            
+
             yield self.statement()
             self.advance()
 
@@ -326,10 +475,10 @@ class Parser:
                     omg = self.current_tok
                     if omg.type in (TT_ELIF):
                         self.advance()
-                        value = self.literal()
+                        expr = self.statement()
                         self.advance()
                         ifbody = list(self.ifbody())
-                        yield ElseIfNode(omg, value, ifbody)
+                        yield ElseIfNode(omg, expr, ifbody)
                     elif omg.type in (TT_ELSE):
                         self.advance()
                         elsebody = list(self.ifbody())
@@ -347,7 +496,7 @@ class Parser:
             oic = self.current_tok
             if oic.type not in (TT_CONTROL_END):
                 raise ErrorSyntax(self.current_tok,f"Expected OIC at pos {self.current_tok.pos}")
-            res = IfNode(op_token, expr)
+            res = IfElseNode(op_token, expr, oic)
             return res
         else:
             raise ErrorSyntax(self.current_tok,f"Expected IF at pos {self.current_tok.pos}")
@@ -364,10 +513,13 @@ class Parser:
         elif self.current_tok.type in (TT_VAR_DEC):
             res = self.variableLong()
         elif self.current_tok.type in (TT_IDENTIFIER):
-            res = self.variableShort()
+            if self.tokens[self.token_idx+1].type in (TT_VAR_VAL_ASSIGN):
+                res = self.variableShort()
+            else:
+                res = self.variable()
         elif self.current_tok.type in (GP_COMPARISON):
             res = self.comparison()
-        elif self.current_tok.type in (GP_BOOLEAN_LONG+GP_BOOLEAN_SHORT):
+        elif self.current_tok.type in (*GP_BOOLEAN_LONG, *GP_BOOLEAN_SHORT, *GP_BOOLEAN_INF):
             res = self.boolean()
         elif self.current_tok.type in (TT_TYPECAST_2):
             res = self.typecast()
@@ -379,13 +531,15 @@ class Parser:
             res = self.loop()
         elif self.current_tok.type in (TT_IF):
             res = self.ifelse()
+        elif self.current_tok.type in (TT_CONCAT):
+            res = self.concatenation()
 
         return StatementNode("",res)
 
 
     def body(self):
         while(self.token_idx+1 < len(self.tokens)):
-            if self.tokens[self.token_idx+1].type in (TT_CODE_END):
+            if self.seekToken().type in (TT_CODE_END):
                 break
             
             self.advance()
@@ -394,6 +548,7 @@ class Parser:
 
     def code(self):
         try:
+            resetSymbolTable()
             #Start of code
             start_node = self.advance()
             
@@ -403,7 +558,7 @@ class Parser:
             body_node = list(self.body())
 
             #End of code
-            end_node = self.advance()
+            end_node = self.current_tok
 
             if end_node.type not in (TT_CODE_END):
                 raise ErrorSyntax(self.current_tok, f"Expected KTHBYE at pos {self.current_tok.pos}")

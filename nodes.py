@@ -3,8 +3,41 @@ from error import *
 from tkinter import *
 from tkinter import simpledialog
 
-ST = [{"type": "IT", "value": None}]
-VT = {"IT": None}
+IS_OPERATING = False
+
+IT = "IT"
+NOOB = "NOOB"
+NUMBAR = "NUMBAR"
+NUMBR = "NUMBR"
+YARN = "YARN"
+TROOF = "TROOF"
+
+def resetSymbolTable():
+    global SYMBOL_TABLE
+    SYMBOL_TABLE = {}
+
+
+def toBool(value):
+    return True if value == "WIN" else False
+
+
+def toTroof(value):
+    return "WIN" if value else "FAIL"
+
+
+def toValue(inputValue):
+    if isinstance(inputValue,ArithmeticNode):
+        return str(inputValue.value)
+    elif isinstance(inputValue, VariableNode):
+        if inputValue.token.val not in SYMBOL_TABLE:
+            raise ErrorSemantic(inputValue.token,"Variable not Initialized")
+
+        return str(SYMBOL_TABLE[inputValue.token.val]["value"])
+    elif isinstance(inputValue,TroofNode):
+        return inputValue.token.val
+
+    return inputValue.token.val
+
 
 class BasicNode:
     def __init__(self,token):
@@ -12,6 +45,9 @@ class BasicNode:
 
     def __repr__(self) -> str:
         return f'({self.token})'
+
+    def run(self):
+        pass
 
 
 class UnaryOpNode:
@@ -21,6 +57,9 @@ class UnaryOpNode:
 
     def __repr__(self) -> str:
         return f'({self.left}, {self.right})'
+
+    def run(self):
+        pass
 
 
 class BinOpNode:
@@ -33,6 +72,9 @@ class BinOpNode:
     def __repr__(self) -> str:
         return f'({self.OP_TOKEN}, {self.EXPR1}, {self.AN}, {self.EXPR2})'
 
+    def run(self):
+        pass
+
 
 class DoubleOpNode:
     def __init__(self, left, middle, right) -> None:
@@ -43,38 +85,74 @@ class DoubleOpNode:
     def __repr__(self) -> str:
         return f'({self.left}, {self.middle}, {self.right})'
 
+    def run(self):
+        pass
+
 
 class Program(DoubleOpNode):
     def __init__(self, start_node, body_node,end_node, tbl_sym) -> None:
         super().__init__(start_node, body_node, end_node)
-        printST()
-        print(VT)
-        # clear previous items in the lexemes treeview
-        for x in tbl_sym.get_children():
-            tbl_sym.delete(x)
-        for index,key in enumerate(VT):
-            tbl_sym.insert("",'end',iid=index,
-            values=(key,VT[key]))
+        self.tbl_sym = tbl_sym
+        self.run()
+
+    def run(self):
+        for statement in self.middle:
+            statement.run()
+
+        #  printST()
+        
+        if self.tbl_sym is not None:
+            # clear previous items in the lexemes treeview
+            for x in self.tbl_sym.get_children():
+                self.tbl_sym.delete(x)
+            
+            for index,key in enumerate(SYMBOL_TABLE):
+                if SYMBOL_TABLE[key]["type"] == YARN:
+                    self.tbl_sym.insert("",'end',iid=index,
+                    values=(key,"\""+str(SYMBOL_TABLE[key]["value"])+"\""))
+                else:
+                    self.tbl_sym.insert("",'end',iid=index,
+                    values=(key,SYMBOL_TABLE[key]["value"]))
 
 
-class NoobNode(BasicNode):
+class LiteralNode:
+    def run(self):
+        pass
+
+
+# NULL
+class NoobNode(LiteralNode):
+    def __init__(self):
+        self.value: None = None
+
+
+# INTEGERS
+class NumbrNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
+        self.value: int = int(token.val)
 
 
-class NumbrNode(BasicNode):
+# FLOATS
+class NumbarNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
+        self.value: float = float(token.val)
 
 
-class NumbarNode(BasicNode):
+#"STRINGBODY"
+class YarnNode(BasicNode,LiteralNode):
+    def __init__(self, token) -> None:
+        super().__init__(token)
+        self.value: str = str(token.val)
+        #  SYMBOL_TABLE[IT] = {"type": YARN, "value": self.value}
+
+
+#TRUE OR FALSE
+class TroofNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
-
-
-class YarnNode(BasicNode):
-    def __init__(self, token):
-        super().__init__(token)
+        self.value = True if self.token.val == "WIN" else False
 
 
 class OperatorNode(BasicNode):
@@ -86,51 +164,82 @@ class VariableNode(BasicNode):
     def __init__(self, token):
         super().__init__(token)
 
+    def run(self):
+        #  print(self.token)
+        if not IS_OPERATING:
+            if self.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(self.token,"Variable not Initialized")
+            SYMBOL_TABLE[IT] = {"type": SYMBOL_TABLE[self.token.val]['type'], "value": SYMBOL_TABLE[self.token.val]['value']}
+
 
 class StatementNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
+    def run(self):
+        if self.right != None:
+            self.right.run()
+
+
 #ARITHMETICOP EXPR AN EXPR
 class ArithmeticNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        left = self.check(EXPR1)
-        right = self.check(EXPR2)
 
-        if OP_TOKEN.type in (TT_SUMMATION):
-            ST[0]["value"] = eval(left + "+" + right)
-        elif OP_TOKEN.type in (TT_SUB):
-            ST[0]["value"] = eval(left + "-" + right)
-        elif OP_TOKEN.type in (TT_MUL_OP):
-            ST[0]["value"] = eval(left + "*" + right)
-        elif OP_TOKEN.type in (TT_DIV_OP):
-            ST[0]["value"] = eval(left + "/" + right)
-        elif OP_TOKEN.type in (TT_MOD):
-            ST[0]["value"] = eval(left + "%" + right)
-        elif OP_TOKEN.type in (TT_MAX):
-            ST[0]["value"] = max((eval(left),eval(right)))
-        elif OP_TOKEN.type in (TT_MIN):
-            ST[0]["value"] = min((eval(left),eval(right)))
+    def run(self):
+        self.EXPR1.run()
+        self.EXPR2.run()
 
-        self.value=ST[0]["value"]
-        VT["IT"] = ST[0]["value"]
-    
+        left = self.check(self.EXPR1)
+        right = self.check(self.EXPR2)
+        
+        isNumbar = self.isNumbar(left) or self.isNumbar(right)
+
+        if self.OP_TOKEN.type in (TT_SUMMATION):
+            self.value = eval(left + "+" + right)
+        elif self.OP_TOKEN.type in (TT_SUB):
+            self.value = eval(left + "-" + right)
+        elif self.OP_TOKEN.type in (TT_MUL_OP):
+            self.value = eval(left + "*" + right)
+        elif self.OP_TOKEN.type in (TT_DIV_OP):
+            if isNumbar:
+                self.value = eval(left + "/" + right)
+            else:
+                if not int(left) < int(right):
+                    self.value = eval(left + "//" + right)
+                else:
+                    self.value = float(left)/float(right)
+        elif self.OP_TOKEN.type in (TT_MOD):
+            self.value = eval(left + "%" + right)
+        elif self.OP_TOKEN.type in (TT_MAX):
+            self.value = max((eval(left),eval(right)))
+        elif self.OP_TOKEN.type in (TT_MIN):
+            self.value = min((eval(left),eval(right)))
+
+        if isNumbar:
+            SYMBOL_TABLE[IT] = {"type": NUMBAR, "value": self.value}
+        else:
+            SYMBOL_TABLE[IT] = {"type": NUMBR, "value": self.value}
+
+    def isNumbar(self, value:str):
+        return True if "." in value else False
+
     def check(self, INPUT):
         if isinstance(INPUT,ArithmeticNode):
             return str(INPUT.value)
         elif isinstance(INPUT, VariableNode):
-            if INPUT.token.val not in VT:
+            if INPUT.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(INPUT.token,"Variable not Initialized")
             try:
-                int(VT[INPUT.token.val])
-                float(VT[INPUT.token.val])
+                float(SYMBOL_TABLE[INPUT.token.val]["value"])
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
-            return str(VT[INPUT.token.val])
-        elif isinstance(INPUT,StringNode):
+            except TypeError:
+                raise ErrorSemantic(INPUT.token,"Variable contains Nothing. Unable to use Arithmetic operations on Nothing")
+
+            return str(SYMBOL_TABLE[INPUT.token.val]["value"])
+        elif isinstance(INPUT,YarnNode):
             try:
-                int(INPUT.token.val)
                 float(INPUT.token.val)
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Unable to use Arithmetic operations on Yarn")
@@ -142,145 +251,363 @@ class ArithmeticNode(BinOpNode):
 class GimmehNode(UnaryOpNode):
     def __init__(self, left, right, txt_console):
         super().__init__(left, right)
-        if right.token.val not in VT:
-            raise ErrorSemantic(right.token,"Variable not Initialized")
-        answer = simpledialog.askstring("Input", f"Value for: {right.token.val}")
-        ST[0]["value"] = answer
-        VT["IT"] = ST[0]["value"]
-        VT[right.token.val] = answer
+        self.txt_console = txt_console
+
+    def run(self):
+        if self.right.token.val not in SYMBOL_TABLE:
+            raise ErrorSemantic(self.right.token,"Variable not Initialized")
+        answer = simpledialog.askstring("Input", f"Value for: {self.right.token.val}")
+
+        SYMBOL_TABLE[IT] = {"type": YARN, "value": answer}
+        SYMBOL_TABLE[self.right.token.val]["type"] = YARN
+        SYMBOL_TABLE[self.right.token.val]["value"] = answer
+
+        self.txt_console.configure(state=NORMAL)
+        self.txt_console.insert(INSERT,str(answer)+'\n')
+        self.txt_console.configure(state=DISABLED)
+
+
+#SMOOSH
+class SmooshNode(UnaryOpNode):
+    def __init__(self, left, right):
+        super().__init__(left, right)
+
+    def run(self):
+        self.left.run()
+
+        valueList = []
+        valueList.append(self.check(self.left))
+
+        for value in self.right:
+            value.run()
+            valueList.append(self.check(value))
+
+        self.value = ''.join(valueList)
+
+        SYMBOL_TABLE[IT] = {"type": YARN, "value": self.value}
+
+    def check(self,value):
+        if isinstance(value, VariableNode):
+            if value.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(value.token,"Variable not Initialized")
+            return str(SYMBOL_TABLE[value.token.val]["value"])
+        elif isinstance(value,BooleanNode):
+            return str(value.value)
+        else:
+            return str(value.token.val)
 
 
 #VISIBLE
 class VisibleNode(UnaryOpNode):
-    def __init__(self, left, right, txt_console):
+    def __init__(self, left, right, txt_console, suppress):
         super().__init__(left, right)
-        if isinstance(right, VariableNode):
-            if right.token.val not in VT:
-                raise ErrorSemantic(right.token,"Variable not Initialized")
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(VT[right.token.val])+'\n')
-            txt_console.configure(state=DISABLED)
-        elif isinstance(right,BooleanNode):
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(right.value)+'\n')
-            txt_console.configure(state=DISABLED)
+        self.txt_console = txt_console
+        self.suppress = suppress
+
+    def run(self):
+        global IS_OPERATING
+        IS_OPERATING = True
+        output = []
+        for value in self.right:
+            value.run()
+            if isinstance(value, VariableNode):
+                if value.token.val not in SYMBOL_TABLE:
+                    raise ErrorSemantic(value.token,"Variable not Initialized")
+                output.append(str(SYMBOL_TABLE[value.token.val]["value"]))
+            elif isinstance(value,(BooleanNode, SmooshNode, ArithmeticNode, ComparisonNode)):
+                output.append(str(value.value))
+            else:
+                output.append(str(value.token.val))
+        
+        if not self.suppress:
+            output.append('\n')
+        
+        if self.txt_console is None: 
+            # CLI
+            print("".join(output))
         else:
-            txt_console.configure(state=NORMAL)
-            txt_console.insert(INSERT,str(right.token.val)+'\n')
-            txt_console.configure(state=DISABLED)
+            # GUI
+            self.txt_console.configure(state=NORMAL)
+            self.txt_console.insert(INSERT,"".join(output))
+            self.txt_console.configure(state=DISABLED)
+
+        IS_OPERATING = False
 
 
 class AssignmentNode():
     def assign(self,VAR,EXPR):
-        if EXPR is None:
-            ST.append({"type": "variable", "token": VAR.token.val, "value": None})
-            VT[str(VAR.token.val)] = None
-        
+        if EXPR == None:
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": None, "value": None}
+            
         elif isinstance(EXPR, ArithmeticNode):
-            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
-            VT[str(VAR.token.val)] = ST[0]["value"]
-        
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": SYMBOL_TABLE[IT]["value"]}
+
         elif isinstance(EXPR, BooleanNode):
-            ST.append({"type": "variable", "token": VAR.token.val, "value": ST[0]["value"]})
-            VT[str(VAR.token.val)] = ST[0]["value"]
-        
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": SYMBOL_TABLE[IT]["value"]}
+
+        elif isinstance(EXPR, VariableNode):
+            if EXPR.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(EXPR.token,"Variable not Initialized")
+            
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": SYMBOL_TABLE[EXPR.token.val]["type"], "value": SYMBOL_TABLE[EXPR.token.val]["value"]}
+
+        elif isinstance(EXPR, TroofNode):
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.token.val}
+
+        elif isinstance(EXPR, TypecastNode):
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.value}
+
+        elif EXPR.token.type in TT_INTEGER:
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": EXPR.value}
+        elif EXPR.token.type in TT_FLOAT:
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBR, "value": EXPR.value}
+
         else:
-            ST.append({"type": "variable", "token": VAR.token.val, "value": EXPR.token.val})
-            ST[0]["value"] = EXPR.token.val
             if VAR.token.type not in TT_STRING:
                 if VAR.token.val.isdigit():
-                    VT[VAR.token.val] = eval(EXPR.token.val)
-            VT[str(VAR.token.val)] = EXPR.token.val
+                    SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": eval(EXPR.token.val)}
+
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": YARN, "value": EXPR.token.val}
+
 
 #I HAS A Variable
 class AssignmentShlongNode(UnaryOpNode,AssignmentNode):
     def __init__(self, IHASA, VAR):
         super().__init__(IHASA, VAR)
-        self.assign(VAR,None)
+
+    def run(self):
+        self.assign(self.right, None)
 
 
 #I HAS A VAR ITZ EPXR
 class AssignmentLongNode(BinOpNode,AssignmentNode):
     def __init__(self, IHASA, VAR, ITZ, EXPR) -> None:
         super().__init__(IHASA, VAR, ITZ, EXPR)
-        self.assign(VAR,EXPR)
+
+    def run(self):
+        self.EXPR2.run()
+        self.assign(self.EXPR1,self.EXPR2)
 
 
 #VAR R EXPR
 class AssignmentShortNode(DoubleOpNode,AssignmentNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
-        self.assign(left,right)
+
+    def run(self):
+        self.right.run()
+        self.assign(self.left,self.right)
 
 
 #OPERATION EXPR AN EXPR
 class ComparisonNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
+        self.op_token = OP_TOKEN
+        self.expr1 = EXPR1
+        self.an = AN
+        self.expr2 = EXPR2
+
+    def run(self):
+        self.EXPR1.run()
+        self.EXPR2.run()
+
+        left = toValue(self.EXPR1)
+        right = toValue(self.EXPR2)
+        output = None
+
+        if self.OP_TOKEN.type in (TT_EQU_OP):
+            output = left == right
+        elif self.OP_TOKEN.type in (TT_NEQU):
+            output = left != right
+
+        self.value = toTroof(output)
+        SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
+
 
 class BooleanNode():
+    def tobool(self,INPUT):
+        if isinstance(INPUT, ComparisonNode):
+            INPUT.run()
+            return True if SYMBOL_TABLE[IT]['value'] == "WIN" else False
+
+        return True if self.check(INPUT) == "WIN" else False
+
+    def totroof(self,INPUT):
+        return "WIN" if INPUT else "FAIL"
+
     def check(self, INPUT):
         if isinstance(INPUT,TroofNode):
             return str(INPUT.token.val)
         elif isinstance(INPUT, VariableNode):
-            if INPUT.token.val not in VT:
+            if INPUT.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(INPUT.token,"Variable not Initialized")
-            
-            if VT[INPUT.token.val] not in ("WIN","FAIL"):
+
+            if SYMBOL_TABLE[INPUT.token.val]["value"] not in ("WIN","FAIL"):
                 raise ErrorSemantic(INPUT.token,"Variable contain Yarn. Unable to use Boolean operations on Yarn")
-            
-            return str(VT[INPUT.token.val])
-        elif isinstance(INPUT,StringNode):
-            if VT[INPUT.token.val] not in ("WIN","FAIL"):
+
+            return str(SYMBOL_TABLE[INPUT.token.val])
+        elif isinstance(INPUT,YarnNode):
+            if SYMBOL_TABLE[INPUT.token.val]["value"] not in ("WIN","FAIL"):
                 raise ErrorSemantic(INPUT.token,"Unable to use Boolean operations on Yarn")
 
-        return str(INPUT.token.val)
+        raise ErrorSemantic(INPUT.token,"Invalid value for boolean operations")
+
+
+class BooleanInfNode(UnaryOpNode, BooleanNode):
+    def __init__(self, op_token, left, right):
+        super().__init__(left,right)
+        self.op_token = op_token
+
+    def run(self):
+        self.left.run()
+
+        output = self.tobool(self.left)
+        if self.op_token.type in (TT_AND_INF):
+            for value in self.right:
+                value.run()
+                output = output and self.tobool(value)
+        elif self.op_token.type in (TT_OR_INF):
+            for value in self.right:
+                value.run()
+                output = output or self.tobool(value)
+
+        self.value = self.totroof(output)
+        SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
+
 
 #
 class BooleanLongNode(BinOpNode,BooleanNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        left = self.check(EXPR1)
-        right = self.check(EXPR2)
+
+    def run(self):
+        self.EXPR1.run()
+        self.EXPR2.run()
+
+        leftval = self.check(self.EXPR1)
+        rightval = self.check(self.EXPR2)
+        left = True if leftval == "WIN" else False
+        right = True if rightval == "WIN" else False
+
         output = None
 
-        if OP_TOKEN.type in (TT_AND):
+        if self.OP_TOKEN.type in (TT_AND):
             output = left and right
-        elif OP_TOKEN.type in (TT_OR_OP):
+        elif self.OP_TOKEN.type in (TT_OR_OP):
             output = left or right
-        elif OP_TOKEN.type in (TT_XOR):
+        elif self.OP_TOKEN.type in (TT_XOR):
             output = not (left or right)
-        
-        ST[0]["value"] = "WIN" if output else "FAIL"
-        self.value = ST[0]["value"]
-        VT["IT"] = ST[0]["value"]
+
+        self.value = "WIN" if output else "FAIL"
+        SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
 
 
 #OPERATION EXPR
 class BooleanShortNode(UnaryOpNode,BooleanNode):
     def __init__(self, left, right):
         super().__init__(left, right)
-        val = self.check(right)
-        output = None
 
-        if left.type in (TT_NOT):
-            output = not val
-        
-        ST[0]["value"] = "WIN" if output else "FAIL"
-        self.value = ST[0]["value"]
-        VT["IT"] = ST[0]["value"]
+    def run(self):
+        self.right.run()
+
+        val = self.check(self.right)
+        output = not val
+
+        self.value = "WIN" if output else "FAIL"
+        SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
+
+
+class TypecastNode:
+    def run(self,expr,token):
+        expr.run()
+        """ FIX ME PROPERLY """
+        try:
+            token.run()
+        except:
+            pass
+
+        value = self.getValue(expr)
+        originalType = self.getType(expr)
+        newType = token.val
+
+        self.value = self.getCastedValue(expr,value,originalType,newType)
+        SYMBOL_TABLE[IT] = {"type": newType, "value": self.value}
+
+        if isinstance(expr,VariableNode):
+            SYMBOL_TABLE[str(expr.token.val)] = {"type": newType, "value": self.value}
+
+    def getType(self,expr):
+        if isinstance(expr,VariableNode):
+            if expr.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(expr.token,"Variable not Initialized")
+            return SYMBOL_TABLE[expr.token.val]["type"]
+        elif isinstance(expr,(BooleanNode,ComparisonNode)):
+            return TROOF
+        elif isinstance(expr,SmooshNode):
+            return YARN
+
+    def getValue(self, expr):
+        if isinstance(expr,VariableNode):
+            if expr.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(expr.token,"Variable not Initialized")
+            return SYMBOL_TABLE[expr.token.val]["value"]
+        elif isinstance(expr,(BooleanNode,ComparisonNode)):
+            return expr.val
+        elif isinstance(expr,SmooshNode):
+            return expr.val
+
+    def getCastedValue(self,expr, value, originalType, newType):
+        res = None
+        if originalType == NUMBR:
+            if newType == "NUMBR":
+                res = int(value)
+            elif newType == "NUMBAR":
+                res = float(value)
+            elif newType == "YARN":
+                res = str(value)
+        elif originalType == NUMBAR:
+            if newType == "NUMBR":
+                res = int(value)
+            elif newType == "NUMBAR":
+                res = float(value)
+            elif newType == "YARN":
+                res = str(value)
+        elif originalType == YARN:
+            if newType == "NUMBR":
+                try:
+                    int(value)
+                except ValueError:
+                    raise ErrorSemantic(expr.token,"Unable to Typecast Yarn {value} to Numbr")
+                res = int(value)
+            elif newType == "NUMBAR":
+                try:
+                    float(value)
+                except ValueError:
+                    raise ErrorSemantic(expr.token,"Unable to Typecast Yarn {value} to Numbar")
+                res = float(value)
+            elif newType == "YARN":
+                res = str(value)
+
+        return res
 
 
 #MAEK EXPR AN TYPE
-class TypecastLongNode(BinOpNode):
+class TypecastLongNode(TypecastNode, BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
+    def run(self):
+        super().run(self.EXPR1,self.EXPR2)
+
 
 #MAEK EXPR possible
-class TypecastShortNode(DoubleOpNode):
+class TypecastShortNode(TypecastNode,DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
+
+    def run(self):
+        super().run(self.middle,self.right)
 
 
 #OPERATION EXPR
@@ -288,11 +615,27 @@ class SwitchNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
+    def run(self):
+        shouldContinue = False
+        for statement in self.right:
+            if statement.run(shouldContinue):
+                break;
+            
+            shouldContinue = True
+
 
 #OMG VALUE STATEMENT
 class SwitchCaseNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
+
+    def run(self, continuee=False):
+        if SYMBOL_TABLE[IT]['value'] == self.middle.value or continuee:
+            for statement in self.right:
+                statement.run()
+                if isinstance(statement,CaseBreakNode):
+                    return True
+        return False
 
 
 #OMGWTF
@@ -300,12 +643,25 @@ class DefaultCaseNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
+    def run(self):
+        for statement in self.right:
+            statement.run()
+        return True
 
 #
 class CaseBreakNode(BasicNode):
     def __init__(self, token):
         super().__init__(token)
 
+#ORLY
+class IfElseNode(DoubleOpNode):
+    def __init__(self, left, middle, right) -> None:
+        super().__init__(left, middle, right)
+
+    def run(self):
+        for statement in self.middle:
+            if statement.run():
+                break
 
 #ORLY
 class IfNode(UnaryOpNode):
@@ -313,10 +669,29 @@ class IfNode(UnaryOpNode):
         super().__init__(left, right)
 
 
+    def run(self):
+        if SYMBOL_TABLE[IT]['value'] == "WIN":
+            for statement in self.right:
+                statement.run()
+            return True
+
+        return False
+
+
 #MEBBE VALUE ELSEBODY
 class ElseIfNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
+
+    def run(self):
+        self.middle.run()
+
+        if SYMBOL_TABLE[IT]['value'] == "WIN":
+            for statement in self.right:
+                statement.run()
+
+            return True
+        return False
 
 
 #NOWAI
@@ -324,17 +699,10 @@ class ElseNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
-#"STRINGBODY"
-class StringNode(BasicNode):
-    def __init__(self, token) -> None:
-        super().__init__(token)
-
-
-#TRUE OR FALSE
-class TroofNode(BasicNode):
-    def __init__(self, token):
-        super().__init__(token)
-        self.value = True if self.token.val == "WIN" else False
+    def run(self):
+        for statement in self.right:
+            statement.run()
+        return False
 
 
 class LoopNodeShort:
@@ -352,6 +720,9 @@ class LoopNodeShort:
         return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.codeblock}, {self.del_end}, {self.label_end})'
 
 
+# IM IN YR <label> <operation> YR <variable> [TIL|WILE <expression>]
+# <code block>
+# IM OUTTA YR <label>
 class LoopNodeLong:
     def __init__(self, del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end) -> None:
         self.del_start = del_start
@@ -365,11 +736,43 @@ class LoopNodeLong:
         self.del_end = del_end
         self.label_end = label_end
 
+        if self.var.val not in VT:
+            raise ErrorSemantic(self.var,"Variable not Initialized")
+        #!!!!!!!!!!!! insert check if var can be casted into int
+
+        
+
     def __repr__(self) -> str:
         return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
 
+    #for the parser; check if it will loop again
+    def execute(self):
+        self.cond_expr = ComparisonNode(self.cond_expr.op_token, self.cond_expr.expr1 , self.cond_expr.an, self.cond_expr.expr2)
+        if self.cond.type == TT_UNTIL:
+            return not(toBool(self.cond_expr.value))
+        elif self.cond.type == TT_WHILE:
+            return toBool(self.cond_expr.value)
+        else:
+            return None
+
+    #for increment/decrement
+    def next(self):
+        if self.operation.type == TT_INC:
+            ST.append({"type": "variable", "token": self.var.val, "value": eval(VT[self.var.val] + "+1")})
+            ST[0]["value"] = str(eval(VT[self.var.val] + "+1"))
+            VT[self.var.val] = ST[0]["value"]
+        elif self.operation.type == TT_DEC:
+            ST.append({"type": "variable", "token": self.var.val, "value": eval(VT[self.var.val] + "-1")})
+            ST[0]["value"] = str(eval(VT[self.var.val] + "-1"))
+            VT[self.var.val] = ST[0]["value"]
+        else:
+            print(f'errorrr self.operation.type:{self.operation.type}')
 
 def printST():
-    for entry in ST:
-        print(entry)
+    for key,value in SYMBOL_TABLE.items():
+        print(key,value)
 
+
+SYMBOL_TABLE = {
+    IT: None
+}
