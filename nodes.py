@@ -365,9 +365,13 @@ class AssignmentNode():
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.value}
 
         elif EXPR.token.type in TT_INTEGER:
-            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": EXPR.value}
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": int(EXPR.token.val)}
+        
         elif EXPR.token.type in TT_FLOAT:
-            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBR, "value": EXPR.value}
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBR, "value": float(EXPR.token.val)}
+        
+        elif EXPR.token.type in TT_BOOLEAN:
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.token.val}
 
         else:
             if VAR.token.type not in TT_STRING:
