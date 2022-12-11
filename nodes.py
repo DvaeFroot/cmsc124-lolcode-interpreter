@@ -407,10 +407,6 @@ class AssignmentShortNode(DoubleOpNode,AssignmentNode):
 class ComparisonNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        self.op_token = OP_TOKEN
-        self.expr1 = EXPR1
-        self.an = AN
-        self.expr2 = EXPR2
 
     def run(self):
         self.EXPR1.run()
@@ -722,22 +718,6 @@ class ElseNode(UnaryOpNode):
             statement.run()
         return False
 
-
-class LoopNodeShort:
-    def __init__(self, del_start, label_start, operation, yr, var, codeblock, del_end, label_end) -> None:
-        self.del_start = del_start
-        self.label_start = label_start
-        self.operation = operation
-        self.yr = yr
-        self.var = var
-        self.codeblock = codeblock
-        self.del_end = del_end
-        self.label_end = label_end
-
-    def __repr__(self) -> str:
-        return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.codeblock}, {self.del_end}, {self.label_end})'
-
-
 # IM IN YR <label> <operation> YR <variable> [TIL|WILE <expression>]
 # <code block>
 # IM OUTTA YR <label>
@@ -754,18 +734,10 @@ class LoopNodeLong:
         self.del_end = del_end
         self.label_end = label_end
 
-        if self.var.val not in VT:
-            raise ErrorSemantic(self.var,"Variable not Initialized")
-        #!!!!!!!!!!!! insert check if var can be casted into int
-
-        
-
-    def __repr__(self) -> str:
-        return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
-
-    #for the parser; check if it will loop again
+#for the parser; check if it will loop again
     def execute(self):
-        self.cond_expr = ComparisonNode(self.cond_expr.op_token, self.cond_expr.expr1 , self.cond_expr.an, self.cond_expr.expr2)
+        # self.cond_expr = ComparisonNode(self.cond_expr.op_token, self.cond_expr.expr1 , self.cond_expr.an, self.cond_expr.expr2)
+        self.cond_expr.run()
         if self.cond.type == TT_UNTIL:
             return not(toBool(self.cond_expr.value))
         elif self.cond.type == TT_WHILE:
@@ -776,15 +748,28 @@ class LoopNodeLong:
     #for increment/decrement
     def next(self):
         if self.operation.type == TT_INC:
-            ST.append({"type": "variable", "token": self.var.val, "value": eval(VT[self.var.val] + "+1")})
-            ST[0]["value"] = str(eval(VT[self.var.val] + "+1"))
-            VT[self.var.val] = ST[0]["value"]
+            SYMBOL_TABLE[str(self.var.val)]["value"] += 1
+
         elif self.operation.type == TT_DEC:
-            ST.append({"type": "variable", "token": self.var.val, "value": eval(VT[self.var.val] + "-1")})
-            ST[0]["value"] = str(eval(VT[self.var.val] + "-1"))
-            VT[self.var.val] = ST[0]["value"]
+            SYMBOL_TABLE[str(self.var.val)]["value"] += 1
+
         else:
             print(f'errorrr self.operation.type:{self.operation.type}')
+
+    def run(self):
+        if self.var.val not in SYMBOL_TABLE:
+            raise ErrorSemantic(self.var,"Variable not Initialized")
+        #!!!!!!!!!!!! insert check if var can be casted into int
+
+        while(self.execute()):
+            for statement in self.codeblock:
+                statement.run()
+            self.next()
+
+    def __repr__(self) -> str:
+        # return f'{self.codeblock}'
+        return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
+
 
 def printST():
     for key,value in SYMBOL_TABLE.items():

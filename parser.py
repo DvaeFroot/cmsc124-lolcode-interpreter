@@ -1,7 +1,7 @@
 from token_types import *
 from nodes import *
 from error import *
-
+#type:ignore
 class Parser:
     def __init__(self, tokens,  txt_console=None, tbl_sym=None) -> None:
         self.tokens = tokens
@@ -10,7 +10,7 @@ class Parser:
         self.tbl_sym = tbl_sym
         self.insideString = False
         self.insideSmoosh = False
-
+        self.loop_token_idx = {}
 
     def advance(self):
         self.token_idx += 1
@@ -368,14 +368,37 @@ class Parser:
             return res
         return ErrorSyntax(self.current_tok, f"Expected \" at pos {self.current_tok.pos}")
 
-
-    def loopbody(self):
+# helper function for storing start and end token index of loops; to be stored in dictionary "self.loop_token_idx"
+# input:
+#  - label: String; start_label of loops
+# output:
+#  - self.loop_token_idx[label]: array; (starting index, ending index)
+    def loopbody(self, label):
+        self.loop_token_idx[label.val] = []
+        self.loop_token_idx[label.val].append(self.token_idx-1) #start index of loop
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_LOOP_END):
-                break
-            
-            yield self.statement()
+                if self.tokens[self.token_idx+1].type not in (TT_IDENTIFIER):
+                    raise ErrorSyntax(self.tokens[self.token_idx+1],f"Expected IDENTIFIER at pos{self.tokens[self.token_idx+1]}")
+                if label.val == self.tokens[self.token_idx+1].val:
+                    self.loop_token_idx[label.val].append(self.token_idx) #end index of loop
+                    break
+                else:
+                    pass # IM OUTTA YR encountered but wrong label
             self.advance()
+        # return self.loop_token_idx[label.val]
+
+
+# execution of loop codeblock
+    def executeLoop(self, start, end):
+        # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~entered loop")
+        self.token_idx = start
+        while(self.token_idx+1 < end):
+            # print(f'{self.token_idx} : {self.tokens[self.token_idx]}')
+            if self.tokens[self.token_idx+1].type in (TT_CODE_END):
+                break
+            self.advance()
+            yield self.statement()
 
     def loop(self):
         if self.current_tok.type in (TT_LOOP_STRT):
@@ -383,44 +406,48 @@ class Parser:
             label_start = self.advance()
             if label_start.type not in (TT_IDENTIFIER):
                 raise ErrorSyntax(self.current_tok, f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+            if label_start.val in self.loop_token_idx:
+                raise ErrorSyntax(self.current_tok,"Loop IDENTIFIER same as outer loop")
+            
             operation = self.advance()
             if operation.type not in (TT_INC, TT_DEC):
                 raise ErrorSyntax(self.current_tok,f"Expected UPPIN OR NERFIN at pos {self.current_tok.pos}")
+
             yr = self.advance()
             if yr.type not in (TT_YR):
                 raise ErrorSyntax(self.current_tok,f"Expected YR at pos {self.current_tok.pos}")
+
             var = self.advance()
             if var.type not in (TT_IDENTIFIER):
                 raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos {self.current_tok.pos}")
+
             cond = self.advance()
             if cond.type in (TT_WHILE, TT_UNTIL):
                 self.advance()
                 cond_expr = self.expr()
+
                 self.advance()
 
-                codeblock = list(self.loopbody())
+                #start & end token index of loop -> self.loop_token_idx[label_start.val]
+                self.loopbody(label_start)
+                
                 del_end = self.current_tok
 
                 if del_end.type not in (TT_LOOP_END):
                     raise ErrorSyntax(self.current_tok,f"Expected IM OUTTA YR at pos {self.current_tok}")
+
                 label_end = self.advance()
                 if label_end.type not in (TT_IDENTIFIER):
                     raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos{self.current_tok}")
+                if label_start.val != label_end.val:
+                    raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER \"{label_start.val}\" at pos{self.current_tok}")
 
-                res = LoopNodeLong(del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end)
-                return res
-
-            codeblock = list(self.loopbody())
-            del_end = self.current_tok
-            if del_end.type not in (TT_LOOP_END):
-                raise ErrorSyntax(self.current_tok,f"Expected IM OUTTA YR at pos {self.current_tok.pos}")
-            label_end = self.advance()
-            if label_end.type not in (TT_IDENTIFIER):
-                raise ErrorSyntax(self.current_tok,f"Expected IDENTIFIER at pos {self.current_tok.pos}")
-
-            res = LoopNodeShort(del_start, label_start, operation, yr, var, codeblock, del_end, label_end)
-            return res
-
+                #statements inside the loop
+                codeblock = list(self.executeLoop(self.loop_token_idx[label_start.val][0], self.loop_token_idx[label_start.val][1]))
+                
+                self.loop_token_idx.popitem()
+                self.advance()
+                return LoopNodeLong(del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end)
 
     def ifbody(self):
         while(self.token_idx < len(self.tokens)):
