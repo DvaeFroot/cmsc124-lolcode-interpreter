@@ -633,11 +633,14 @@ class SwitchNode(UnaryOpNode):
 
     def run(self):
         shouldContinue = False
+        didRun = False
+        shouldContinue = False
         for statement in self.right:
-            if statement.run(shouldContinue):
-                break;
-            
-            shouldContinue = True
+            didRun, shouldContinue = statement.run(didRun, shouldContinue)
+            if shouldContinue:
+                continue
+            if didRun:
+                break
 
 
 #OMG VALUE STATEMENT
@@ -645,13 +648,14 @@ class SwitchCaseNode(DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
 
-    def run(self, continuee=False):
-        if SYMBOL_TABLE[IT]['value'] == self.middle.value or continuee:
+    def run(self, didRun, continuee=False):
+        if SYMBOL_TABLE[IT]['value'] == self.middle.value or (didRun and continuee):
             for statement in self.right:
                 statement.run()
                 if isinstance(statement,CaseBreakNode):
-                    return True
-        return False
+                    return True, False
+                return True, True
+        return False, False
 
 
 #OMGWTF
@@ -659,10 +663,10 @@ class DefaultCaseNode(UnaryOpNode):
     def __init__(self, left, right):
         super().__init__(left, right)
 
-    def run(self):
+    def run(self, didRun, shouldContinue = False):
         for statement in self.right:
             statement.run()
-        return True
+        return True, False
 
 #
 class CaseBreakNode(BasicNode):
