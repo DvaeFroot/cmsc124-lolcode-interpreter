@@ -34,6 +34,39 @@ class Parser:
         return res
 
 
+    def code(self):
+        try:
+            resetSymbolTable()
+            #Start of code
+            start_node = self.advance()
+            
+            if start_node.type not in (TT_CODE_STRT):
+                raise ErrorSyntax(self.current_tok, f"Expected HAI at {self.current_tok.pos}")
+
+            body_node = list(self.body())
+
+            #End of code
+            end_node = self.current_tok
+
+            if end_node.type not in (TT_CODE_END):
+                raise ErrorSyntax(self.current_tok, f"Expected KTHBYE at pos {self.current_tok.pos}")
+
+            res = Program(start_node, body_node, end_node, self.tbl_sym)
+
+            return res
+        except Error as err:
+            return err
+    
+    
+    def body(self):
+        while(self.token_idx+1 < len(self.tokens)):
+            if self.seekToken().type in (TT_CODE_END) or self.current_tok.type in (TT_CODE_END):
+                break
+            
+            self.advance()
+            yield self.statement()
+
+
     def literal(self):
         if self.current_tok.type in (TT_FLOAT):
             return NumbarNode(self.current_tok)
@@ -47,7 +80,7 @@ class Parser:
         return ErrorSyntax(self.current_tok, "Not a literal")
 
 
-    def print(self):
+    def do_print(self):
         if self.current_tok.type in (TT_OUTPUT):
             self.insideString = True
             left = self.current_tok
@@ -301,7 +334,9 @@ class Parser:
             res = BooleanShortNode(op_token, expr)
             return res
 
-
+    """
+    START SWITCH STATEMENT
+    """
     def casebody(self):
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_BREAK, TT_CONTROL_END, TT_CASE):
@@ -346,6 +381,9 @@ class Parser:
         else:
             raise ErrorSyntax(self.current_tok, f"Expected OIC at {self.current_tok.pos}")
 
+    """
+    END SWITCH STATEMENT
+    """
 
     def string(self):
         if self.current_tok.type in (TT_STR_DELIMITER):
@@ -360,7 +398,9 @@ class Parser:
             return res
         return ErrorSyntax(self.current_tok, f"Expected \" at pos {self.current_tok.pos}")
 
-
+    """
+    START LOOP STATEMENT
+    """
     def loopbody(self):
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_LOOP_END):
@@ -404,7 +444,14 @@ class Parser:
             res = LoopNodeLong(del_start, label_start, operation, yr, var, cond, cond_expr, codeblock, del_end, label_end)
             return res
 
+    """
+    END LOOP STATEMENT
+    """
 
+    
+    """
+    START IF STATEMENT
+    """
     def ifbody(self):
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_ELIF, TT_ELSE, TT_CONTROL_END):
@@ -450,6 +497,9 @@ class Parser:
         else:
             raise ErrorSyntax(self.current_tok,f"Expected IF at pos {self.current_tok.pos}")
 
+    """
+    END IF STATEMENT
+    """
 
     def statement(self):
         res = None
@@ -458,7 +508,7 @@ class Parser:
         elif self.current_tok.type in (TT_READ):
             res = self.get_input()
         elif self.current_tok.type in (TT_OUTPUT):
-            res = self.print()
+            res = self.do_print()
         elif self.current_tok.type in (TT_VAR_DEC):
             res = self.variableLong()
         elif self.current_tok.type in (TT_IDENTIFIER):
@@ -484,36 +534,3 @@ class Parser:
             res = self.concatenation()
 
         return StatementNode("",res)
-
-
-    def body(self):
-        while(self.token_idx+1 < len(self.tokens)):
-            if self.seekToken().type in (TT_CODE_END) or self.current_tok.type in (TT_CODE_END):
-                break
-            
-            self.advance()
-            yield self.statement()
-
-
-    def code(self):
-        try:
-            resetSymbolTable()
-            #Start of code
-            start_node = self.advance()
-            
-            if start_node.type not in (TT_CODE_STRT):
-                raise ErrorSyntax(self.current_tok, f"Expected HAI at {self.current_tok.pos}")
-
-            body_node = list(self.body())
-
-            #End of code
-            end_node = self.current_tok
-
-            if end_node.type not in (TT_CODE_END):
-                raise ErrorSyntax(self.current_tok, f"Expected KTHBYE at pos {self.current_tok.pos}")
-
-            res = Program(start_node, body_node, end_node, self.tbl_sym)
-
-            return res
-        except Error as err:
-            return err
