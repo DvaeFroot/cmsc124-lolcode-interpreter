@@ -137,7 +137,7 @@ class YarnNode(BasicNode,LiteralNode):
     def __init__(self, token) -> None:
         super().__init__(token)
         self.value: str = str(token.val)
-        SYMBOL_TABLE[IT] = {"type": YARN, "value": self.value}
+        #  SYMBOL_TABLE[IT] = {"type": YARN, "value": self.value}
 
 #TRUE OR FALSE
 class TroofNode(BasicNode,LiteralNode):
@@ -156,7 +156,7 @@ class VariableNode(BasicNode):
 
     def run(self):
         print(self.token)
-        SYMBOL_TABLE[IT] = {"type": SYMBOL_TABLE[self.token.val]['type'], "value": SYMBOL_TABLE[self.token.val]['value']}
+        #  SYMBOL_TABLE[IT] = {"type": SYMBOL_TABLE[self.token.val]['type'], "value": SYMBOL_TABLE[self.token.val]['value']}
 
 
 
@@ -208,10 +208,10 @@ class ArithmeticNode(BinOpNode):
             SYMBOL_TABLE[IT] = {"type": NUMBAR, "value": self.value}
         else:
             SYMBOL_TABLE[IT] = {"type": NUMBR, "value": self.value}
-    
+
     def isNumbar(self, value:str):
         return True if "." in value else False
-    
+
     def check(self, INPUT):
         if isinstance(INPUT,ArithmeticNode):
             return str(INPUT.value)
@@ -224,7 +224,7 @@ class ArithmeticNode(BinOpNode):
                 raise ErrorSemantic(INPUT.token,"Variable contains Yarn. Unable to use Arithmetic operations on Yarn")
             except TypeError:
                 raise ErrorSemantic(INPUT.token,"Variable contains Nothing. Unable to use Arithmetic operations on Nothing")
-            
+
             return str(SYMBOL_TABLE[INPUT.token.val]["value"])
         elif isinstance(INPUT,YarnNode):
             try:
@@ -564,7 +564,7 @@ class TypecastNode:
 
 
 #MAEK EXPR AN TYPE
-class TypecastLongNode(BinOpNode,TypecastNode):
+class TypecastLongNode(TypecastNode, BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
 
@@ -573,7 +573,7 @@ class TypecastLongNode(BinOpNode,TypecastNode):
 
 
 #MAEK EXPR possible
-class TypecastShortNode(DoubleOpNode,TypecastNode):
+class TypecastShortNode(TypecastNode,DoubleOpNode):
     def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
 
