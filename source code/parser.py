@@ -88,6 +88,9 @@ class Parser:
             right = []
             suppress = False
             while 1:
+                an = self.seekToken()
+                if an.type in (TT_ARG_SEP):
+                    self.advance()
                 self.advance()
                 temptok = self.current_tok
                 exproutput = self.expr(raiseError=False)
