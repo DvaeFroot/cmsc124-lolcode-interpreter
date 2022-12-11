@@ -405,6 +405,44 @@ class AssignmentShortNode(DoubleOpNode,AssignmentNode):
         self.right.run()
         self.assign(self.left,self.right)
 
+    def assign(self,VAR,EXPR):
+        res = None
+        if isinstance(EXPR, VariableNode):
+            res = EXPR.run()
+
+        if SYMBOL_TABLE[str(VAR.token.val)]['type'] == NOOB:
+            pass
+
+        elif isinstance(EXPR, ArithmeticNode):
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": SYMBOL_TABLE[IT]["value"]}
+
+        elif isinstance(EXPR, BooleanNode):
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": SYMBOL_TABLE[IT]["value"]}
+
+        elif isinstance(EXPR, VariableNode):
+            if EXPR.token.val not in SYMBOL_TABLE:
+                raise ErrorSemantic(EXPR.token,"Variable not Initialized")
+
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": SYMBOL_TABLE[EXPR.token.val]["type"], "value": SYMBOL_TABLE[EXPR.token.val]["value"]}
+
+        elif isinstance(EXPR, TroofNode):
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.token.val}
+
+        elif isinstance(EXPR, TypecastNode):
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": TROOF, "value": EXPR.value}
+
+        elif EXPR.token.type in TT_INTEGER:
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": EXPR.value}
+        elif EXPR.token.type in TT_FLOAT:
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBR, "value": EXPR.value}
+
+        else:
+            if VAR.token.type not in TT_STRING:
+                if VAR.token.val.isdigit():
+                    SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": eval(EXPR.token.val)}
+
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": YARN, "value": EXPR.token.val}
+
 
 #OPERATION EXPR AN EXPR
 class ComparisonNode(BinOpNode):
@@ -632,11 +670,12 @@ class SwitchNode(UnaryOpNode):
         super().__init__(left, right)
 
     def run(self):
-        shouldContinue = False
         didRun = False
         shouldContinue = False
         for statement in self.right:
+            print(statement)
             didRun, shouldContinue = statement.run(didRun, shouldContinue)
+            print(didRun, shouldContinue)
             if shouldContinue:
                 continue
             if didRun:
@@ -654,7 +693,7 @@ class SwitchCaseNode(DoubleOpNode):
                 statement.run()
                 if isinstance(statement,CaseBreakNode):
                     return True, False
-                return True, True
+            return True, True
         return False, False
 
 
