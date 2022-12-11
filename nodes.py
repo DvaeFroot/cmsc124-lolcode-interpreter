@@ -32,9 +32,12 @@ def toValue(inputValue):
         if inputValue.token.val not in SYMBOL_TABLE:
             raise ErrorSemantic(inputValue.token,"Variable not Initialized")
 
-        return str(SYMBOL_TABLE[inputValue.token.val]["value"])
+        return SYMBOL_TABLE[inputValue.token.val]["value"]
     elif isinstance(inputValue,TroofNode):
         return inputValue.token.val
+    elif isinstance(inputValue,LiteralNode):
+        return inputValue.value
+    
 
     return inputValue.token.val
 
@@ -753,38 +756,22 @@ class LoopNodeLong:
         self.codeblock = codeblock
         self.del_end = del_end
         self.label_end = label_end
-
-        if self.var.val not in VT:
-            raise ErrorSemantic(self.var,"Variable not Initialized")
-        #!!!!!!!!!!!! insert check if var can be casted into int
-
-        
-
+    
+    def run(self):
+        value = 1 if self.operation.val == "UPPIN" else -1
+        while True:
+            self.cond_expr.run()
+            
+            if toBool(self.cond_expr.value):
+                break
+            
+            for statement in self.codeblock:
+                statement.run()
+            
+            SYMBOL_TABLE[self.var.val]["value"] += value
+    
     def __repr__(self) -> str:
         return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
-
-    #for the parser; check if it will loop again
-    def execute(self):
-        self.cond_expr = ComparisonNode(self.cond_expr.op_token, self.cond_expr.expr1 , self.cond_expr.an, self.cond_expr.expr2)
-        if self.cond.type == TT_UNTIL:
-            return not(toBool(self.cond_expr.value))
-        elif self.cond.type == TT_WHILE:
-            return toBool(self.cond_expr.value)
-        else:
-            return None
-
-    #for increment/decrement
-    def next(self):
-        if self.operation.type == TT_INC:
-            ST.append({"type": "variable", "token": self.var.val, "value": eval(VT[self.var.val] + "+1")})
-            ST[0]["value"] = str(eval(VT[self.var.val] + "+1"))
-            VT[self.var.val] = ST[0]["value"]
-        elif self.operation.type == TT_DEC:
-            ST.append({"type": "variable", "token": self.var.val, "value": eval(VT[self.var.val] + "-1")})
-            ST[0]["value"] = str(eval(VT[self.var.val] + "-1"))
-            VT[self.var.val] = ST[0]["value"]
-        else:
-            print(f'errorrr self.operation.type:{self.operation.type}')
 
 def printST():
     for key,value in SYMBOL_TABLE.items():
