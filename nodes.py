@@ -410,10 +410,6 @@ class AssignmentShortNode(DoubleOpNode,AssignmentNode):
 class ComparisonNode(BinOpNode):
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
         super().__init__(OP_TOKEN, EXPR1, AN, EXPR2)
-        self.op_token = OP_TOKEN
-        self.expr1 = EXPR1
-        self.an = AN
-        self.expr2 = EXPR2
 
     def run(self):
         self.EXPR1.run()
@@ -725,22 +721,6 @@ class ElseNode(UnaryOpNode):
             statement.run()
         return False
 
-
-class LoopNodeShort:
-    def __init__(self, del_start, label_start, operation, yr, var, codeblock, del_end, label_end) -> None:
-        self.del_start = del_start
-        self.label_start = label_start
-        self.operation = operation
-        self.yr = yr
-        self.var = var
-        self.codeblock = codeblock
-        self.del_end = del_end
-        self.label_end = label_end
-
-    def __repr__(self) -> str:
-        return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.codeblock}, {self.del_end}, {self.label_end})'
-
-
 # IM IN YR <label> <operation> YR <variable> [TIL|WILE <expression>]
 # <code block>
 # IM OUTTA YR <label>
@@ -779,6 +759,7 @@ class LoopNodeLong:
     
     def __repr__(self) -> str:
         return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
+
 
 def printST():
     for key,value in SYMBOL_TABLE.items():

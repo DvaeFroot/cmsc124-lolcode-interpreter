@@ -211,12 +211,6 @@ class Lexer(object):
                 
                 tokens.append(tok)
         
-        # remove new lines in end of tokens list
-        for x in range(len(tokens)-1,0,-1):
-            if (tokens[x].type in (TT_NEWLINE)):
-                tokens.pop()
-            else:
-                break
         return tokens
 
 #  if __name__ == "__main__":
