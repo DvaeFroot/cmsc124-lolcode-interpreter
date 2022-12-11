@@ -3,6 +3,7 @@ TT_TYPE =               'Type Literal'
 TT_BOOLEAN =            'Boolean Literal'
 TT_FLOAT =              'Float Literal'
 TT_INTEGER =            'Integer Literal'
+TT_NULL =               'Null Literal'
 
 #Keywords
 #START
