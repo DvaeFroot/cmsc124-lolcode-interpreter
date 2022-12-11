@@ -620,7 +620,7 @@ class TypecastNode:
             elif newType == "YARN":
                 res = str(value)
             elif newType == "NOOB":
-                raise ErrorSemantic(expr.token,"Unable to Typecast NUMBR {value} to NOOB")
+                raise ErrorSemantic(expr.token,f"Unable to Typecast NUMBR {value} to NOOB")
         elif originalType == NUMBAR:
             if newType == "NUMBR":
                 res = int(value)
@@ -629,19 +629,19 @@ class TypecastNode:
             elif newType == "YARN":
                 res = str(value)
             elif newType == "NOOB":
-                raise ErrorSemantic(expr.token,"Unable to Typecast NUMBAR {value} to NOOB")
+                raise ErrorSemantic(expr.token,f"Unable to Typecast NUMBAR {value} to NOOB")
         elif originalType == YARN:
             if newType == "NUMBR":
                 try:
                     int(value)
                 except ValueError:
-                    raise ErrorSemantic(expr.token,"Unable to Typecast Yarn {value} to Numbr")
+                    raise ErrorSemantic(expr.token,f"Unable to Typecast Yarn {value} to Numbr")
                 res = int(value)
             elif newType == "NUMBAR":
                 try:
                     float(value)
                 except ValueError:
-                    raise ErrorSemantic(expr.token,"Unable to Typecast Yarn {value} to Numbar")
+                    raise ErrorSemantic(expr.token,f"Unable to Typecast Yarn {value} to Numbar")
                 res = float(value)
             elif newType == "YARN":
                 res = str(value)
