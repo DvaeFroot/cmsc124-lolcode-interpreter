@@ -168,7 +168,6 @@ class VariableNode(BasicNode):
         super().__init__(token)
 
     def run(self):
-        #  print(self.token)
         if not IS_OPERATING:
             if self.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(self.token,"Variable not Initialized")
@@ -677,9 +676,7 @@ class SwitchNode(UnaryOpNode):
         didRun = False
         shouldContinue = False
         for statement in self.right:
-            print(statement)
             didRun, shouldContinue = statement.run(didRun, shouldContinue)
-            print(didRun, shouldContinue)
             if shouldContinue:
                 continue
             if didRun:
