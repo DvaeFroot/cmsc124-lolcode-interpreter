@@ -642,9 +642,8 @@ class SwitchNode(UnaryOpNode):
 
 #OMG VALUE STATEMENT
 class SwitchCaseNode(DoubleOpNode):
-    def __init__(self, left, middle, right, gtfo = None) -> None:
+    def __init__(self, left, middle, right) -> None:
         super().__init__(left, middle, right)
-        self.gtfo = gtfo
 
     def run(self, continuee=False):
         if SYMBOL_TABLE[IT]['value'] == self.middle.value or continuee:

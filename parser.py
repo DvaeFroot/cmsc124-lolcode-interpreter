@@ -314,12 +314,6 @@ class Parser:
             self.advance()
 
 
-    def casebreak(self):
-        if self.tokens[self.token_idx].type not in (TT_CASEBREAK):
-            return None
-        return CaseBreakNode(self.advance())
-
-
     def switchcase(self):
         while(self.token_idx < len(self.tokens)):
             if self.tokens[self.token_idx].type in (TT_CONTROL_END):
@@ -336,9 +330,7 @@ class Parser:
             value = self.literal()
             self.advance()
             casebody = list(self.casebody())
-            casebreak = self.casebreak()
-            #  print(casebody)
-            yield SwitchCaseNode(omg, value, casebody, casebreak)
+            yield SwitchCaseNode(omg, value, casebody)
 
 
     def switch(self):
