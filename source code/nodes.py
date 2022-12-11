@@ -348,7 +348,7 @@ class VisibleNode(UnaryOpNode):
 class AssignmentNode():
     def assign(self,VAR,EXPR):
         if EXPR == None or isinstance(EXPR, NoobNode):
-            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NOOB, "value": None}
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NOOB, "value": "NOOB"}
 
         elif isinstance(EXPR, ArithmeticNode):
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": SYMBOL_TABLE[IT]["value"]}
