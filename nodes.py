@@ -15,11 +15,14 @@ def resetSymbolTable():
     global SYMBOL_TABLE
     SYMBOL_TABLE = {}
 
+
 def toBool(value):
     return True if value == "WIN" else False
 
+
 def toTroof(value):
     return "WIN" if value else "FAIL"
+
 
 def toValue(inputValue):
     if isinstance(inputValue,ArithmeticNode):
@@ -33,6 +36,7 @@ def toValue(inputValue):
         return inputValue.token.val
 
     return inputValue.token.val
+
 
 class BasicNode:
     def __init__(self,token):
@@ -55,6 +59,7 @@ class UnaryOpNode:
 
     def run(self):
         pass
+
 
 class BinOpNode:
     def __init__(self, OP_TOKEN, EXPR1, AN, EXPR2) -> None:
@@ -126,11 +131,13 @@ class NumbrNode(BasicNode,LiteralNode):
         super().__init__(token)
         self.value: int = int(token.val)
 
+
 # FLOATS
 class NumbarNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
         self.value: float = float(token.val)
+
 
 #"STRINGBODY"
 class YarnNode(BasicNode,LiteralNode):
@@ -139,11 +146,13 @@ class YarnNode(BasicNode,LiteralNode):
         self.value: str = str(token.val)
         #  SYMBOL_TABLE[IT] = {"type": YARN, "value": self.value}
 
+
 #TRUE OR FALSE
 class TroofNode(BasicNode,LiteralNode):
     def __init__(self, token):
         super().__init__(token)
         self.value = True if self.token.val == "WIN" else False
+
 
 class OperatorNode(BasicNode):
     def __init__(self, token):
@@ -155,9 +164,9 @@ class VariableNode(BasicNode):
         super().__init__(token)
 
     def run(self):
-        print(self.token)
+        #  print(self.token)
         #  SYMBOL_TABLE[IT] = {"type": SYMBOL_TABLE[self.token.val]['type'], "value": SYMBOL_TABLE[self.token.val]['value']}
-
+        pass
 
 
 class StatementNode(UnaryOpNode):
@@ -254,6 +263,7 @@ class GimmehNode(UnaryOpNode):
         self.txt_console.insert(INSERT,str(answer)+'\n')
         self.txt_console.configure(state=DISABLED)
 
+
 #SMOOSH
 class SmooshNode(UnaryOpNode):
     def __init__(self, left, right):
@@ -282,6 +292,7 @@ class SmooshNode(UnaryOpNode):
             return str(value.value)
         else:
             return str(value.token.val)
+
 
 #VISIBLE
 class VisibleNode(UnaryOpNode):
@@ -314,6 +325,7 @@ class VisibleNode(UnaryOpNode):
             self.txt_console.configure(state=NORMAL)
             self.txt_console.insert(INSERT,"".join(output))
             self.txt_console.configure(state=DISABLED)
+
 
 class AssignmentNode():
     def assign(self,VAR,EXPR):
@@ -349,6 +361,7 @@ class AssignmentNode():
                     SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": eval(EXPR.token.val)}
 
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": YARN, "value": EXPR.token.val}
+
 
 #I HAS A Variable
 class AssignmentShlongNode(UnaryOpNode,AssignmentNode):
@@ -400,9 +413,14 @@ class ComparisonNode(BinOpNode):
         self.value = toTroof(output)
         SYMBOL_TABLE[IT] = {"type": TROOF, "value": self.value}
 
+
 class BooleanNode():
     def tobool(self,INPUT):
-        return True if self.check(INPUT) == "WIN" else FALSE
+        if isinstance(INPUT, ComparisonNode):
+            INPUT.run()
+            return True if SYMBOL_TABLE[IT]['value'] == "WIN" else False
+
+        return True if self.check(INPUT) == "WIN" else False
 
     def totroof(self,INPUT):
         return "WIN" if INPUT else "FAIL"
@@ -423,7 +441,7 @@ class BooleanNode():
                 raise ErrorSemantic(INPUT.token,"Unable to use Boolean operations on Yarn")
 
         raise ErrorSemantic(INPUT.token,"Invalid value for boolean operations")
-        # return str(INPUT.token.val)
+
 
 class BooleanInfNode(UnaryOpNode, BooleanNode):
     def __init__(self, op_token, left, right):
@@ -707,6 +725,7 @@ class LoopNodeLong:
 def printST():
     for key,value in SYMBOL_TABLE.items():
         print(key,value)
+
 
 SYMBOL_TABLE = {
     IT: None

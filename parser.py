@@ -282,7 +282,6 @@ class Parser:
 
             res = BooleanInfNode(op_token, left, right)
             return res
-
         elif self.current_tok.type in GP_BOOLEAN_LONG:
             op_token = self.current_tok
             self.advance()
@@ -477,7 +476,7 @@ class Parser:
                 res = self.variable()
         elif self.current_tok.type in (GP_COMPARISON):
             res = self.comparison()
-        elif self.current_tok.type in (*GP_BOOLEAN_LONG, *GP_BOOLEAN_SHORT):
+        elif self.current_tok.type in (*GP_BOOLEAN_LONG, *GP_BOOLEAN_SHORT, *GP_BOOLEAN_INF):
             res = self.boolean()
         elif self.current_tok.type in (TT_TYPECAST_2):
             res = self.typecast()
