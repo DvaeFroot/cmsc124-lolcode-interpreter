@@ -27,14 +27,17 @@ def toTroof(value):
 
 def toValue(inputValue):
     if isinstance(inputValue,ArithmeticNode):
-        return str(inputValue.value)
+        return inputValue.value
     elif isinstance(inputValue, VariableNode):
         if inputValue.token.val not in SYMBOL_TABLE:
             raise ErrorSemantic(inputValue.token,"Variable not Initialized")
 
-        return str(SYMBOL_TABLE[inputValue.token.val]["value"])
+        return SYMBOL_TABLE[inputValue.token.val]["value"]
     elif isinstance(inputValue,TroofNode):
         return inputValue.token.val
+    elif isinstance(inputValue,LiteralNode):
+        return inputValue.value
+    
 
     return inputValue.token.val
 
@@ -733,41 +736,28 @@ class LoopNodeLong:
         self.codeblock = codeblock
         self.del_end = del_end
         self.label_end = label_end
-
-#for the parser; check if it will loop again
-    def execute(self):
-        # self.cond_expr = ComparisonNode(self.cond_expr.op_token, self.cond_expr.expr1 , self.cond_expr.an, self.cond_expr.expr2)
-        self.cond_expr.run()
-        if self.cond.type == TT_UNTIL:
-            return not(toBool(self.cond_expr.value))
-        elif self.cond.type == TT_WHILE:
-            return toBool(self.cond_expr.value)
-        else:
-            return None
-
-    #for increment/decrement
-    def next(self):
-        if self.operation.type == TT_INC:
-            SYMBOL_TABLE[str(self.var.val)]["value"] += 1
-
-        elif self.operation.type == TT_DEC:
-            SYMBOL_TABLE[str(self.var.val)]["value"] += 1
-
-        else:
-            print(f'errorrr self.operation.type:{self.operation.type}')
-
+    
     def run(self):
-        if self.var.val not in SYMBOL_TABLE:
-            raise ErrorSemantic(self.var,"Variable not Initialized")
-        #!!!!!!!!!!!! insert check if var can be casted into int
+        value = 1 if self.operation.val == "UPPIN" else -1
+        cond = True if self.cond.type == TT_UNTIL else False
+        
+        while True:
+            self.cond_expr.run()
 
-        while(self.execute()):
+            if cond:
+                if toBool(self.cond_expr.value):
+                    break
+            else:
+                if not toBool(self.cond_expr.value):
+                    break
+            
             for statement in self.codeblock:
                 statement.run()
-            self.next()
-
+            
+            SYMBOL_TABLE[self.var.val]["value"] += value
+            
+    
     def __repr__(self) -> str:
-        # return f'{self.codeblock}'
         return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
 
 
