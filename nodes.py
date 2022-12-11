@@ -27,7 +27,7 @@ def toTroof(value):
 
 def toValue(inputValue):
     if isinstance(inputValue,ArithmeticNode):
-        return str(inputValue.value)
+        return inputValue.value
     elif isinstance(inputValue, VariableNode):
         if inputValue.token.val not in SYMBOL_TABLE:
             raise ErrorSemantic(inputValue.token,"Variable not Initialized")
@@ -759,16 +759,23 @@ class LoopNodeLong:
     
     def run(self):
         value = 1 if self.operation.val == "UPPIN" else -1
+        cond = True if self.cond.type == TT_UNTIL else False
+        
         while True:
             self.cond_expr.run()
-            
-            if toBool(self.cond_expr.value):
-                break
+
+            if cond:
+                if toBool(self.cond_expr.value):
+                    break
+            else:
+                if not toBool(self.cond_expr.value):
+                    break
             
             for statement in self.codeblock:
                 statement.run()
             
             SYMBOL_TABLE[self.var.val]["value"] += value
+            
     
     def __repr__(self) -> str:
         return f'({self.del_start}, {self.label_start}, {self.operation}, {self.yr}, {self.var}, {self.cond},{self.cond_expr},{self.codeblock}, {self.del_end})'
