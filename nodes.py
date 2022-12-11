@@ -100,12 +100,12 @@ class Program(DoubleOpNode):
             statement.run()
 
         #  printST()
-        
+
         if self.tbl_sym is not None:
             # clear previous items in the lexemes treeview
             for x in self.tbl_sym.get_children():
                 self.tbl_sym.delete(x)
-            
+
             for index,key in enumerate(SYMBOL_TABLE):
                 if SYMBOL_TABLE[key]["type"] == YARN:
                     self.tbl_sym.insert("",'end',iid=index,
@@ -190,7 +190,7 @@ class ArithmeticNode(BinOpNode):
 
         left = self.check(self.EXPR1)
         right = self.check(self.EXPR2)
-        
+
         isNumbar = self.isNumbar(left) or self.isNumbar(right)
 
         if self.OP_TOKEN.type in (TT_SUMMATION):
@@ -228,6 +228,10 @@ class ArithmeticNode(BinOpNode):
         elif isinstance(INPUT, VariableNode):
             if INPUT.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(INPUT.token,"Variable not Initialized")
+            if SYMBOL_TABLE[INPUT.token.val]['type'] in TROOF:
+                raise ErrorSemantic(INPUT.token,"Variable contains TROOF. Unable to use Arithmetic operatons on TROOF")
+            if SYMBOL_TABLE[INPUT.token.val]['type'] in NOOB:
+                raise ErrorSemantic(INPUT.token,"Variable contains NOOB. Unable to use Arithmetic operatons on NOOB")
             try:
                 float(SYMBOL_TABLE[INPUT.token.val]["value"])
             except ValueError:
@@ -316,10 +320,10 @@ class VisibleNode(UnaryOpNode):
                 output.append(str(value.value))
             else:
                 output.append(str(value.token.val))
-        
+
         if not self.suppress:
             output.append('\n')
-        
+
         if self.txt_console is None:
             # CLI
             print("".join(output))
@@ -334,9 +338,9 @@ class VisibleNode(UnaryOpNode):
 
 class AssignmentNode():
     def assign(self,VAR,EXPR):
-        if EXPR == None:
-            SYMBOL_TABLE[str(VAR.token.val)] = {"type": None, "value": None}
-            
+        if EXPR == None or isinstance(EXPR, NoobNode):
+            SYMBOL_TABLE[str(VAR.token.val)] = {"type": NOOB, "value": None}
+
         elif isinstance(EXPR, ArithmeticNode):
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": NUMBAR, "value": SYMBOL_TABLE[IT]["value"]}
 
@@ -346,7 +350,7 @@ class AssignmentNode():
         elif isinstance(EXPR, VariableNode):
             if EXPR.token.val not in SYMBOL_TABLE:
                 raise ErrorSemantic(EXPR.token,"Variable not Initialized")
-            
+
             SYMBOL_TABLE[str(VAR.token.val)] = {"type": SYMBOL_TABLE[EXPR.token.val]["type"], "value": SYMBOL_TABLE[EXPR.token.val]["value"]}
 
         elif isinstance(EXPR, TroofNode):
@@ -557,13 +561,24 @@ class TypecastNode:
 
     def getCastedValue(self,expr, value, originalType, newType):
         res = None
-        if originalType == NUMBR:
+        if originalType == NOOB:
+            if newType == "TROOF":
+                res = False
+            elif newType == "NUMBR":
+                res = 0
+            elif newType == "NUMBAR":
+                res = 0
+            elif newType == "YARN":
+                res = ""
+        elif originalType == NUMBR:
             if newType == "NUMBR":
                 res = int(value)
             elif newType == "NUMBAR":
                 res = float(value)
             elif newType == "YARN":
                 res = str(value)
+            elif newType == "NOOB":
+                raise ErrorSemantic(expr.token,"Unable to Typecast NUMBR {value} to NOOB")
         elif originalType == NUMBAR:
             if newType == "NUMBR":
                 res = int(value)
@@ -571,6 +586,8 @@ class TypecastNode:
                 res = float(value)
             elif newType == "YARN":
                 res = str(value)
+            elif newType == "NOOB":
+                raise ErrorSemantic(expr.token,"Unable to Typecast NUMBAR {value} to NOOB")
         elif originalType == YARN:
             if newType == "NUMBR":
                 try:
@@ -614,14 +631,12 @@ class SwitchNode(UnaryOpNode):
         super().__init__(left, right)
 
     def run(self):
-        gtfo = False
-        is_run = False
+        shouldContinue = False
         for statement in self.right:
-            is_run, gtfo = statement.run(is_run, gtfo)
-            if not gtfo:
-                continue
-            if is_run:
-                break
+            if statement.run(shouldContinue):
+                break;
+            
+            shouldContinue = True
 
 
 #OMG VALUE STATEMENT
@@ -630,12 +645,13 @@ class SwitchCaseNode(DoubleOpNode):
         super().__init__(left, middle, right)
         self.gtfo = gtfo
 
-    def run(self, is_run, gtfo):
-        if SYMBOL_TABLE[IT]['value'] == self.middle.value or (is_run and not gtfo):
+    def run(self, continuee=False):
+        if SYMBOL_TABLE[IT]['value'] == self.middle.value or continuee:
             for statement in self.right:
                 statement.run()
-            return True, True if self.gtfo != None else False
-        return False, False
+                if isinstance(statement,CaseBreakNode):
+                    return True
+        return False
 
 
 #OMGWTF

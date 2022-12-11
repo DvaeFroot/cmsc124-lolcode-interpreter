@@ -304,10 +304,13 @@ class Parser:
 
     def casebody(self):
         while(self.token_idx < len(self.tokens)):
-            if self.tokens[self.token_idx].type in (TT_BREAK, TT_CASE, TT_CONTROL_END, TT_CASEBREAK):
-                 break
+            if self.tokens[self.token_idx].type in (TT_BREAK, TT_CONTROL_END, TT_CASE):
+                break
 
-            yield self.statement()
+            if self.current_tok.type in (TT_CASEBREAK):
+                yield CaseBreakNode(self.current_tok)
+            else:
+                yield self.statement()
             self.advance()
 
 
