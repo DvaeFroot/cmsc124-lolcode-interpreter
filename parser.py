@@ -532,7 +532,7 @@ class Parser:
 
     def body(self):
         while(self.token_idx+1 < len(self.tokens)):
-            if self.seekToken().type in (TT_CODE_END):
+            if self.seekToken().type in (TT_CODE_END) or self.current_tok.type in (TT_CODE_END):
                 break
             
             self.advance()
@@ -543,11 +543,10 @@ class Parser:
         try:
             resetSymbolTable()
             #Start of code
-            start_node = self.advance()
-            
+            start_node = self.tokens[0]
+            self.advance()
             if start_node.type not in (TT_CODE_STRT):
                 raise ErrorSyntax(self.current_tok, f"Expected HAI at {self.current_tok.pos}")
-
             body_node = list(self.body())
 
             #End of code
