@@ -249,6 +249,11 @@ class ArithmeticNode(BinOpNode):
                 float(INPUT.token.val)
             except ValueError:
                 raise ErrorSemantic(INPUT.token,"Unable to use Arithmetic operations on Yarn")
+        elif isinstance(INPUT, TroofNode):
+            if INPUT.token.val == "WIN":
+                return "1"
+            else:
+                return "0"
 
         return str(INPUT.token.val)
 
