@@ -543,8 +543,8 @@ class Parser:
         try:
             resetSymbolTable()
             #Start of code
-            start_node = self.tokens[0]
-            self.advance()
+            start_node = self.advance()
+            
             if start_node.type not in (TT_CODE_STRT):
                 raise ErrorSyntax(self.current_tok, f"Expected HAI at {self.current_tok.pos}")
             body_node = list(self.body())
